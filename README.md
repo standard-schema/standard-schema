@@ -2,7 +2,7 @@
 
 # _Standard Schema_
 
-This is a proposal for a standard interface to be adopted across TypeScript validation libraries. The goal is to make it easier for library authors to accept user-defined schemas as part of their API, in a library-agnostic way.
+This is a proposal for a standard interface to be adopted across TypeScript validation libraries. The goal is to make it easier for open-source libraries to accept user-defined schemas as part of their API, in a library-agnostic way.
 
 ## Usage: Accepting user-defined schemas
 
@@ -19,87 +19,91 @@ function inferSchema<T extends InferSchema>(schema: T) {
 }
 ```
 
-Then pass this schema through the `standardizeSchema` utility function to "convert" it to a standard format with the following type signature.
+The `InferSchema` type is a simple interface. All _Standard Schema_ compatible schemas must conform to this interface.
 
 ```ts
-interface StandardSchema<O, I> {
-  _output: O;
-  _input: I;
-  validate(data: I): O | ValidationError;
+interface InferSchema<T> {
+  // must be visible in the public type signature
+  '{type}': T;
+
+  // can be hidden from the public type signature (runtime only)
+  '{validate}': (data: unknown) => T | ValidationError;
+}
+
+interface ValidationError {
+  '{validation_error}': true;
+  issues: Issue[];
+}
+
+interface Issue {
+  message: string;
+  path: (string | number | symbol)[];
 }
 ```
 
-To validate schema with this schema, you can call the `validate` method. It returns `ValidationError | T`, where `T` is the inferred type of the schema.
+The `{type}` key allows consuming libraries to easily extract the _inferred type_ of the schema. The `{validate}` symbol corresponds to a runtime validation method with a standard return type signature. Libraries can expect this method to be defined on all _Standard Schema_ compatible schemas.
 
 ```ts
-var userDefinedSchema = makeSchema<{ name: string }>();
+const someSchema = {
+  /* some user-defined schema */
+};
 
-const schema = inferSchema(zodSchema);
-const result = schema.validate({ name: 'hello' });
+const standardizedSchema = inferSchema(someSchema);
+const result = standardizedSchema[Symbol.for('{validate}')]({ name: 'Billie' });
 if (isValidationError(result)) {
-  console.log(result.issues);
+  result.issues; // detailed error reporting
 } else {
-  result.name;
+  result.name; // fully typed
 }
 ```
 
 ## Usage: Schema library authors
 
-### "Self-documenting" schemas
-
-Instead of forcing all schema libraries to conform to a standard interface, this allows schema libraries to be "self-documenting". All compatible schema must conform to the following interface.
+Add the `{type}` property to your base class or interface. This property should correspond to the inferred type of the schema.
 
 ```ts
-type InferSchema<OutputType extends Key = Key, InputType extends Key = Key> = {
-  ['{schema}']: {
-    validateMethod: Key;
-    outputType: OutputType;
-    inputType: InputType;
-  };
-};
-```
-
-The `{schema}` property corresponds to a metadata object. This metadata objects tells the consuming library how to extract the inferred type from the schema.
-
-All schemas have a `{schema}` property in their type signature. This makes it easy to statically verify that a schema conforms to the _Standard Schema_ format. This `{schema}` property contains the information required to both a) infer static types and b) validate data against the schema at runtime.
-
-### Example
-
-Here's an example of a schema library that conforms to the _Standard Schema_ format.
-
-```ts
-class Schema<T> {
-  _output: T;
-  validate(input: unknown): T | ValidationError;
-
-  ['{schema}']: {
-    validateMethod: 'validate';
-    outputType: '_output';
-    // default to `outputType` if the library has no concept of "input types"
-    inputType: '_output';
-  };
+class BaseSchema<T> {
+  '{type}': T;
 }
 ```
 
-A consuming library can use the `InferSchema` utility to infer the type of this schema, then use the contained information to extract the output type and run the validation method.
-
-### Avoiding auto-complete clutter
-
-Is this actually better than asking all libraries to simply conform to a standard interface, like the one below?
+Next, implement a validation method that conforms to the following signature.
 
 ```ts
-interface StandardSchema<O, I> {
-  '{validate}': (data: any) => O | ValidationError;
-  '{output}': O;
-  '{input}': I;
-}
+type ValidationMethod<T> = (data: unknown) => T | ValidationError;
 ```
 
-One of the goals of this proposal is to make it as east as possible for schema libraries to conform to Standard Schema without cluttering their type signatures.
+This can be hidden from the public type signature, as it's only used at runtime.
 
-The main advantage of the proposed approach is that it allows schema libraries to define their own methods and properties on the schema object. It may not be desirable to attach obscure-looking properties like `{validate}` to a schema, where it clutters auto-complete and can confuse users.
+```ts
+class StringSchema {
+  '{type}': string;
 
-<!-- > The runtime validation method doesn't need to be visible in the TypeScript signature. This allows schema libraries to comply with _Standard Schema_ without cluttering up their Intellisense signatures. -->
+  // simple parse method
+  parse(data: unknown) {
+    if (typeof data !== 'string') throw new Error('Expected a string');
+    return data;
+  }
+
+  // defining a {validate} method that conforms to the standard signature
+  // can be private or protected
+  private '{validate}'(data: unknown) {
+    try {
+      return this.parse(data);
+    } catch (err) {
+      return {
+        ['{validation_error}']: true,
+        issues: [
+          {
+            message: err.message,
+            path: [],
+          },
+        ],
+      };
+    }
+  }
+}
+```
 
 ### Why braces `{}`?
 
@@ -137,6 +141,21 @@ So if the standard type signatures used a symbol declared with `Symbol.for()`, t
 
 Ideally, it would be possible to ship a _Standard Schema_ compatible library without incurring any new runtime dependencies. (While `standard-schema` does export some utility functions, these are not required to use the _Standard Schema_ format.) Thus, we're left with string literals.
 
+### About `ValidationError`
+
+The notable part of the `ValidationError` interface is what it _doesn't_ include. Namely, there's no indication that it extends `Error`. As mentioned elsewhere, it's expensive to allocate `Error` instances in JavaScript, since it captures the stack trace at the time of creation.
+
+Instead, the `ValidationError` is a simple object with an `issues` property. Each issue is an object that conforms to the following interface.
+
+```ts
+interface Issue {
+  message: string;
+  path: string[];
+}
+```
+
+This is intended to be as minimal as possible, while supporting common use cases like form validation.
+
 ### Why does the validate method return a union?
 
 The validation method must conform to the following interface:
@@ -173,18 +192,3 @@ interface Schema<O> {
 This necessarily involves allocating a new object on every parse operation. For performance-sensitive applications, this isn't acceptable.
 
 Instead, the proposed validation method is expected to return a simple union of `T` and `ValidationError`.
-
-### About `ValidationError`
-
-The notable part of the `ValidationError` interface is what it _doesn't_ include. Namely, there's no indication that it extends `Error`. As mentioned elsewhere, it's expensive to allocate `Error` instances in JavaScript, since it captures the stack trace at the time of creation.
-
-Instead, the `ValidationError` is a simple object with an `issues` property. Each issue is an object that conforms to the following interface.
-
-```ts
-interface Issue {
-  message: string;
-  path: string[];
-}
-```
-
-This is intended to be as minimal as possible, while supporting common use cases like form validation.

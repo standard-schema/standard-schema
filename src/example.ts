@@ -1,40 +1,27 @@
 import {
   InferSchema,
-  STANDARD_SCHEMA,
   ValidationError,
   isValidationError,
   standardizeSchema,
-} from '.';
+} from '../src';
 
-class ZodSchema<T> {
-  _output!: T;
-  _input!: unknown;
+class BaseSchema<T> {
+  '{type}': T;
   validate(data: unknown): T {
-    return data as T;
+    // do validation logic here
+    if (Math.random() < 0.5) return data as T;
+    throw new Error('Invalid data');
   }
-  // compatible schemas declare the following metadata about themselves
-  ['{standard_schema}'] = {
-    // how to extract inferred output type
-    outputType: '_output',
-    // how to extract inferred input type
-    inputType: '_input',
-    // the name of the schemas validation method
-    // should return (T | ValidationError)
-    validateMethod: 'validate',
-  } as const;
-}
-
-export declare const as: unique symbol;
-class ArkType<T> {
-  [as]!: T;
-  allows(data: unknown): T | ValidationError {
-    return data as T;
+  private '{validate}'(data: unknown): T | ValidationError {
+    try {
+      return this.validate(data);
+    } catch (err) {
+      return {
+        '{validation_error}': true,
+        issues: [{ message: err.message, path: [] }],
+      };
+    }
   }
-  ['{standard_schema}'] = {
-    outputType: as,
-    inputType: as,
-    validateMethod: 'allows',
-  } as const;
 }
 
 // example usage in libraries
@@ -42,26 +29,11 @@ function inferSchema<T extends InferSchema>(schema: T) {
   return standardizeSchema(schema);
 }
 
-// Zod example
-{
-  var zodSchema!: ZodSchema<{ name: string }>;
-  const schema = inferSchema(zodSchema);
-  const result = schema.validate({ name: 'hello' });
-  if (isValidationError(result)) {
-    console.log(result.issues);
-  } else {
-    result.name;
-  }
-}
-
-// ArkType example
-{
-  var arkTypeSchema!: ArkType<{ name: string }>;
-  const schema = inferSchema(arkTypeSchema);
-  const result = schema.validate({ name: 'hello' });
-  if (isValidationError(result)) {
-    console.log(result.issues);
-  } else {
-    result.name;
-  }
+declare var someSchema: BaseSchema<{ name: string }>;
+const schema = inferSchema(someSchema);
+const result = schema['{validate}']({ name: 'hello' });
+if (isValidationError(result)) {
+  console.log(result.issues);
+} else {
+  result.name;
 }
