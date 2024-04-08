@@ -133,7 +133,7 @@ const anotherObject: typeof object = {
 
 So if the standard type signatures used a symbol declared with `Symbol.for()`, that exact symbol would need to be exported at runtime and imported by any consuming libraries. This means consumers would need to include `standard-library` as a runtime dependency.
 
-Ideally, it would be possible to ship a _Standard Schema_ compatible library without incurring any new runtime dependencies. While `standard-schema` does export some utility functions, these are not required to use the _Standard Schema_ format.
+Ideally, it would be possible to ship a _Standard Schema_ compatible library without incurring any new runtime dependencies. (While `standard-schema` does export some utility functions, these are not required to use the _Standard Schema_ format.) Thus, we're left with string literals.
 
 ### Why does the validate method return a union?
 
