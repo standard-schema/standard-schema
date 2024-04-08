@@ -30,9 +30,3 @@ export function standardizeSchema<T extends InputSchema>(schema: T) {
 export function isValidationError(result: unknown): result is ValidationError {
   return (result as ValidationError)[VALIDATION_ERROR] === true;
 }
-
-const testSymbol = Symbol.for('{type}');
-const object = {
-  [testSymbol]: 'some data',
-  validate() {},
-};
