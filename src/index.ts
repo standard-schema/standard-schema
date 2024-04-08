@@ -1,5 +1,5 @@
 type Key = keyof any;
-// export const STANDARD_SCHEMA = '{standard_schema}' as const;
+export const STANDARD_SCHEMA = '{standard_schema}';
 export type STANDARD_SCHEMA = '{standard_schema}';
 export type InferSchema<
   OutputType extends Key = Key,
@@ -12,7 +12,7 @@ export type InferSchema<
   };
 };
 
-// export const VALIDATION_ERROR = '{standard_validation_error}' as const;
+export const VALIDATION_ERROR = '{standard_validation_error}';
 export type VALIDATION_ERROR = '{standard_validation_error}';
 export interface ValidationError {
   ['standard_validation_error']: true;
@@ -51,15 +51,3 @@ export function standardizeSchema<T extends InferSchema>(schema: T) {
 export function isValidationError(result: unknown): result is ValidationError {
   return (result as ValidationError)[VALIDATION_ERROR] === true;
 }
-
-const testSymbol = Symbol.for('test');
-const object = {
-  [testSymbol]: 'some data',
-};
-
-// somewhere else
-const anotherTestSymbol = Symbol.for('test');
-const anotherObject: typeof object = {
-  [anotherTestSymbol]: 'some data',
-};
-// ^
