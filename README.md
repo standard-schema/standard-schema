@@ -6,9 +6,13 @@ This is a proposal for a standard interface to be adopted across TypeScript vali
 
 ## Usage: Accepting user-defined schemas
 
-Install `standard-schema` as a dependency (if you wish to use the utility functions) _or_ copy `src/index.ts` into your project.
+Install `standard-schema` as a dev dependency.
 
-To accept a user-defined schema in your API, use a generic function parameter that extends `InferSchema`:
+```sh
+pnpm add --dev standard-schema
+```
+
+To accept a user-defined schema in your API, use a generic function parameter that extends `InferSchema`.
 
 ```ts
 import { type InferSchema, standardizeSchema } from 'standard-schema';
@@ -44,9 +48,7 @@ interface Issue {
 The `{type}` key allows consuming libraries to easily extract the _inferred type_ of the schema. The `{validate}` symbol corresponds to a runtime validation method with a standard return type signature. Libraries can expect this method to be defined on all _Standard Schema_ compatible schemas.
 
 ```ts
-const someSchema = {
-  /* some user-defined schema */
-};
+const someSchema = /* some user-defined schema */
 
 const standardizedSchema = inferSchema(someSchema);
 const result = standardizedSchema[Symbol.for('{validate}')]({ name: 'Billie' });
@@ -105,11 +107,11 @@ class StringSchema {
 }
 ```
 
+## FAQ
+
 ### Why braces `{}`?
 
 The reason this key name The goal of wrapping these keys in `{}` braces is to both avoid conflicts with existing API surface and to de-prioritize these keys in auto-complete. The `{` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
-
-The downside is that it looks
 
 ### Why not use symbols for the keys?
 
@@ -141,22 +143,7 @@ So if the standard type signatures used a symbol declared with `Symbol.for()`, t
 
 Ideally, it would be possible to ship a _Standard Schema_ compatible library without incurring any new runtime dependencies. (While `standard-schema` does export some utility functions, these are not required to use the _Standard Schema_ format.) Thus, we're left with string literals.
 
-### About `ValidationError`
-
-The notable part of the `ValidationError` interface is what it _doesn't_ include. Namely, there's no indication that it extends `Error`. As mentioned elsewhere, it's expensive to allocate `Error` instances in JavaScript, since it captures the stack trace at the time of creation.
-
-Instead, the `ValidationError` is a simple object with an `issues` property. Each issue is an object that conforms to the following interface.
-
-```ts
-interface Issue {
-  message: string;
-  path: string[];
-}
-```
-
-This is intended to be as minimal as possible, while supporting common use cases like form validation.
-
-### Why does the validate method return a union?
+### Why does `{validate}` return a union?
 
 The validation method must conform to the following interface:
 
@@ -168,14 +155,31 @@ Note that the validation method should _not_ throw to indicate an error. It's ex
 
 Instead the method returns a union of `T` (the inferred output type) and `ValidationError`.
 
+### How does error reporting work?
+
+On a failed validation, the `{validate}` method returns an object compatible with the `ValidationError` interface.
+
 ```ts
 interface ValidationError {
   '{validation_error}': true;
-  issues: string[];
+  issues: Issue[];
 }
 ```
 
-A `ValidationError` must contain a special property to indicate that it's a validation error. This key is sufficiently uncommon that it can be assumed that any data with that key defined is a `ValidationError`, _not_ as successful parse result.
+A `ValidationError` has a `{validation_error}` flag (to distinguish it from `T`) and an `issues` array. Each `Issue` is an object that conforms to the following interface.
+
+```ts
+interface Issue {
+  message: string;
+  path: (string | number | symbol)[];
+}
+```
+
+This is intended to be as minimal as possible, while supporting common use cases like form validation.
+
+### Why doesn't `ValidationError` extend `Error`?
+
+It _could_ but it doesn't have to (and probably shouldn't). It's expensive to allocate `Error` instances in JavaScript, since it captures the stack trace at the time of creation. Many performance-sensitive libraries don't throw Errors for this reason.
 
 ### Why not use a discriminated union?
 
@@ -190,5 +194,3 @@ interface Schema<O> {
 ```
 
 This necessarily involves allocating a new object on every parse operation. For performance-sensitive applications, this isn't acceptable.
-
-Instead, the proposed validation method is expected to return a simple union of `T` and `ValidationError`.
