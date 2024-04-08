@@ -1,3 +1,5 @@
+> Early draft. Not complete.
+
 # _Standard Schema_
 
 This is a proposal for a standard interface to be adopted across TypeScript validation libraries. The goal is to make it easier for library authors to accept user-defined schemas as part of their API, in a library-agnostic way.
