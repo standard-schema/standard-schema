@@ -1,21 +1,21 @@
 type Key = keyof any;
-export const STANDARD_SCHEMA = '{standard_schema}';
-export type STANDARD_SCHEMA = '{standard_schema}';
+export const STANDARD_SCHEMA = '{schema}';
+export type STANDARD_SCHEMA = '{schema}';
 export type InferSchema<
   OutputType extends Key = Key,
   InputType extends Key = Key
 > = {
-  ['{standard_schema}']: {
+  ['{schema}']: {
     validateMethod: Key;
     outputType: OutputType;
     inputType: InputType;
   };
 };
 
-export const VALIDATION_ERROR = '{standard_validation_error}';
-export type VALIDATION_ERROR = '{standard_validation_error}';
+export const VALIDATION_ERROR = '{validation_error}';
+export type VALIDATION_ERROR = '{validation_error}';
 export interface ValidationError {
-  ['standard_validation_error']: true;
+  ['{validation_error}']: true;
   issues: Array<{ message: string; path: (string | number | symbol)[] }>;
 }
 
@@ -50,4 +50,9 @@ export function standardizeSchema<T extends InferSchema>(schema: T) {
 
 export function isValidationError(result: unknown): result is ValidationError {
   return (result as ValidationError)[VALIDATION_ERROR] === true;
+}
+
+const arg = 'asdf'
+if(isValidationError(arg)){
+  arg.
 }
