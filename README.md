@@ -15,13 +15,42 @@ pnpm add --dev standard-schema
 To accept a user-defined schema in your API, use a generic function parameter that extends `InputSchema`.
 
 ```ts
-import type { InputSchema, Infer, StandardSchema  } from 'standard-schema';
+import type { InputSchema, OutputType, StandardSchema  } from 'standard-schema';
 
 // example usage in libraries
 function inferSchema<T extends InputSchema>(schema: T) {
-  return schema as StandardSchema<Infer<T>>;
+  return (schema as unknown) as StandardSchema<OutputType<T>>;
 }
 ```
+
+Now that you've accepted a user-define schema, you can validate data with it.
+
+```ts
+import type { InputSchema, OutputType, StandardSchema, ValidationError } from 'standard-schema';
+
+// example usage in libraries
+function inferSchema<T extends InputSchema>(schema: T) {
+  return (schema as unknown) as StandardSchema<OutputType<T>>;
+}
+
+function isValidationError(result: unknown): result is ValidationError {
+  return (result as ValidationError)[VALIDATION_ERROR] === true;
+}
+
+const someSchema = /* some user-defined schema */
+
+const standardizedSchema = inferSchema(someSchema);
+const data = { name: 'Billie' };
+const result = standardizedSchema[Symbol.for('{validate}')](data);
+
+if (isValidationError(result)) {
+  result.issues; // detailed error reporting
+} else {
+  result.name; // fully typed
+}
+```
+
+## Implementing the standard: schema library authors
 
 The `InputSchema` type is a simple interface. All _Standard Schema_ compatible schemas must conform to this interface.
 
@@ -30,7 +59,7 @@ interface InputSchema<T> {
   // must be visible in the public type signature
   '{type}': T;
 
-  // can be hidden from the public type signature (runtime only)
+  // can be hidden from the public type signature (private/protected)
   '{validate}': (data: unknown) => T | ValidationError;
 }
 
@@ -45,23 +74,7 @@ interface Issue {
 }
 ```
 
-The `{type}` key allows consuming libraries to easily extract the _inferred type_ of the schema. The `{validate}` symbol corresponds to a runtime validation method with a standard return type signature. Libraries can expect this method to be defined on all _Standard Schema_ compatible schemas.
-
-```ts
-const someSchema = /* some user-defined schema */
-
-const standardizedSchema = inferSchema(someSchema);
-const result = standardizedSchema[Symbol.for('{validate}')]({ name: 'Billie' });
-if (isValidationError(result)) {
-  result.issues; // detailed error reporting
-} else {
-  result.name; // fully typed
-}
-```
-
-## Usage: Schema library authors
-
-Add the `{type}` property to your base class or interface. This property should correspond to the inferred type of the schema.
+The `{type}` key allows consuming libraries to easily extract the _inferred type_ of your library's schemas. Add the `{type}` property to your base class or interface. This property should correspond to the inferred type of the schema.
 
 ```ts
 class BaseSchema<T> {
@@ -69,13 +82,18 @@ class BaseSchema<T> {
 }
 ```
 
-Next, implement a validation method that conforms to the following signature.
+Next, implement a `{validate}` method that conforms to the following signature.
 
 ```ts
 type ValidationMethod<T> = (data: unknown) => T | ValidationError;
 ```
 
-This can be hidden from the public type signature, as it's only used at runtime.
+A few additional details:
+
+- The `{validate}` method can be hidden from autocomplete with `private` or `protected`.
+- _This method should not throw errors._ Instead, _return_ a `ValidationError` object on failure.
+
+### Example
 
 ```ts
 class StringSchema {

@@ -39,3 +39,20 @@ if (isValidationError(result)) {
 } else {
   result.name;
 }
+
+
+import type { InputSchema, Infer, StandardSchema  } from '.';
+
+// example usage in libraries
+function inferSchema<T extends InputSchema>(schema: T) {
+  return (schema as unknown) as StandardSchema<OutputType<T>>;
+}
+const someSchema = /* some user-defined schema */
+
+const standardizedSchema = inferSchema(someSchema);
+const result = standardizedSchema[Symbol.for('{validate}')]({ name: 'Billie' });
+if (isValidationError(result)) {
+  result.issues; // detailed error reporting
+} else {
+  result.name; // fully typed
+}
