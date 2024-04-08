@@ -127,39 +127,30 @@ class StringSchema {
 
 ## FAQ
 
+### Do I need to include `standard-schema` as a dependency?
+
+You can include `standard-schema` as a dev dependency and consume the library exclusively with `import type`. The library may export some runtime utility functions but they are only available for convenience.
+
 ### Why braces `{}`?
 
-The reason this key name The goal of wrapping these keys in `{}` braces is to both avoid conflicts with existing API surface and to de-prioritize these keys in auto-complete. The `{` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
+The goal of wrapping the ky names in `{}` braces is to both avoid conflicts with existing API surface and to de-prioritize these keys in auto-complete. The `{` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
+
+![Fq4ipUaaYAEsArj](https://github.com/standard-schema/standard-schema/assets/3084745/a3443bf5-7f59-4d89-83d8-24acd503665e)
 
 ### Why not use symbols for the keys?
 
-In TypeScript, using a plain `Symbol` as a key always collapses to a simple `symbol` type.
+In TypeScript, using a plain `Symbol` inline as a key always collapses to a simple `symbol` type. This would cause conflicts with other schema properties that use symbols.
 
 ```ts
 const object = {
-  [Symbol.for('test')]: 'some data',
+  [Symbol.for('{type}')]: 'some data',
 };
 // { [k: symbol]: string }
 ```
 
-Declaring the symbol externally has the opposite problem. The type becomes _too_ specific.
+By contrast, declaring the symbol externally makes it "nominally typed". This means the key is sorted in autocomplete under the variable name (`testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike `{}`-wrapped string keys.
 
-```ts
-const testSymbol = Symbol.for('test');
-const object = {
-  [testSymbol]: 'some data',
-};
-
-const anotherTestSymbol = Symbol.for('test');
-const anotherObject: typeof object = {
-  [anotherTestSymbol]: 'some data',
-};
-// ^ Object literal may only specify known properties, and '[anotherTestSymbol]' does not exist in type '{ [testSymbol]: string; }'.ts(2353)
-```
-
-So if the standard type signatures used a symbol declared with `Symbol.for()`, that exact symbol would need to be exported at runtime and imported by any consuming libraries. This means consumers would need to include `standard-library` as a runtime dependency.
-
-Ideally, it would be possible to ship a _Standard Schema_ compatible library without incurring any new runtime dependencies. (While `standard-schema` does export some utility functions, these are not required to use the _Standard Schema_ format.) Thus, we're left with string literals.
+![Screenshot 2024-04-08 at 2 11 35 PM](https://github.com/standard-schema/standard-schema/assets/3084745/4085f5de-bd4f-4b72-8e72-1303674ac412)
 
 ### Why does `{validate}` return a union?
 
@@ -172,6 +163,20 @@ type ValidationMethod<T> = (data: unknown) => T | ValidationError;
 Note that the validation method should _not_ throw to indicate an error. It's expensive to throw an error in JavaScript, so any standard method signature should support the ability to perform validation without `throw` for performance reasons.
 
 Instead the method returns a union of `T` (the inferred output type) and `ValidationError`.
+
+### Why not use a discriminated union?
+
+Many libraries provide a validation method that returns a discriminated union.
+
+```ts
+interface Schema<O> {
+  '{validate}': (
+    data: any
+  ) => { success: true; data: O } | { success: false; error: ValidationError };
+}
+```
+
+This necessarily involves allocating a new object on every parse operation. For performance-sensitive applications, this isn't acceptable.
 
 ### How does error reporting work?
 
@@ -195,20 +200,6 @@ interface Issue {
 
 This is intended to be as minimal as possible, while supporting common use cases like form validation.
 
-### Why doesn't `ValidationError` extend `Error`?
+### Does `ValidationError` extend `Error`?
 
-It _could_ but it doesn't have to (and probably shouldn't). It's expensive to allocate `Error` instances in JavaScript, since it captures the stack trace at the time of creation. Many performance-sensitive libraries don't throw Errors for this reason.
-
-### Why not use a discriminated union?
-
-Many libraries provide a validation method that returns a discriminated union.
-
-```ts
-interface Schema<O> {
-  '{validate}': (
-    data: any
-  ) => { success: true; data: O } | { success: false; error: ValidationError };
-}
-```
-
-This necessarily involves allocating a new object on every parse operation. For performance-sensitive applications, this isn't acceptable.
+It _could_ but it doesn't have to (and probably shouldn't). It's expensive to allocate `Error` instances in JavaScript, since it captures the stack trace at the time of creation. Many performance-sensitive libraries don't throw `Errors` for this reason.
