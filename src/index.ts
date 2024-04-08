@@ -52,7 +52,37 @@ export function isValidationError(result: unknown): result is ValidationError {
   return (result as ValidationError)[VALIDATION_ERROR] === true;
 }
 
-const arg = 'asdf'
-if(isValidationError(arg)){
-  arg.
+const arg = {
+  asdf: 'asdf',
+  '@@type': 'asdf',
+  '+type': 'asdf',
+  qwer: 'asdf',
+  '{type}': 'asdf',
+};
+
+class StringSchema {
+  '{type}': string;
+
+  // simple parse method
+  parse(data: unknown) {
+    if (typeof data !== 'string') throw new Error('Expected a string');
+    return data;
+  }
+
+  // defining a {validate} method that conforms to the standard signature
+  private '{validate}'(data: unknown) {
+    try {
+      return this.parse(data);
+    } catch (err) {
+      return {
+        ['{validation_error}']: true,
+        issues: [
+          {
+            message: err.message,
+            path: [],
+          },
+        ],
+      };
+    }
+  }
 }
