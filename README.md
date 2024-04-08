@@ -6,27 +6,27 @@ This is a proposal for a standard interface to be adopted across TypeScript vali
 
 ## Usage: Accepting user-defined schemas
 
-Install `standard-schema` as a dev dependency.
+Install `standard-schema`, or copy-paste `src/index.ts` into your project.
 
 ```sh
 pnpm add --dev standard-schema
 ```
 
-To accept a user-defined schema in your API, use a generic function parameter that extends `InferSchema`.
+To accept a user-defined schema in your API, use a generic function parameter that extends `InputSchema`.
 
 ```ts
-import { type InferSchema, standardizeSchema } from 'standard-schema';
+import type { InputSchema, Infer, StandardSchema  } from 'standard-schema';
 
 // example usage in libraries
-function inferSchema<T extends InferSchema>(schema: T) {
-  return standardizeSchema(schema);
+function inferSchema<T extends InputSchema>(schema: T) {
+  return schema as StandardSchema<Infer<T>>;
 }
 ```
 
-The `InferSchema` type is a simple interface. All _Standard Schema_ compatible schemas must conform to this interface.
+The `InputSchema` type is a simple interface. All _Standard Schema_ compatible schemas must conform to this interface.
 
 ```ts
-interface InferSchema<T> {
+interface InputSchema<T> {
   // must be visible in the public type signature
   '{type}': T;
 

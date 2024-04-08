@@ -1,4 +1,4 @@
-export interface InferSchema {
+export interface InputSchema {
   ['{type}']: unknown;
 }
 
@@ -14,13 +14,16 @@ export interface Issue {
   path: (string | number | symbol)[];
 }
 
-export type OutputType<T extends InferSchema> = T['{type}'];
+export type OutputType<T extends InputSchema> = T['{type}'];
+export type InputType<T extends InputSchema> = T extends { '{input}': infer I }
+  ? I
+  : OutputType<T>;
 
 export interface StandardSchema<O> {
   ['{type}']: O;
   ['{validate}'](data: unknown): O | ValidationError;
 }
-export function standardizeSchema<T extends InferSchema>(schema: T) {
+export function standardizeSchema<T extends InputSchema>(schema: T) {
   return (schema as unknown) as StandardSchema<T['{type}']>;
 }
 

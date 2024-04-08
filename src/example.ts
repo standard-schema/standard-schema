@@ -1,8 +1,9 @@
 import {
-  InferSchema,
+  InputSchema,
   ValidationError,
+  StandardSchema,
+  OutputType,
   isValidationError,
-  standardizeSchema,
 } from '../src';
 
 class BaseSchema<T> {
@@ -25,15 +26,16 @@ class BaseSchema<T> {
 }
 
 // example usage in libraries
-function inferSchema<T extends InferSchema>(schema: T) {
-  return standardizeSchema(schema);
+function inferSchema<T extends InputSchema>(schema: T) {
+  return (schema as unknown) as StandardSchema<OutputType<T>>;
 }
 
 declare var someSchema: BaseSchema<{ name: string }>;
+
 const schema = inferSchema(someSchema);
 const result = schema['{validate}']({ name: 'hello' });
 if (isValidationError(result)) {
-  console.log(result.issues);
+  result.issues;
 } else {
   result.name;
 }
