@@ -34,7 +34,7 @@ function inferSchema<T extends InputSchema>(schema: T) {
 }
 
 function isValidationError(result: unknown): result is ValidationError {
-  return (result as ValidationError)[VALIDATION_ERROR] === true;
+  return (result as ValidationError)["{validation_error}"] === true;
 }
 
 const someSchema = /* some user-defined schema */

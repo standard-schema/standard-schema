@@ -1,10 +1,4 @@
-import {
-  InputSchema,
-  ValidationError,
-  StandardSchema,
-  OutputType,
-  isValidationError,
-} from '../src';
+import type { InputSchema, OutputType, StandardSchema, ValidationError } from '.';
 
 class BaseSchema<T> {
   '{type}': T;
@@ -30,12 +24,18 @@ function inferSchema<T extends InputSchema>(schema: T) {
   return (schema as unknown) as StandardSchema<OutputType<T>>;
 }
 
-declare var someSchema: BaseSchema<{ name: string }>;
+function isValidationError(result: unknown): result is ValidationError {
+  return (result as ValidationError)['{validation_error}'] === true;
+}
 
-const schema = inferSchema(someSchema);
-const result = schema['{validate}']({ name: 'hello' });
+const someSchema = new BaseSchema<{name: string}>()/* some user-defined schema */
+
+const standardizedSchema = inferSchema(someSchema);
+const data = { name: 'Billie' };
+const result = standardizedSchema[Symbol.for('{validate}')](data);
+
 if (isValidationError(result)) {
-  result.issues;
+  result.issues; // detailed error reporting
 } else {
-  result.name;
+  result.name; // fully typed
 }
