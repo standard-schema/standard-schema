@@ -1,32 +1,43 @@
-export interface InputSchema {
-  ['{type}']: unknown;
+export interface StandardSchema {
+	"~output": unknown;
 }
 
-export const VALIDATION_ERROR = '{validation_error}';
-export type VALIDATION_ERROR = '{validation_error}';
 export interface ValidationError {
-  ['{validation_error}']: true;
-  issues: Issue[];
+	"~validationerror": true;
+	issues: Issue[];
 }
 
 export interface Issue {
-  message: string;
-  path: (string | number | symbol)[];
+	message: string;
+	path: (string | number | symbol)[];
 }
 
-export type OutputType<T extends InputSchema> = T['{type}'];
-export type InputType<T extends InputSchema> = T extends { '{input}': infer I }
-  ? I
-  : OutputType<T>;
-
-export interface StandardSchema<O> {
-  ['{type}']: O;
-  ['{validate}'](data: unknown): O | ValidationError;
+export type OutputType<T extends StandardSchema> = T["~output"];
+export type InputType<T extends StandardSchema> = T extends {
+	"~input": infer I;
 }
-export function standardizeSchema<T extends InputSchema>(schema: T) {
-  return (schema as unknown) as StandardSchema<T['{type}']>;
+	? I
+	: OutputType<T>; // defaults to output type
+
+export type Standardize<T extends StandardSchema> = {
+	"~output": OutputType<T>;
+	"~input": InputType<T>;
+	"~validate"(data: unknown): OutputType<T> | ValidationError;
+};
+export function standardizeSchema<T extends StandardSchema>(
+	schema: T,
+): Standardize<T> {
+	return schema as unknown as Standardize<T>;
 }
 
 export function isValidationError(result: unknown): result is ValidationError {
-  return (result as ValidationError)[VALIDATION_ERROR] === true;
+	return (result as ValidationError)["~validationerror"] === true;
 }
+
+const object = {
+	"~a": true,
+	a: true,
+	z: true,
+};
+
+object.

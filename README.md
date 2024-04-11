@@ -34,14 +34,14 @@ function inferSchema<T extends InputSchema>(schema: T) {
 }
 
 function isValidationError(result: unknown): result is ValidationError {
-  return (result as ValidationError)["{validation_error}"] === true;
+  return (result as ValidationError)["~validationerror"] === true;
 }
 
 const someSchema = /* some user-defined schema */
 
 const standardizedSchema = inferSchema(someSchema);
 const data = { name: 'Billie' };
-const result = standardizedSchema[Symbol.for('{validate}')](data);
+const result = standardizedSchema[Symbol.for('~validate')](data);
 
 if (isValidationError(result)) {
   result.issues; // detailed error reporting
@@ -57,14 +57,14 @@ The `InputSchema` type is a simple interface. All _Standard Schema_ compatible s
 ```ts
 interface InputSchema<T> {
   // must be visible in the public type signature
-  '{type}': T;
+  '~output': T;
 
   // can be hidden from the public type signature (private/protected)
-  '{validate}': (data: unknown) => T | ValidationError;
+  '~validate': (data: unknown) => T | ValidationError;
 }
 
 interface ValidationError {
-  '{validation_error}': true;
+  '~validationerror': true;
   issues: Issue[];
 }
 
@@ -74,15 +74,15 @@ interface Issue {
 }
 ```
 
-The `{type}` key allows consuming libraries to easily extract the _inferred type_ of your library's schemas. Add the `{type}` property to your base class or interface. This property should correspond to the inferred type of the schema.
+The `~output` key allows consuming libraries to easily extract the _inferred type_ of your library's schemas. Add the `~output` property to your base class or interface. This property should correspond to the inferred type of the schema.
 
 ```ts
 class BaseSchema<T> {
-  '{type}': T;
+  '~output': T;
 }
 ```
 
-Next, implement a `{validate}` method that conforms to the following signature.
+Next, implement a `~validate` method that conforms to the following signature.
 
 ```ts
 type ValidationMethod<T> = (data: unknown) => T | ValidationError;
@@ -90,14 +90,14 @@ type ValidationMethod<T> = (data: unknown) => T | ValidationError;
 
 A few additional details:
 
-- The `{validate}` method can be hidden from autocomplete with `private` or `protected`.
+- The `~validate` method can be hidden from autocomplete with `private` or `protected`.
 - _This method should not throw errors._ Instead, _return_ a `ValidationError` object on failure.
 
 ### Example
 
 ```ts
 class StringSchema {
-  '{type}': string;
+  '~output': string;
 
   // simple parse method
   parse(data: unknown) {
@@ -105,14 +105,14 @@ class StringSchema {
     return data;
   }
 
-  // defining a {validate} method that conforms to the standard signature
+  // defining a ~validate method that conforms to the standard signature
   // can be private or protected
-  private '{validate}'(data: unknown) {
+  private '~validate'(data: unknown) {
     try {
       return this.parse(data);
     } catch (err) {
       return {
-        ['{validation_error}']: true,
+        ['~validationerror']: true,
         issues: [
           {
             message: err.message,
@@ -131,11 +131,11 @@ class StringSchema {
 
 You can include `standard-schema` as a dev dependency and consume the library exclusively with `import type`. The library may export some runtime utility functions but they are only available for convenience.
 
-### Why braces `{}`?
+### Why tilde `~`?
 
-The goal of wrapping the ky names in `{}` braces is to both avoid conflicts with existing API surface and to de-prioritize these keys in auto-complete. The `{` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
+The goal of prefixing the key names with `~` is to both avoid conflicts with existing API surface and to de-prioritize these keys in auto-complete. The `~` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
 
-![Fq4ipUaaYAEsArj](https://github.com/standard-schema/standard-schema/assets/3084745/a3443bf5-7f59-4d89-83d8-24acd503665e)
+![Screenshot 2024-04-10 at 5 48 30 PM](https://github.com/standard-schema/standard-schema/assets/3084745/5dfc0219-7531-481e-9691-cff5bc471378)
 
 ### Why not use symbols for the keys?
 
@@ -143,16 +143,16 @@ In TypeScript, using a plain `Symbol` inline as a key always collapses to a simp
 
 ```ts
 const object = {
-  [Symbol.for('{type}')]: 'some data',
+  [Symbol.for('~output')]: 'some data',
 };
 // { [k: symbol]: string }
 ```
 
-By contrast, declaring the symbol externally makes it "nominally typed". This means the key is sorted in autocomplete under the variable name (`testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike `{}`-wrapped string keys.
+By contrast, declaring the symbol externally makes it "nominally typed". This means the key is sorted in autocomplete under the variable name (e.g. `testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike `{}`-wrapped string keys.
 
 ![Screenshot 2024-04-08 at 2 11 35 PM](https://github.com/standard-schema/standard-schema/assets/3084745/4085f5de-bd4f-4b72-8e72-1303674ac412)
 
-### Why does `{validate}` return a union?
+### Why does `~validate` return a union?
 
 The validation method must conform to the following interface:
 
@@ -170,7 +170,7 @@ Many libraries provide a validation method that returns a discriminated union.
 
 ```ts
 interface Schema<O> {
-  '{validate}': (
+  '~validate': (
     data: any
   ) => { success: true; data: O } | { success: false; error: ValidationError };
 }
@@ -180,16 +180,16 @@ This necessarily involves allocating a new object on every parse operation. For 
 
 ### How does error reporting work?
 
-On a failed validation, the `{validate}` method returns an object compatible with the `ValidationError` interface.
+On a failed validation, the `~validate` method returns an object compatible with the `ValidationError` interface.
 
 ```ts
 interface ValidationError {
-  '{validation_error}': true;
+  '~validationerror': true;
   issues: Issue[];
 }
 ```
 
-A `ValidationError` has a `{validation_error}` flag (to distinguish it from `T`) and an `issues` array. Each `Issue` is an object that conforms to the following interface.
+A `ValidationError` has a `~validationerror` flag (to distinguish it from `T`) and an `issues` array. Each `Issue` is an object that conforms to the following interface.
 
 ```ts
 interface Issue {
