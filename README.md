@@ -122,7 +122,7 @@ _Important_: The `~validate` method should not throw errors. Instead, it should 
 
 ### Example
 
-The following class implements a Standard Schema-compatible `string` validator.
+The following class implements a `Standard Schema`-compatible `string` validator.
 
 ```ts
 import type {
