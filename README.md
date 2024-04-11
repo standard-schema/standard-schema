@@ -11,6 +11,26 @@
 
 This is a proposal for a standard interface to be adopted across TypeScript validation libraries. The goal is to make it easier for open-source libraries to accept user-defined schemas as part of their API, in a library-agnostic way.Type safety is important, but it doesn't make sense for every API library and framework to implement their own runtime type validation system. This proposal establishes a common pattern for exchanging _type validators_ between libraries.
 
+## The standard interface
+
+```ts
+interface StandardSchema<O, I> {
+  '~output': O;
+  '~input': I;
+  // runtime only (does not need to be visible in the type signature)
+  '~validate': (data: unknown) => O | ValidationError;
+}
+
+interface ValidationError {
+  // runtime only (does not need to be visible in the type signature)
+  '~validationerror': true;
+  issues: Array<{
+    message: string;
+    path: (string | number | symbol)[];
+  }>;
+}
+```
+
 ## Accepting user-defined schemas
 
 So, you're building a library and want to accept user-defined schemas. Great!

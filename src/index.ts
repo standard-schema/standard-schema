@@ -1,15 +1,6 @@
 export interface StandardSchema {
   "~output": unknown;
-}
-
-export interface ValidationError {
-  "~validationerror": true;
-  issues: Issue[];
-}
-
-export interface Issue {
-  message: string;
-  path: (string | number | symbol)[];
+  "~input"?: unknown;
 }
 
 export type OutputType<T extends StandardSchema> = T["~output"];
@@ -25,6 +16,16 @@ export type Decorate<T extends StandardSchema> = {
   "~validate"(data: unknown): OutputType<T> | ValidationError;
 };
 
-export function isValidationError(result: unknown): result is ValidationError {
-  return (result as ValidationError)["~validationerror"] === true;
+export interface ValidationError {
+  "~validationerror": true;
+  issues: Issue[];
+}
+
+export interface Issue {
+  message: string;
+  path: (string | number | symbol)[];
+}
+
+export function isValidationError(result: any): result is ValidationError {
+  return result["~validationerror"] === true;
 }
