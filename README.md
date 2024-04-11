@@ -1,7 +1,11 @@
 > Early draft. Not complete.
 
-# _Standard Schema_
-
+<p align="center">
+  <h1 align="center">🦆<br/>Standard Schema</h1>
+  <p align="center">
+    A proposal for a common standard interface for TypeScript schema validation libraries.
+  </p>
+</p>
 This is a proposal for a standard interface to be adopted across TypeScript validation libraries. The goal is to make it easier for open-source libraries to accept user-defined schemas as part of their API, in a library-agnostic way.
 
 ## Usage: Accepting user-defined schemas
