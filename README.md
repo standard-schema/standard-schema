@@ -6,11 +6,16 @@
     A proposal for a common standard interface for TypeScript and JavaScript schema validation libraries.
   </p>
 </p>
-This is a proposal for a standard interface to be adopted across TypeScript validation libraries. The goal is to make it easier for open-source libraries to accept user-defined schemas as part of their API, in a library-agnostic way.
 
-## Usage: Accepting user-defined schemas
+<br/>
 
-Install `standard-schema`, or copy-paste `src/index.ts` into your project.
+This is a proposal for a standard interface to be adopted across TypeScript validation libraries. The goal is to make it easier for open-source libraries to accept user-defined schemas as part of their API, in a library-agnostic way.Type safety is important, but it doesn't make sense for every API library and framework to implement their own runtime type validation system. This proposal establishes a common pattern for exchanging _type validators_ between libraries.
+
+## Accepting user-defined schemas
+
+So, you're building a library and want to accept user-defined schemas. Great!
+
+First, install `standard-schema` as a dev dependency. This package only contains types!
 
 ```sh
 pnpm add --dev standard-schema
@@ -27,31 +32,38 @@ function inferSchema<T extends StandardSchema>(schema: T) {
 }
 ```
 
-Now that you've accepted a user-define schema, you can validate data with it.
+The `Decorate` utility takes the inferred type, extracts type information from it, and returns a fully typed object with a `~validate` method. You can use this method to parse data.
 
 ```ts
-import type { StandardSchema, OutputType, Decorate, ValidationError } from 'standard-schema';
+import { ValidationError } from 'standard-schema';
+import { CoolSchema } from 'some-cool-schema-library';
 
-// example usage in libraries
-function inferSchema<T extends StandardSchema>(schema: T) {
-  return (schema as unknown) as Decorate<T>;
-}
+const someSchema = new CoolSchema<{ name: string }>();
+
+const inferredSchema = inferSchema(someSchema);
+const result = inferredSchema['~validate']({ name: 'Billie' });
 
 function isValidationError(result: unknown): result is ValidationError {
-  return (result as ValidationError)["~validationerror"] === true;
+  return (result as ValidationError)['~validationerror'] === true;
 }
-
-const someSchema = /* some user-defined schema */
-
-const standardizedSchema = inferSchema(someSchema);
-const data = { name: 'Billie' };
-const result = standardizedSchema['~validate'](data);
 
 if (isValidationError(result)) {
   result.issues; // detailed error reporting
 } else {
-  result.name; // fully typed
+  result.name; // fully typed result
 }
+```
+
+To extract the output and input types from a schema, use the `OutputType` and `InputType` utility types.
+
+```ts
+import type { OutputType, InputType } from 'standard-schema';
+
+const someSchema = new CoolSchema<{ name: string }>();
+const inferredSchema = inferSchema(someSchema);
+
+type Output = OutputType<typeof someSchema>; // { name: string }
+type Input = InputType<typeof someSchema>; // { name: string }
 ```
 
 ## Implementing the standard: schema library authors
@@ -73,8 +85,6 @@ The type signature of the `~output` key should correspond to the inferred output
 ```ts
 export type OutputType<T extends StandardSchema> = T['~output'];
 ```
-
-### Input types
 
 If your library implements any form of transform or coercion, it's possible the output type can diverge from the expected input type. If this is applicable to your library, your schemas should also include an `~input` key.
 
