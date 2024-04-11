@@ -126,40 +126,40 @@ The following class implements a `Standard Schema`-compatible `string` validator
 
 ```ts
 import type {
-	StandardSchema,
-	OutputType,
-	InputType,
-	ValidationError,
-	Decorate,
+  StandardSchema,
+  OutputType,
+  InputType,
+  ValidationError,
+  Decorate,
 } from ".";
 
 class StringSchema {
-	"~output": string;
+  "~output": string;
 
-	// library-specific validation method
-	parse(data: unknown): string {
-		// do validation logic here
-		if (typeof data === "string") return data;
-		throw new Error("Invalid data");
-	}
+  // library-specific validation method
+  parse(data: unknown): string {
+    // do validation logic here
+    if (typeof data === "string") return data;
+    throw new Error("Invalid data");
+  }
 
-	// defining a ~validate method that conforms to the standard signature
-	// can be private or protected
-	private "~validate"(data: unknown) {
-		try {
-			return this.parse(data);
-		} catch (err) {
-			return {
-				"~validationerror": true,
-				issues: [
-					{
-						message: (err as Error)?.message,
-						path: [],
-					},
-				],
-			};
-		}
-	}
+  // defining a ~validate method that conforms to the standard signature
+  // can be private or protected
+  private "~validate"(data: unknown) {
+    try {
+      return this.parse(data);
+    } catch (err) {
+      return {
+        "~validationerror": true,
+        issues: [
+          {
+            message: (err as Error)?.message,
+            path: [],
+          },
+        ],
+      };
+    }
+  }
 }
 ```
 
