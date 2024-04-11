@@ -1,7 +1,8 @@
-> Early draft. Not complete.
+> This is a draft! Feel free to submit an issue to start discussions relating to this proposal!
 
 <p align="center">
-  <h1 align="center">🦆<br/>Standard Schema</h1>
+  <h1 align="center">🦆<br/>`Standard Schema`</h1>
+  <br />
   <p align="center">
     A proposal for a common standard interface for TypeScript schema validation libraries.
   </p>
