@@ -1,14 +1,6 @@
 > This is a draft! Feel free to submit an issue to start discussions relating to this proposal!
 
 <p align="center">
-  <h1 align="center">🦆<br/>`Standard Schema`</h1>
-  <br />
-  <p align="center">
-    A proposal for a common standard interface for TypeScript schema validation libraries.
-  </p>
-</p>
-
-<p align="center">
   <h1 align="center">🦆<br/><code>Standard Schema</code></h1>
   <p align="center">
     A proposal for a common standard interface for TypeScript and JavaScript schema validation libraries.
