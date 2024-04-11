@@ -1,19 +1,37 @@
-import type { StandardSchema, OutputType, ValidationError, Decorate } from ".";
+import type {
+	StandardSchema,
+	OutputType,
+	InputType,
+	ValidationError,
+	Decorate,
+} from ".";
 
-class BaseSchema<T> {
-	"~output": T;
-	validate(data: unknown): T {
+// import { OutputType, InputType } from "standard-schema";
+
+class StringSchema {
+	"~output": string;
+
+	// library-specific validation method
+	parse(data: unknown): string {
 		// do validation logic here
-		if (Math.random() < 0.5) return data as T;
+		if (typeof data === "string") return data;
 		throw new Error("Invalid data");
 	}
-	private "~validate"(data: unknown): T | ValidationError {
+
+	// defining a ~validate method that conforms to the standard signature
+	// can be private or protected
+	private "~validate"(data: unknown) {
 		try {
-			return this.validate(data);
-		} catch (err: unknown) {
+			return this.parse(data);
+		} catch (err) {
 			return {
 				"~validationerror": true,
-				issues: [{ message: (err as Error).message, path: [] }],
+				issues: [
+					{
+						message: (err as Error)?.message,
+						path: [],
+					},
+				],
 			};
 		}
 	}
@@ -28,16 +46,17 @@ function isValidationError(result: unknown): result is ValidationError {
 	return (result as ValidationError)["~validationerror"] === true;
 }
 
-const someSchema = new BaseSchema<{
-	name: string;
-}>(); /* some user-defined schema */
+const someSchema = new StringSchema(); /* some user-defined schema */
 
 const schema = inferSchema(someSchema);
-const data = { name: "Billie" };
+type SchemaOutput = OutputType<typeof schema>; // string
+type SchemaInput = InputType<typeof schema>; // string
+
+const data = "tuna";
 const result = schema["~validate"](data);
 
 if (isValidationError(result)) {
 	result.issues; // detailed error reporting
 } else {
-	result.name; // fully typed result
+	result.toLowerCase(); // fully typed result
 }

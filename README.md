@@ -7,6 +7,13 @@
     A proposal for a common standard interface for TypeScript schema validation libraries.
   </p>
 </p>
+
+<p align="center">
+  <h1 align="center">🦆<br/><code>Standard Schema</code></h1>
+  <p align="center">
+    A proposal for a common standard interface for TypeScript and JavaScript schema validation libraries.
+  </p>
+</p>
 This is a proposal for a standard interface to be adopted across TypeScript validation libraries. The goal is to make it easier for open-source libraries to accept user-defined schemas as part of their API, in a library-agnostic way.
 
 ## Usage: Accepting user-defined schemas
@@ -17,25 +24,25 @@ Install `standard-schema`, or copy-paste `src/index.ts` into your project.
 pnpm add --dev standard-schema
 ```
 
-To accept a user-defined schema in your API, use a generic function parameter that extends `InputSchema`.
+To accept a user-defined schema in your API, use a generic function parameter that extends `StandardSchema`.
 
 ```ts
-import type { InputSchema, OutputType, StandardSchema  } from 'standard-schema';
+import type { StandardSchema, OutputType, Decorate  } from 'standard-schema';
 
 // example usage in libraries
-function inferSchema<T extends InputSchema>(schema: T) {
-  return (schema as unknown) as StandardSchema<OutputType<T>>;
+function inferSchema<T extends StandardSchema>(schema: T) {
+  return (schema as unknown) as Decorate<T>;
 }
 ```
 
 Now that you've accepted a user-define schema, you can validate data with it.
 
 ```ts
-import type { InputSchema, OutputType, StandardSchema, ValidationError } from 'standard-schema';
+import type { StandardSchema, OutputType, Decorate, ValidationError } from 'standard-schema';
 
 // example usage in libraries
-function inferSchema<T extends InputSchema>(schema: T) {
-  return (schema as unknown) as StandardSchema<OutputType<T>>;
+function inferSchema<T extends StandardSchema>(schema: T) {
+  return (schema as unknown) as Decorate<T>;
 }
 
 function isValidationError(result: unknown): result is ValidationError {
@@ -46,7 +53,7 @@ const someSchema = /* some user-defined schema */
 
 const standardizedSchema = inferSchema(someSchema);
 const data = { name: 'Billie' };
-const result = standardizedSchema[Symbol.for('~validate')](data);
+const result = standardizedSchema['~validate'](data);
 
 if (isValidationError(result)) {
   result.issues; // detailed error reporting
@@ -57,13 +64,51 @@ if (isValidationError(result)) {
 
 ## Implementing the standard: schema library authors
 
-The `InputSchema` type is a simple interface. All _Standard Schema_ compatible schemas must conform to this interface.
+To make your library compatible with the `Standard Schema` spec, your library must be compatible in both the _static_ and the _runtime_ domain.
+
+### Static domain
+
+This one is easy. Your schemas should conform to the following interface. This is all that's required in the static domain to be compatible with the `Standard Schema` spec.
 
 ```ts
-interface InputSchema<T> {
-  // must be visible in the public type signature
-  '~output': T;
+interface StandardSchema {
+  '~output': unknown;
+}
+```
 
+The type signature of the `~output` key should correspond to the inferred output type of the schema. This type can be extracted with the `OutputType` utility type.
+
+```ts
+export type OutputType<T extends StandardSchema> = T['~output'];
+```
+
+### Input types
+
+If your library implements any form of transform or coercion, it's possible the output type can diverge from the expected input type. If this is applicable to your library, your schemas should also include an `~input` key.
+
+```ts
+interface StandardSchema {
+  '~output': unknown;
+  '~input': unknown;
+}
+```
+
+This key isn't necessary. If it is omitted, the inferred input type of your schema will default to the output type.
+
+```ts
+export type InputType<T extends StandardSchema> = T extends {
+  '~input': infer I;
+}
+  ? I
+  : OutputType<T>; // defaults to output type
+```
+
+### Runtime domain
+
+At runtime, your schemas should implement the following interface.
+
+```ts
+interface StandardSchema<T> {
   // can be hidden from the public type signature (private/protected)
   '~validate': (data: unknown) => T | ValidationError;
 }
@@ -79,54 +124,50 @@ interface Issue {
 }
 ```
 
-The `~output` key allows consuming libraries to easily extract the _inferred type_ of your library's schemas. Add the `~output` property to your base class or interface. This property should correspond to the inferred type of the schema.
+The `~validate` method _does not_ need to be publicly visible on your schema's type signature. If implemented as an instance method, it can be marked `private` or `protected` on the base class to hide it from your end users.
 
-```ts
-class BaseSchema<T> {
-  '~output': T;
-}
-```
-
-Next, implement a `~validate` method that conforms to the following signature.
-
-```ts
-type ValidationMethod<T> = (data: unknown) => T | ValidationError;
-```
-
-A few additional details:
-
-- The `~validate` method can be hidden from autocomplete with `private` or `protected`.
-- _This method should not throw errors._ Instead, _return_ a `ValidationError` object on failure.
+_Important_: The `~validate` method should not throw errors. Instead, it should either a) return the validated data on success, or b) return a `ValidationError` on failure.
 
 ### Example
 
+The following class implements a Standard Schema-compatible `string` validator.
+
 ```ts
+import type {
+	StandardSchema,
+	OutputType,
+	InputType,
+	ValidationError,
+	Decorate,
+} from ".";
+
 class StringSchema {
-  '~output': string;
+	"~output": string;
 
-  // simple parse method
-  parse(data: unknown) {
-    if (typeof data !== 'string') throw new Error('Expected a string');
-    return data;
-  }
+	// library-specific validation method
+	parse(data: unknown): string {
+		// do validation logic here
+		if (typeof data === "string") return data;
+		throw new Error("Invalid data");
+	}
 
-  // defining a ~validate method that conforms to the standard signature
-  // can be private or protected
-  private '~validate'(data: unknown) {
-    try {
-      return this.parse(data);
-    } catch (err) {
-      return {
-        ['~validationerror']: true,
-        issues: [
-          {
-            message: err.message,
-            path: [],
-          },
-        ],
-      };
-    }
-  }
+	// defining a ~validate method that conforms to the standard signature
+	// can be private or protected
+	private "~validate"(data: unknown) {
+		try {
+			return this.parse(data);
+		} catch (err) {
+			return {
+				"~validationerror": true,
+				issues: [
+					{
+						message: (err as Error)?.message,
+						path: [],
+					},
+				],
+			};
+		}
+	}
 }
 ```
 
