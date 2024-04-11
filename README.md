@@ -198,7 +198,7 @@ const object = {
 
 By contrast, declaring the symbol externally makes it "nominally typed". This means the key is sorted in autocomplete under the variable name (e.g. `testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike `~`-prefixed string keys.
 
-![Screenshot 2024-04-10 at 9 06 51 PM](https://github.com/standard-schema/standard-schema/assets/3084745/1fcf569e-130a-41a2-9d65-3a639252262a)
+![Screenshot 2024-04-10 at 9 33 33 PM](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
 
 ### Why does `~validate` return a union?
 
