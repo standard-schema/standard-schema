@@ -18,12 +18,12 @@ export type Decorate<T extends StandardSchema> = {
 
 export interface ValidationError {
   '~validationerror': true;
-  issues: Issue[];
+  readonly issues: Issue[];
 }
 
 export interface Issue {
   message: string;
-  path: (string | number | symbol)[];
+  readonly path: (string | number | symbol)[];
 }
 
 export function isValidationError(result: any): result is ValidationError {
