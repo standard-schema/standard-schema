@@ -14,20 +14,35 @@ This is a proposal for a standard interface to be adopted across TypeScript vali
 ## The standard interface
 
 ```ts
-interface StandardSchema<O, I> {
-  '~output': O;
-  '~input': I;
-  // runtime only (does not need to be visible in the type signature)
-  '~validate': (data: unknown) => O | ValidationError;
+export interface StandardSchema<Input = unknown, Output = unknown> {
+  '~standard': number; // version number
+  '~types'?: {
+    input: Input;
+    output: Output;
+  };
+  // this must be implemented at runtime but does not need to exist in the type signature
+  '~validate': (
+    input: { value: unknown },
+    ...args: any[]
+  ) => StandardResult<Output>;
+}
+export type StandardResult<Value> =
+  | StandardSuccessResult<Value>
+  | StandardFailureResult;
+
+export interface StandardSuccessResult<Value> {
+  value: Value;
+  issues?: ReadonlyArray<StandardIssue>;
 }
 
-interface ValidationError {
-  // runtime only (does not need to be visible in the type signature)
-  '~validationerror': true;
-  issues: Array<{
-    message: string;
-    path: (string | number | symbol)[];
-  }>;
+export interface StandardFailureResult {
+  value?: unknown;
+  issues: ReadonlyArray<StandardIssue>;
+}
+
+export interface StandardIssue {
+  message: string;
+  path?: ReadonlyArray<PropertyKey | { key: PropertyKey }>;
 }
 ```
 
@@ -44,33 +59,39 @@ pnpm add --dev standard-schema
 To accept a user-defined schema in your API, use a generic function parameter that extends `StandardSchema`.
 
 ```ts
-import type { StandardSchema, OutputType, Decorate  } from 'standard-schema';
+import type { StandardSchema, OutputType, Decorate } from 'standard-schema';
 
 // example usage in libraries
-function inferSchema<T extends StandardSchema>(schema: T) {
-  return (schema as unknown) as Decorate<T>;
+function inferSchema<T extends StandardSchema>(schema: T): T {
+  return schema;
 }
 ```
 
-The `Decorate` utility takes the inferred type, extracts type information from it, and returns a fully typed object with a `~validate` method. You can use this method to parse data.
+Here's a complete example of how to validate data with a user-provided schema.
 
 ```ts
-import { ValidationError } from 'standard-schema';
+// example usage in libraries
 import { CoolSchema } from 'some-cool-schema-library';
 
-const someSchema = new CoolSchema<{ name: string }>();
-
-const inferredSchema = inferSchema(someSchema);
-const result = inferredSchema['~validate']({ name: 'Billie' });
-
-function isValidationError(result: unknown): result is ValidationError {
-  return (result as ValidationError)['~validationerror'] === true;
+function inferSchema<T extends StandardSchema>(
+  schema: T
+): StandardSchemaVersioned {
+  return schema as unknown as StandardSchemaVersioned;
 }
 
-if (isValidationError(result)) {
-  result.issues; // detailed error reporting
+const someSchema: CoolSchema<{ name: string }> = new CoolSchema();
+const inferredSchema = inferSchema(someSchema);
+const value = { name: 'Billie' };
+
+if (inferredSchema['~standard'] === 1) {
+  const result = inferredSchema['~validate']({ value });
+  if (result.issues) {
+    result.issues; // readonly StandardIssue[]
+  } else {
+    result.value; // unknown
+  }
 } else {
-  result.name; // fully typed result
+  throw new Error('Unsupported StandardSchema version');
 }
 ```
 
@@ -82,8 +103,8 @@ import type { OutputType, InputType } from 'standard-schema';
 const someSchema = new CoolSchema<{ name: string }>();
 const inferredSchema = inferSchema(someSchema);
 
-type Output = OutputType<typeof someSchema>; // { name: string }
-type Input = InputType<typeof someSchema>; // { name: string }
+type Output = OutputType<typeof inferredSchema>; // { name: string }
+type Input = InputType<typeof inferredSchema>; // { name: string }
 ```
 
 ## Implementing the standard: schema library authors
@@ -92,104 +113,45 @@ To make your library compatible with the `Standard Schema` spec, your library mu
 
 ### Static domain
 
-This one is easy. Your schemas should conform to the following interface. This is all that's required in the static domain to be compatible with the `Standard Schema` spec.
+Your schemas should conform to the following interface. This is all that's required in the static domain to be compatible with the `Standard Schema` spec.
 
 ```ts
 interface StandardSchema {
-  '~output': unknown;
+  '~standard': number; // version number
+  '~types': { output: unknown; input: unknown };
 }
-```
-
-The type signature of the `~output` key should correspond to the inferred output type of the schema. This type can be extracted with the `OutputType` utility type.
-
-```ts
-export type OutputType<T extends StandardSchema> = T['~output'];
-```
-
-If your library implements any form of transform or coercion, it's possible the output type can diverge from the expected input type. If this is applicable to your library, your schemas should also include an `~input` key.
-
-```ts
-interface StandardSchema {
-  '~output': unknown;
-  '~input': unknown;
-}
-```
-
-This key isn't necessary. If it is omitted, the inferred input type of your schema will default to the output type.
-
-```ts
-export type InputType<T extends StandardSchema> = T extends {
-  '~input': infer I;
-}
-  ? I
-  : OutputType<T>; // defaults to output type
 ```
 
 ### Runtime domain
 
-At runtime, your schemas should implement the following interface.
+The Standard Schema spec has built-in _versioning_. Successive versions of the spec may require different methods or properties to be defined on your schema at runtime.
 
-```ts
-interface StandardSchema<T> {
-  // can be hidden from the public type signature (private/protected)
-  '~validate': (data: unknown) => T | ValidationError;
-}
+At the moment there is only one version: `1`. To be compatible with Standard Schema v1, your schema needs to implement a single method: `~validate`. The signature is already described above.
 
-interface ValidationError {
-  '~validationerror': true;
-  issues: Issue[];
-}
-
-interface Issue {
-  message: string;
-  path: (string | number | symbol)[];
-}
-```
-
-The `~validate` method _does not_ need to be publicly visible on your schema's type signature. If implemented as an instance method, it can be marked `private` or `protected` on the base class to hide it from your end users.
-
-_Important_: The `~validate` method should not throw errors. Instead, it should either a) return the validated data on success, or b) return a `ValidationError` on failure.
+> You can hide this method from the public-facing type signature if you like, but it isn't necessary. The easiest way to do this in a class definition is with the `private` modifier.
 
 ### Example
 
 The following class implements a `Standard Schema`-compatible `string` validator.
 
 ```ts
-import type {
-  StandardSchema,
-  OutputType,
-  InputType,
-  ValidationError,
-  Decorate,
-} from ".";
+import type { StandardSchema, v1 } from 'standard-schema';
 
-class StringSchema {
-  "~output": string;
-
-  // library-specific validation method
-  parse(data: unknown): string {
-    // do validation logic here
-    if (typeof data === "string") return data;
-    throw new Error("Invalid data");
-  }
-
+class StringSchema implements StandardSchema {
+  '~standard' = 1;
+  '~types': { output: string; input: string };
   // defining a ~validate method that conforms to the standard signature
-  // can be private or protected
-  private "~validate"(data: unknown) {
-    try {
-      return this.parse(data);
-    } catch (err) {
-      return {
-        "~validationerror": true,
-        issues: [
-          {
-            message: (err as Error)?.message,
-            path: [],
-          },
-        ],
-      };
-    }
-  }
+  private '~validate' = ((input: { value: unknown }) => {
+    if (typeof input.value === 'string') return { value: input.value };
+    return {
+      issues: [
+        {
+          message: 'invalid type',
+          path: [],
+        },
+      ],
+    };
+  }) satisfies v1.Validate<this['~types']['output']>;
 }
 ```
 
@@ -197,7 +159,7 @@ class StringSchema {
 
 ### Do I need to include `standard-schema` as a dependency?
 
-You can include `standard-schema` as a dev dependency and consume the library exclusively with `import type`. The library may export some runtime utility functions but they are only available for convenience.
+You can include `standard-schema` as a dev dependency and consume the library exclusively with `import type`. The `standard-schema` package only exports types. You can also copy-paste the contents of `index.ts` into your project.
 
 ### Why tilde `~`?
 
@@ -219,55 +181,3 @@ const object = {
 By contrast, declaring the symbol externally makes it "nominally typed". This means the key is sorted in autocomplete under the variable name (e.g. `testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike `~`-prefixed string keys.
 
 ![Screenshot 2024-04-10 at 9 33 33 PM](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
-
-### Why does `~validate` return a union?
-
-The validation method must conform to the following interface:
-
-```ts
-type ValidationMethod<T> = (data: unknown) => T | ValidationError;
-```
-
-Note that the validation method should _not_ throw to indicate an error. It's expensive to throw an error in JavaScript, so any standard method signature should support the ability to perform validation without `throw` for performance reasons.
-
-Instead the method returns a union of `T` (the inferred output type) and `ValidationError`.
-
-### Why not use a discriminated union?
-
-Many libraries provide a validation method that returns a discriminated union.
-
-```ts
-interface Schema<O> {
-  '~validate': (
-    data: any
-  ) => { success: true; data: O } | { success: false; error: ValidationError };
-}
-```
-
-This necessarily involves allocating a new object on every parse operation. For performance-sensitive applications, this isn't acceptable.
-
-### How does error reporting work?
-
-On a failed validation, the `~validate` method returns an object compatible with the `ValidationError` interface.
-
-```ts
-interface ValidationError {
-  '~validationerror': true;
-  issues: Issue[];
-}
-```
-
-A `ValidationError` has a `~validationerror` flag (to distinguish it from `T`) and an `issues` array. Each `Issue` is an object that conforms to the following interface.
-
-```ts
-interface Issue {
-  message: string;
-  path: (string | number | symbol)[];
-}
-```
-
-This is intended to be as minimal as possible, while supporting common use cases like form validation.
-
-### Does `ValidationError` extend `Error`?
-
-It _could_ but it doesn't have to (and probably shouldn't). It's expensive to allocate `Error` instances in JavaScript, since it captures the stack trace at the time of creation. Many performance-sensitive libraries don't throw `Errors` for this reason.
