@@ -8,17 +8,13 @@ export interface StandardTypes<Input, Output> {
   output: Output;
 }
 
-export type OutputType<T extends StandardSchema> = T extends {
-  '~types': { output: infer Output };
-}
-  ? Output
-  : unknown;
+export type OutputType<T extends StandardSchema> = NonNullable<
+  T['~types']
+>['output'];
 
-export type InputType<T extends StandardSchema> = T extends {
-  '~types': { input: infer Input };
-}
-  ? Input
-  : unknown;
+export type InputType<T extends StandardSchema> = NonNullable<
+  T['~types']
+>['output'];
 
 export type StandardSchemaVersioned = v1.Schema /* ... */;
 
