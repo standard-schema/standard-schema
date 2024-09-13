@@ -1,4 +1,4 @@
-export interface StandardSchema<Input = unknown, Output = unknown> {
+export interface StandardSchema<Input = unknown, Output = Input> {
   '~standard': number; // version number
   '~types'?: StandardTypes<Input, Output>;
 }
