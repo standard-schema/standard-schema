@@ -5,11 +5,11 @@ export interface StandardSchema<Input = unknown, Output = Input> {
   /**
    * The version number of the standard.
    */
-  "~standard": number;
+  readonly "~standard": number;
   /**
    * The stored type information of the schema.
    */
-  "~types"?: StandardTypes<Input, Output> | undefined;
+  readonly "~types"?: StandardTypes<Input, Output> | undefined;
 }
 
 /**
@@ -19,11 +19,11 @@ export interface StandardTypes<Input, Output> {
   /**
    * The input type of the schema.
    */
-  input: Input;
+  readonly input: Input;
   /**
    * The output type of the schema.
    */
-  output: Output;
+  readonly output: Output;
 }
 
 /**

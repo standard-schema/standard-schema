@@ -8,48 +8,25 @@ export interface StandardSchema<Input = unknown, Output = Input>
   /**
    * The version number of the standard.
    */
-  "~standard": 1;
+  readonly "~standard": 1;
   /**
    * The vendor name of the schema library.
    */
-  "~vendor": string;
+  readonly "~vendor": string;
   /**
    * Validates unknown input values.
    */
-  "~validate": StandardValidate<Output>;
+  readonly "~validate": StandardValidate<Output>;
 }
 
 /**
  * The validate function interface.
  */
 export interface StandardValidate<Output> {
-  (input: StandardInput, ...args: any[]): StandardOutput<Output>;
-}
-
-/**
- * The async Standard Schema v1 interface.
- */
-export interface StandardSchemaAsync<Input = unknown, Output = Input>
-  extends BaseSchema<Input, Output> {
-  /**
-   * The version number of the standard.
-   */
-  "~standard": 1;
-  /**
-   * The vendor name of the schema library.
-   */
-  "~vendor": string;
-  /**
-   * Validates unknown input values.
-   */
-  "~validate": StandardValidateAsync<Output>;
-}
-
-/**
- * The async validate function interface.
- */
-export interface StandardValidateAsync<Output> {
-  (input: StandardInput, ...args: any[]): Promise<StandardOutput<Output>>;
+  (
+    input: StandardInput,
+    ...args: any[]
+  ): Promise<StandardOutput<Output>> | StandardOutput<Output>;
 }
 
 /**
@@ -59,7 +36,7 @@ export interface StandardInput {
   /**
    * The unknown input value.
    */
-  value: unknown;
+  readonly value: unknown;
 }
 
 /**
@@ -76,11 +53,11 @@ export interface StandardSuccessOutput<Output> {
   /**
    * The typed output value.
    */
-  value: Output;
+  readonly value: Output;
   /**
    * The non-existent issues.
    */
-  issues?: false | null | undefined;
+  readonly issues?: never;
 }
 
 /**
@@ -90,7 +67,7 @@ export interface StandardFailureOutput {
   /**
    * The issues of failed validation.
    */
-  issues: ReadonlyArray<StandardIssue>;
+  readonly issues: ReadonlyArray<StandardIssue>;
 }
 
 /**
@@ -100,11 +77,11 @@ export interface StandardIssue {
   /**
    * The error message of the issue.
    */
-  message: string;
+  readonly message: string;
   /**
    * The path of the issue, if any.
    */
-  path?: ReadonlyArray<StandardPathItem> | undefined;
+  readonly path?: ReadonlyArray<PropertyKey | StandardPathItem> | undefined;
 }
 
 /**
@@ -114,5 +91,5 @@ export interface StandardPathItem {
   /**
    * The key of the path item.
    */
-  key: unknown;
+  readonly key: unknown;
 }
