@@ -3,7 +3,10 @@
   "license": "MIT",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
-  "files": ["dist", "src"],
+  "files": [
+    "dist",
+    "src"
+  ],
   "engines": {
     "node": ">=10"
   },
@@ -20,12 +23,6 @@
     "hooks": {
       "pre-commit": "tsdx lint"
     }
-  },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
   },
   "name": "standard-schema",
   "author": "Colin McDonnell",
@@ -51,6 +48,7 @@
     "zod": "^3.22.4"
   },
   "dependencies": {
-    "@biomejs/biome": "^1.6.4"
+    "@biomejs/biome": "^1.6.4",
+    "prettier": "^3.3.3"
   }
 }

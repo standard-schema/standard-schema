@@ -23,10 +23,9 @@ export interface StandardSchema<Input = unknown, Output = Input>
  * The validate function interface.
  */
 export interface StandardValidate<Output> {
-  (
-    input: StandardInput,
-    ...args: any[]
-  ): Promise<StandardOutput<Output>> | StandardOutput<Output>;
+  (input: StandardInput, ...args: any[]):
+    | Promise<StandardOutput<Output>>
+    | StandardOutput<Output>;
 }
 
 /**
