@@ -1,4 +1,4 @@
-import { StandardSchema as BaseSchema } from "./base.ts";
+import { StandardSchemaBase as BaseSchema } from "./base.ts";
 
 /**
  * The Standard Schema v1 interface.
