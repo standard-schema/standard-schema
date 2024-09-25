@@ -97,7 +97,8 @@ const inputSchema = acceptSchema(someSchema);
 
 // 2. use the schema to validate data
 const value = { name: 'Billie' };
-const result = inputSchema['~validate']({ value });
+const result = await inputSchema['~validate']({ value });
+
 if (result.issues) {
   result.issues; // readonly StandardIssue[]
 } else {
@@ -105,9 +106,11 @@ if (result.issues) {
 }
 
 // 3. infer input and output types
-type Output = OutputType<typeof inputSchema>; // { name: string }
-type Input = InputType<typeof inputSchema>; // { name: string }
+type Output = InferOutput<typeof inputSchema>; // { name: string }
+type Input = InferInput<typeof inputSchema>; // { name: string }
 ```
+
+Note the `await` after calling `~validate`. This is because the method can return a `Promise`. You should handle Promises however you see fit in your library.
 
 
 ## Implementing the standard: schema library authors
