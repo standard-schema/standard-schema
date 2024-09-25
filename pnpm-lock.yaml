@@ -11,9 +11,6 @@ importers:
       '@biomejs/biome':
         specifier: ^1.6.4
         version: 1.6.4
-      prettier:
-        specifier: ^3.3.3
-        version: 3.3.3
     devDependencies:
       '@size-limit/preset-small-lib':
         specifier: ^11.1.2
@@ -3086,11 +3083,6 @@ packages:
   prettier@1.19.1:
     resolution: {integrity: sha512-s7PoyDv/II1ObgQunCbB9PdLmUcBZcnWOcxDh7O0N/UwDEsHyqkW+Qh28jW+mVuCdx7gLB0BotYI1Y6uI9iyew==}
     engines: {node: '>=4'}
-    hasBin: true
-
-  prettier@3.3.3:
-    resolution: {integrity: sha512-i2tDNA0O5IrMO757lfrdQZCc2jPNDVntV0m/+4whiDfWaTKfMNgR7Qz0NAeGz/nRqF4m5/6CLzbP4/liHt12Ew==}
-    engines: {node: '>=14'}
     hasBin: true
 
   pretty-format@25.5.0:
@@ -7640,8 +7632,6 @@ snapshots:
       fast-diff: 1.3.0
 
   prettier@1.19.1: {}
-
-  prettier@3.3.3: {}
 
   pretty-format@25.5.0:
     dependencies:

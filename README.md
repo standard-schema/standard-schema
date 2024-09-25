@@ -1,5 +1,3 @@
-> This is a draft! Feel free to submit an issue to start discussions relating to this proposal!
-
 <p align="center">
   <h1 align="center">🦆<br/><code>Standard Schema</code></h1>
   <p align="center">
@@ -14,7 +12,7 @@ This is a proposal for a standard interface to be adopted across TypeScript vali
 ## The standard interface
 
 ```ts
-export interface StandardSchema<Input = unknown, Output = unknown> {
+export interface StandardSchema<Input = unknown, Output = Input> {
   '~standard': number; // version number
   '~types'?: {
     input: Input;
@@ -97,7 +95,7 @@ const inputSchema = acceptSchema(someSchema);
 
 // 2. use the schema to validate data
 const value = { name: 'Billie' };
-const result = await inputSchema['~validate']({ value });
+const result = inputSchema['~validate']({ value });
 
 if (result.issues) {
   result.issues; // readonly StandardIssue[]
@@ -122,7 +120,7 @@ To make your library compatible with the `Standard Schema` spec, your library mu
 Your schemas should conform to the following interface. This is all that's required in the static domain to be compatible with the `Standard Schema` spec.
 
 ```ts
-interface StandardSchemaBase {
+interface BaseSchema {
   // which version of Standard Schema this schema is compatible with
   '~standard': number;
   "~vendor": string; // the name of your library
