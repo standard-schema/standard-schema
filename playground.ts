@@ -1,4 +1,9 @@
-import type { v1, StandardSchema, InferOutput, InferInput } from "./index.ts";
+import type {
+  v1,
+  StandardSchema,
+  InferOutput,
+  InferInput,
+} from "./src/index.ts";
 
 abstract class CoolSchema<T> implements v1.StandardSchema<T, T> {
   "~standard": 1; // numeric literal `1`
