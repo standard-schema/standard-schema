@@ -1,4 +1,4 @@
-import { StandardSchema as BaseSchema } from "./base.ts";
+import type { BaseSchema } from "./base.ts";
 
 /**
  * The Standard Schema v1 interface.
@@ -22,12 +22,10 @@ export interface StandardSchema<Input = unknown, Output = Input>
 /**
  * The validate function interface.
  */
-export interface StandardValidate<Output> {
-  (
-    input: StandardInput,
-    ...args: any[]
-  ): Promise<StandardOutput<Output>> | StandardOutput<Output>;
-}
+export type StandardValidate<Output> = (
+  input: StandardInput,
+  ...args: any[]
+) => Promise<StandardOutput<Output>> | StandardOutput<Output>;
 
 /**
  * The input interface of the validate function.

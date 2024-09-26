@@ -1,5 +1,3 @@
-> This is a draft! Feel free to submit an issue to start discussions relating to this proposal!
-
 <p align="center">
   <h1 align="center">🦆<br/><code>Standard Schema</code></h1>
   <p align="center">
@@ -14,17 +12,20 @@ This is a proposal for a standard interface to be adopted across TypeScript vali
 ## The standard interface
 
 ```ts
-export interface StandardSchema<Input = unknown, Output = unknown> {
+export interface StandardSchema<Input = unknown, Output = Input> {
   '~standard': number; // version number
   '~types'?: {
     input: Input;
     output: Output;
   };
-  // this must be implemented at runtime but does not need to exist in the type signature
+  '~vendor': string; // optional vendor name
+  
+  // this must be implemented at runtime 
+  // does not need to exist in the type signature
   '~validate': (
     input: { value: unknown },
-    ...args: any[]
-  ) => StandardResult<Output>;
+    ...args: any[] 
+  ) => StandardResult<Output> | Promise<StandardResult<Output>>;
 }
 export type StandardResult<Value> =
   | StandardSuccessResult<Value>
@@ -59,10 +60,10 @@ pnpm add --dev standard-schema
 To accept a user-defined schema in your API, use a generic function parameter that extends `StandardSchema`.
 
 ```ts
-import type { StandardSchema, OutputType, Decorate } from 'standard-schema';
+import type { v1 } from 'standard-schema';
 
 // example usage in libraries
-function inferSchema<T extends StandardSchema>(schema: T): T {
+function inferSchema<T extends v1.StandardSchema>(schema: T): T {
   return schema;
 }
 ```
@@ -71,41 +72,44 @@ Here's a complete example of how to validate data with a user-provided schema.
 
 ```ts
 // example usage in libraries
-import { CoolSchema } from 'some-cool-schema-library';
+import { StandardSchema, InferOutput } from 'standard-schema';
+import { CoolSchema } from 'some-cool-schema-library'; // not a real library
 
-function inferSchema<T extends StandardSchema>(
-  schema: T
-): StandardSchemaVersioned {
-  return schema as unknown as StandardSchemaVersioned;
-}
-
-const someSchema: CoolSchema<{ name: string }> = new CoolSchema();
-const inferredSchema = inferSchema(someSchema);
-const value = { name: 'Billie' };
-
-if (inferredSchema['~standard'] === 1) {
-  const result = inferredSchema['~validate']({ value });
-  if (result.issues) {
-    result.issues; // readonly StandardIssue[]
-  } else {
-    result.value; // unknown
+// example usage in libraries
+function acceptSchema<T extends StandardSchema>(schema: T): T   {
+  // currently only the first version exists
+  if(schema["~standard"] === 1){
+    return schema as T;
   }
-} else {
-  throw new Error('Unsupported StandardSchema version');
+  throw new Error(`Unrecognized Standard Schema version: ${schema["~standard"]}`);
 }
 ```
 
-To extract the output and input types from a schema, use the `OutputType` and `InputType` utility types.
+Using the generic `acceptSchema` function, you can now accept user-defined schemas in your API.
 
 ```ts
-import type { OutputType, InputType } from 'standard-schema';
-
 const someSchema = new CoolSchema<{ name: string }>();
-const inferredSchema = inferSchema(someSchema);
 
-type Output = OutputType<typeof inferredSchema>; // { name: string }
-type Input = InputType<typeof inferredSchema>; // { name: string }
+// 1. accept a user-defined schema via your API
+const inputSchema = acceptSchema(someSchema); 
+
+// 2. use the schema to validate data
+const value = { name: 'Billie' };
+const result = inputSchema['~validate']({ value });
+
+if (result.issues) {
+  result.issues; // readonly StandardIssue[]
+} else {
+  result.value; // unknown
+}
+
+// 3. infer input and output types
+type Output = InferOutput<typeof inputSchema>; // { name: string }
+type Input = InferInput<typeof inputSchema>; // { name: string }
 ```
+
+Note the `await` after calling `~validate`. This is because the method can return a `Promise`. You should handle Promises however you see fit in your library.
+
 
 ## Implementing the standard: schema library authors
 
@@ -116,42 +120,41 @@ To make your library compatible with the `Standard Schema` spec, your library mu
 Your schemas should conform to the following interface. This is all that's required in the static domain to be compatible with the `Standard Schema` spec.
 
 ```ts
-interface StandardSchema {
-  '~standard': number; // version number
-  '~types': { output: unknown; input: unknown };
+interface BaseSchema {
+  // which version of Standard Schema this schema is compatible with
+  '~standard': number;
+  "~vendor": string; // the name of your library
+  '~types'?: { output: unknown; input: unknown };
 }
 ```
 
 ### Runtime domain
 
-The Standard Schema spec has built-in _versioning_. Successive versions of the spec may require different methods or properties to be defined on your schema at runtime.
+The Standard Schema spec has built-in _versioning_. Successive versions of the spec may require different methods or properties to be defined on your schema at runtime. At the moment there is only one version: `1`. 
 
-At the moment there is only one version: `1`. To be compatible with Standard Schema v1, your schema needs to implement a single method: `~validate`. The signature is already described above.
+To be compatible with Standard Schema v1, your schema needs to implement a single method: `~validate`. The signature is already described above.
 
-> You can hide this method from the public-facing type signature if you like, but it isn't necessary. The easiest way to do this in a class definition is with the `private` modifier.
-
-### Example
-
-The following class implements a `Standard Schema`-compatible `string` validator.
+> You can hide this method/function from the public-facing type signature if you like, but it isn't necessary. The easiest way to do this is with the `private` modifier (if you're using class definitions).
 
 ```ts
-import type { StandardSchema, v1 } from 'standard-schema';
+abstract class CoolSchema<T> implements v1.StandardSchema<T, T> {
+  "~standard": 1; // numeric literal `1`
+  "~vendor": "some-cool-schema-library"; // the name of your library
+  "~types":{
+    input: T;
+    output: T;
+  };
+  
+  abstract "~validate"(input: {value: unknown}): v1.StandardOutput<T>;
+}
 
-class StringSchema implements StandardSchema {
-  '~standard' = 1;
-  '~types': { output: string; input: string };
-  // defining a ~validate method that conforms to the standard signature
-  private '~validate' = ((input: { value: unknown }) => {
-    if (typeof input.value === 'string') return { value: input.value };
-    return {
-      issues: [
-        {
-          message: 'invalid type',
-          path: [],
-        },
-      ],
-    };
-  }) satisfies v1.Validate<this['~types']['output']>;
+class StringSchema extends CoolSchema<string> {
+  override "~validate"(input: {value: unknown}): v1.StandardOutput<string> {
+    if(typeof input.value === 'string'){
+      return {value: input.value};
+    }
+    return {issues: [{message: 'not a string'}]};
+  }
 }
 ```
 

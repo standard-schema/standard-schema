@@ -21,12 +21,6 @@
       "pre-commit": "tsdx lint"
     }
   },
-  "prettier": {
-    "printWidth": 80,
-    "semi": true,
-    "singleQuote": true,
-    "trailingComma": "es5"
-  },
   "name": "standard-schema",
   "author": "Colin McDonnell",
   "module": "dist/standard-schema.esm.js",
