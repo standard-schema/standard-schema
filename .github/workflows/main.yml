@@ -1,15 +1,21 @@
-name: CI
-on: [push]
+name: Main CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+
 jobs:
-  build:
-    name: Build, lint, and test on Node ${{ matrix.node }} and ${{ matrix.os }}
-
-    runs-on: ${{ matrix.os }}
-    strategy:
-      matrix:
-        node: ['20.x']
-        os: [ubuntu-latest, windows-latest, macOS-latest]
-
+  biome:
+    name: Run Biome
+    runs-on: ubuntu-latest
     steps:
-      - name: Checkout repo
-        uses: actions/checkout@v2
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Biome
+        uses: biomejs/setup-biome@v2
+        with:
+          version: latest
+      - name: Run Biome
+        run: biome ci ./src

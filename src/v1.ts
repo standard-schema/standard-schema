@@ -24,6 +24,7 @@ export interface StandardSchema<Input = unknown, Output = Input>
  */
 export type StandardValidate<Output> = (
   input: StandardInput,
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
   ...args: any[]
 ) => StandardOutput<Output> | Promise<StandardOutput<Output>>;
 

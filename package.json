@@ -1,50 +1,44 @@
 {
+  "name": "standard-schema",
+  "description": "A standard interface for TypeScript schema validation libraries",
   "version": "0.1.0",
   "license": "MIT",
-  "main": "dist/index.js",
-  "typings": "dist/index.d.ts",
-  "files": ["dist", "src"],
-  "engines": {
-    "node": ">=10"
+  "author": "Colin McDonnell",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/standard-schema/standard-schema"
+  },
+  "keywords": ["typescript", "schema", "validation", "standard", "interface"],
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": {
+        "types": "./dist/index.d.ts",
+        "default": "./dist/index.js"
+      },
+      "require": {
+        "types": "./dist/index.d.cts",
+        "default": "./dist/index.cjs"
+      }
+    }
+  },
+  "sideEffects": false,
+  "files": ["dist"],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
-    "start": "tsdx watch",
-    "build": "tsdx build",
-    "test": "tsdx test",
-    "lint": "tsdx lint",
-    "prepare": "tsdx build",
-    "size": "size-limit",
-    "analyze": "size-limit --why"
+    "test": "vitest --typecheck",
+    "lint": "pnpm biome lint ./src",
+    "format": "pnpm biome format --write ./src",
+    "check": "pnpm biome check ./src",
+    "build": "tsup"
   },
-  "husky": {
-    "hooks": {
-      "pre-commit": "tsdx lint"
-    }
-  },
-  "name": "standard-schema",
-  "author": "Colin McDonnell",
-  "module": "dist/standard-schema.esm.js",
-  "size-limit": [
-    {
-      "path": "dist/standard-schema.cjs.production.min.js",
-      "limit": "10 KB"
-    },
-    {
-      "path": "dist/standard-schema.esm.js",
-      "limit": "10 KB"
-    }
-  ],
   "devDependencies": {
-    "@size-limit/preset-small-lib": "^11.1.2",
-    "arktype": "^1.0.29-alpha",
-    "husky": "^9.0.11",
-    "size-limit": "^11.1.2",
-    "tsdx": "^0.14.1",
-    "tslib": "^2.6.2",
-    "typescript": "^5.4.4",
-    "zod": "^3.22.4"
-  },
-  "dependencies": {
-    "@biomejs/biome": "^1.6.4"
+    "@biomejs/biome": "^1.9.2",
+    "tsup": "^8.3.0",
+    "typescript": "^5.6.2"
   }
 }
