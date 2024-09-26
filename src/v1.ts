@@ -25,7 +25,7 @@ export interface StandardSchema<Input = unknown, Output = Input>
 export type StandardValidate<Output> = (
   input: StandardInput,
   ...args: any[]
-) => Promise<StandardOutput<Output>> | StandardOutput<Output>;
+) => StandardOutput<Output> | Promise<StandardOutput<Output>>;
 
 /**
  * The input interface of the validate function.
@@ -55,7 +55,7 @@ export interface StandardSuccessOutput<Output> {
   /**
    * The non-existent issues.
    */
-  readonly issues?: never;
+  readonly issues?: null | undefined;
 }
 
 /**
