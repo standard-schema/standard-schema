@@ -51,16 +51,16 @@ export interface StandardIssue {
 
 So, you're building a library and want to accept user-defined schemas. Great!
 
-First, install `standard-schema` as a dev dependency. This package only contains types!
+First, install `@standard-schema/spec` as a dev dependency. This package only contains types!
 
 ```sh
-pnpm add --dev standard-schema
+pnpm add --dev @standard-schema/spec
 ```
 
 To accept a user-defined schema in your API, use a generic function parameter that extends `StandardSchema`.
 
 ```ts
-import type { v1 } from 'standard-schema';
+import type { v1 } from '@standard-schema/spec';
 
 // example usage in libraries
 function inferSchema<T extends v1.StandardSchema>(schema: T): T {
@@ -72,7 +72,7 @@ Here's a complete example of how to validate data with a user-provided schema.
 
 ```ts
 // example usage in libraries
-import { StandardSchema, InferOutput } from 'standard-schema';
+import { StandardSchema, InferOutput } from '@standard-schema/spec';
 import { CoolSchema } from 'some-cool-schema-library'; // not a real library
 
 // example usage in libraries
@@ -160,9 +160,9 @@ class StringSchema extends CoolSchema<string> {
 
 ## FAQ
 
-### Do I need to include `standard-schema` as a dependency?
+### Do I need to include `@standard-schema/spec` as a dependency?
 
-You can include `standard-schema` as a dev dependency and consume the library exclusively with `import type`. The `standard-schema` package only exports types. You can also copy-paste the contents of `index.ts` into your project.
+You can include `@standard-schema/spec` as a dev dependency and consume the library exclusively with `import type`. The `@standard-schema/spec` package only exports types. You can also just copy-paste the types into your project.
 
 ### Why tilde `~`?
 
