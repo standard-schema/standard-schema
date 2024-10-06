@@ -8,7 +8,7 @@ import type { v1 } from "@standard-schema/spec";
  * @returns The dot path or null.
  */
 export function getDotPath(issue: v1.StandardIssue): string | null {
-  if (issue.path) {
+  if (issue.path?.length) {
     let dotPath = "";
     for (const item of issue.path) {
       const key = typeof item === "object" ? item.key : item;

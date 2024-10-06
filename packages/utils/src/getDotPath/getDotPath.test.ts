@@ -16,6 +16,15 @@ describe("getDotPath", () => {
     ).toBeNull();
   });
 
+  test("should return null if path is empty", () => {
+    expect(
+      getDotPath({
+        message: "Error message",
+        path: [],
+      }),
+    ).toBeNull();
+  });
+
   test("should return null if path contains item without key", () => {
     expect(
       getDotPath({
