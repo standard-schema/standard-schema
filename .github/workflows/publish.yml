@@ -57,3 +57,51 @@ jobs:
       - name: Publish
         run: npx jsr publish
         working-directory: packages/spec
+
+  utils_npm:
+    name: Publish /utils to NPM
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install
+      - name: Build
+        run: pnpm build
+        working-directory: packages/utils
+      - name: Publish
+        run: pnpm publish --provenance --access public --no-git-checks
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        continue-on-error: true
+        working-directory: packages/utils
+
+  utils_jsr:
+    name: Publish /utils to JSR
+    needs: ci
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Publish
+        run: npx jsr publish
+        working-directory: packages/utils
