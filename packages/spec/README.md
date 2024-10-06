@@ -1,4 +1,4 @@
-# Standard Schema
+# Standard Schema Spec
 
 A consortium of schema library authors have collaborated to craft a standard interface for schema libraries to benefit the entire JavaScript ecosystem. Standard Schema provides third-party libraries a uniform integration to automatically support multiple schema libraries at once, without adding a single runtime dependency. This simplifies implementation, prevents vendor lock-in, and enables innovation, especially for smaller schema libraries with new ideas.
 
