@@ -1,18 +1,14 @@
 {
   "name": "@standard-schema/utils",
   "description": "The official runtime utils for Standard Schema",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "MIT",
   "author": "Fabian Hiller",
   "repository": {
     "type": "git",
     "url": "https://github.com/standard-schema/standard-schema"
   },
-  "keywords": [
-    "standard",
-    "schema",
-    "utils"
-  ],
+  "keywords": ["standard", "schema", "utils"],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -29,9 +25,7 @@
     }
   },
   "sideEffects": false,
-  "files": [
-    "dist"
-  ],
+  "files": ["dist"],
   "publishConfig": {
     "access": "public"
   },
