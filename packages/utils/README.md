@@ -9,7 +9,7 @@ pnpm add @standard-schema/utils      # pnpm
 bun add @standard-schema/utils       # bun
 ```
 
-### Get Dot Path
+## Get Dot Path
 
 To generate a dot path, simply pass an issue to the `getDotPath` function. If the issue does not contain a path or the path contains a key that is not of type `string` or `number`, the function returns `null`.
 
@@ -39,7 +39,7 @@ async function getFormErrors(schema: StandardSchema, data: unknown) {
 }
 ```
 
-### Schema Error
+## Schema Error
 
 To throw an error that contains all issue information, simply pass the issues of the failed schema validation to the `SchemaError` class. The `SchemaError` class extends the `Error` class with an `issues` property that contains all the issues.
 
