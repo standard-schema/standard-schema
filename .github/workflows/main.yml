@@ -7,8 +7,8 @@ on:
   workflow_call:
 
 jobs:
-  biome:
-    name: Run Biome
+  spec_biome:
+    name: Run Biome in /spec
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -19,3 +19,4 @@ jobs:
           version: latest
       - name: Run Biome
         run: biome ci ./src
+        working-directory: packages/spec
