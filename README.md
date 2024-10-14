@@ -183,6 +183,7 @@ These are the libraries that have already implemented the Standard Schema interf
 
 ### Third Parties
 
+- [Nuxt UI](https://github.com/nuxt/ui): A UI Library for Modern Web Apps, powered by Vue & Tailwind CSS.
 - [tRPC](https://github.com/trpc/trpc): 🧙‍♀️ Move Fast and Break Nothing. End-to-end typesafe APIs made easy.
 
 ## FAQ
