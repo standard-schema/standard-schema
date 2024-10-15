@@ -50,6 +50,8 @@ Schemas libraries that want to support Standard Schema must implement its interf
 > It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that these four properties are defined somehow.
 
 ```ts
+import { v1 } from "@standard-schema/spec";
+
 // Step 1: Define the schema interface
 interface StringSchema extends v1.StandardSchema<string> {
   type: "string";
@@ -81,7 +83,7 @@ Instead of implementing the `StandardSchema` interface natively into your librar
 
 ### Third Party
 
-Other than for schema library authors, we recommend third party authors to install the `@standard-schema/spec` package when implementing Standard Schema into their libraries. This package provides the `StandardSchema` interface and the `InferInput` and `InferOutput` utility types.
+Other than for schema library authors, we recommend third party authors to install the `@standard-schema/spec` package when implementing Standard Schema into their libraries. This package provides the `StandardSchema` interface and its transitively referenced types.
 
 ```sh
 npm install @standard-schema/spec --save-dev  # npm
@@ -93,14 +95,14 @@ bun add @standard-schema/spec --dev           # bun
 After that you can accept any schemas that implement the Standard Schema interface as part of your API. We recommend using a generic that extends the `StandardSchema` interface in most cases to be able to infer the type information of the schema.
 
 ```ts
-import type { InferOutput, StandardSchema } from "@standard-schema/spec";
+import type { StandardSchema } from "@standard-schema/spec";
 
 // Step 1: Define the schema generic
 function createEndpoint<TSchema extends StandardSchema, TOutput>(
   // Step 2: Use the generic to accept a schema
   schema: TSchema,
   // Step 3: Infer the output type from the generic
-  handler: (data: InferOutput<TSchema>) => Promise<TOutput>,
+  handler: (data: TSchema["~types"]["output"]) => Promise<TOutput>,
 ) {
   return async (data: unknown) => {
     // Step 4: Use the schema to validate data
