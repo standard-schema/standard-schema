@@ -8,7 +8,7 @@ The `StandardSchema` interface defines four properties that a schema library mus
 
 - `~standard` stores the version number and can be used to test whether an object is a Standard Schema. 
 
-- `~vendor` stores the name of the schema library. This can be useful for performing vendor-specific operations in special cases. 
+- `~vendor` stores the name of the schema libarry. This can be useful for performing vendor-specific operations in special cases. 
 
 - `~validate` is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. This can be discriminated by checking whether the `issues` property is `undefined`.
 
