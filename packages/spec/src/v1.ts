@@ -20,12 +20,19 @@ export interface StandardSchema<Input = unknown, Output = Input>
 }
 
 /**
+ * Omit from a Standard Schema the properties not expected
+ * to exist at runtime (currently "~types").
+ */
+export type ImplementationOf<Schema extends StandardSchema> = Omit<
+  Schema,
+  "~types"
+>;
+
+/**
  * The validate function interface.
  */
 export type StandardValidate<Output> = (
   input: StandardInput,
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  ...args: any[]
 ) => StandardOutput<Output> | Promise<StandardOutput<Output>>;
 
 /**
@@ -56,7 +63,7 @@ export interface StandardSuccessOutput<Output> {
   /**
    * The non-existent issues.
    */
-  readonly issues?: null | undefined;
+  readonly issues?: undefined;
 }
 
 /**
@@ -80,15 +87,15 @@ export interface StandardIssue {
   /**
    * The path of the issue, if any.
    */
-  readonly path?: ReadonlyArray<PropertyKey | StandardPathItem> | undefined;
+  readonly path?: ReadonlyArray<PropertyKey | StandardPathSegment> | undefined;
 }
 
 /**
  * The path item interface of the issue.
  */
-export interface StandardPathItem {
+export interface StandardPathSegment {
   /**
-   * The key of the path item.
+   * The key of the path segment.
    */
-  readonly key: unknown;
+  readonly key: PropertyKey;
 }
