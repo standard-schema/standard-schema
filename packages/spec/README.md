@@ -57,8 +57,8 @@ interface StringSchema extends v1.StandardSchema<string> {
   message: string;
 }
 
-// Step 2: Declare the external type of your schema
-function string(message?: string): StringSchema {
+// Step 2: Implement the schema interface
+function string(message: string = "Invalid type"): StringSchema {
   return {
     type: "string",
     message,
