@@ -24,7 +24,7 @@ export interface StandardSchema<Input = unknown, Output = Input>
  */
 export type StandardValidate<Output> = (
   input: StandardInput,
-  options?: undefined
+  options?: undefined,
 ) => StandardOutput<Output> | Promise<StandardOutput<Output>>;
 
 /**
@@ -89,5 +89,5 @@ export interface StandardPathSegment {
   /**
    * The key representing a path segment.
    */
-  readonly key: PropertyKey
+  readonly key: PropertyKey;
 }
