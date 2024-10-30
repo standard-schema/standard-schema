@@ -6,15 +6,6 @@ A consortium of schema library authors have collaborated to craft a standard int
 
 The `StandardSchema` interface defines four properties that a schema library must implement to be compatible.
 
-- `~standard` stores the version number and can be used to test whether an object is a Standard Schema. 
-
-- `~vendor` stores the name of the schema libarry. This can be useful for performing vendor-specific operations in special cases. 
-
-- `~validate` is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. This can be discriminated by checking whether the `issues` property is `undefined`.
-
-- `~types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. Authors implementing the schema are encouraged to use TypeScript's `declare` keyword or other means
-of avoiding runtime overhead. `unknown` can be used as a fallback for `input` and/or `output` depending what inference the implementation supports.
-
 ```ts
 /**
  * The Standard Schema v1 interface.
@@ -38,6 +29,14 @@ export interface StandardSchema<Input = unknown, Output = Input> {
   readonly "~types": StandardTypes<Input, Output> | undefined;
 }
 ```
+
+- `~standard` stores the version number and can be used to test whether an object is a Standard Schema. 
+
+- `~vendor` stores the name of the schema libarry. This can be useful for performing vendor-specific operations in special cases. 
+
+- `~validate` is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. This can be discriminated by checking whether the `issues` property is `undefined`.
+
+- `~types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. Authors implementing the schema are encouraged to use TypeScript's `declare` keyword or other means of avoiding runtime overhead. `unknown` can be used as a fallback for `input` and/or `output` depending what inference the implementation supports.
 
 ## Implementation
 
@@ -95,14 +94,14 @@ bun add @standard-schema/spec --dev           # bun
 After that you can accept any schemas that implement the Standard Schema interface as part of your API. We recommend using a generic that extends the `StandardSchema` interface in most cases to be able to infer the type information of the schema.
 
 ```ts
-import type { StandardSchema } from "@standard-schema/spec";
+import type { InferOutput, StandardSchema } from "@standard-schema/spec";
 
 // Step 1: Define the schema generic
 function createEndpoint<TSchema extends StandardSchema, TOutput>(
   // Step 2: Use the generic to accept a schema
   schema: TSchema,
   // Step 3: Infer the output type from the generic
-  handler: (data: TSchema["~types"]["output"]) => Promise<TOutput>,
+  handler: (data: InferOutput<TSchema>) => Promise<TOutput>,
 ) {
   return async (data: unknown) => {
     // Step 4: Use the schema to validate data

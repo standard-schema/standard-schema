@@ -8,24 +8,22 @@ export interface BaseSchema<Input = unknown, Output = Input> {
   readonly "~standard": number;
   /**
    * Inferred types associated with the schema.
-   *
-   * IMPORTANT: This is a type-only property-
-   * it should be used exclusively for inference
-   * will be `undefined` at runtime.
    */
-  readonly "~types": StandardTypes<Input, Output>;
+  readonly "~types"?: (Input: Input) => Output
 }
 
+
+
 /**
- * The base types interface of Standard Schema.
+ * Infers the input type of a Standard Schema.
  */
-export interface StandardTypes<Input, Output> {
-  /**
-   * The input type of the schema.
-   */
-  readonly input: Input;
-  /**
-   * The output type of the schema.
-   */
-  readonly output: Output;
-}
+export type InferInput<Schema extends BaseSchema> = Parameters<NonNullable<
+  Schema["~types"]
+>>[0]
+
+/**
+ * Infers the output type of a Standard Schema.
+ */
+export type InferOutput<Schema extends BaseSchema> = ReturnType<NonNullable<
+  Schema["~types"]
+>>

@@ -20,19 +20,11 @@ export interface StandardSchema<Input = unknown, Output = Input>
 }
 
 /**
- * Omit from a Standard Schema the properties not expected
- * to exist at runtime (currently "~types").
- */
-export type ImplementationOf<Schema extends StandardSchema> = Omit<
-  Schema,
-  "~types"
->;
-
-/**
  * The validate function interface.
  */
 export type StandardValidate<Output> = (
   input: StandardInput,
+  options?: undefined
 ) => StandardOutput<Output> | Promise<StandardOutput<Output>>;
 
 /**
@@ -95,7 +87,7 @@ export interface StandardIssue {
  */
 export interface StandardPathSegment {
   /**
-   * The key of the path segment.
+   * The key representing a path segment.
    */
-  readonly key: PropertyKey;
+  readonly key: PropertyKey
 }
