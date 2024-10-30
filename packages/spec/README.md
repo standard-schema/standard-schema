@@ -49,7 +49,7 @@ Schemas libraries that want to support Standard Schema must implement its interf
 > It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that these four properties are defined somehow.
 
 ```ts
-import { v1 } from "@standard-schema/spec";
+import type { v1 } from "@standard-schema/spec";
 
 // Step 1: Define the schema interface
 interface StringSchema extends v1.StandardSchema<string> {
@@ -58,12 +58,7 @@ interface StringSchema extends v1.StandardSchema<string> {
 }
 
 // Step 2: Declare the external type of your schema
-function string(message?: string): StringSchema
-// Internally, you can use the `ImplementationOf` type to omit
-// properties not expected at runtime like "~types". If you're 
-// using classes, you can instead simply use TypeScript's `declare`
-// keyword for type-only properties.
-function string(message: string = "Invalid type"): v1.ImplementationOf<StringSchema>{
+function string(message?: string): StringSchema {
   return {
     type: "string",
     message,
@@ -82,7 +77,7 @@ Instead of implementing the `StandardSchema` interface natively into your librar
 
 ### Third Party
 
-Other than for schema library authors, we recommend third party authors to install the `@standard-schema/spec` package when implementing Standard Schema into their libraries. This package provides the `StandardSchema` interface and its transitively referenced types.
+Other than for schema library authors, we recommend third party authors to install the `@standard-schema/spec` package when implementing Standard Schema into their libraries. This package provides the `StandardSchema` interface and the `InferInput` and `InferOutput` utility types.
 
 ```sh
 npm install @standard-schema/spec --save-dev  # npm
