@@ -26,7 +26,7 @@ export interface StandardSchema<Input = unknown, Output = Input> {
   /**
    * Inferred types associated with the schema.
    */
-  readonly "~types": StandardTypes<Input, Output> | undefined;
+  readonly "~types"?: StandardTypes<Input, Output> | undefined;
 }
 ```
 
@@ -36,7 +36,7 @@ export interface StandardSchema<Input = unknown, Output = Input> {
 
 - `~validate` is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. This can be discriminated by checking whether the `issues` property is `undefined`.
 
-- `~types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. Authors implementing the schema are encouraged to use TypeScript's `declare` keyword or other means of avoiding runtime overhead. `unknown` can be used as a fallback for `input` and/or `output` depending what inference the implementation supports.
+- `~types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. Authors implementing the schema are encouraged to use TypeScript's `declare` keyword or other means of avoiding runtime overhead. `InferInput` and `InferOutput` can be used to extract their corresponding types.
 
 ## Implementation
 
