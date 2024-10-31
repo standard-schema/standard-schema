@@ -1,22 +1,10 @@
 # Standard Schema Spec
 
-A consortium of schema library authors have collaborated to craft a standard interface for schema libraries to benefit the entire JavaScript ecosystem. Standard Schema provides third-party libraries a uniform integration to automatically support multiple schema libraries at once, without adding a single runtime dependency. This simplifies implementation, prevents vendor lock-in, and enables innovation, especially for smaller schema libraries with new ideas.
-
-## The Problem
-
-Validation is an essential building block for almost any application. Therefore, it was no surprise to see more and more JavaScript frameworks and libraries start to natively support specific schema libraries. Frameworks like Astro and libraries like the OpenAI SDK have adopted Zod in recent months to streamline the experience for their users. But to be honest, the current situation is far from perfect. Either only a single schema library gets first-party support, because the implementation and maintenance of multiple schema libraries is too complicated and time-consuming, or the choice falls on an adapter or resolver pattern, which is usually maintained by a project's community in their spare time.
-
-For this reason, Colin McDonnell, the creator of Zod, came up with the [idea](https://x.com/colinhacks/status/1634284724796661761) of a standard interface for schema libraries. This interface should be minimal, easy to implement, but powerful enough to support the most important features of popular schema libraries. The goal was to make it easier for other libraries to accept user-defined schemas as part of their API, in a library-agnostic way. After much thought and consideration, Standard Schema was born.
-
-## Use Cases
-
-The first version of Standard Schemas aims to address the most common use cases of schema libraries today. This includes API libraries like tRPC and JavaScript frameworks like Astro and Qwik who secure the client/server communication in a type safe way using schemas. Or projects like the T3 Stack, which uses schemas to validate environment variables. It also includes UI libraries like Nuxt UI and form libraries like Reach Hook Form, which use schemas to validate user inputs. Especially with the rise of TypeScript, schemas became the de facto standard as they drastically improved the developer experience by providing the type information and validation in a single source of truth.
-
-At the moment, Standard Schema deliberately tries to cover only the most common use cases. However, we believe that other use cases, such as integrating schema libraries into AI SDKs like Vercel AI or the OpenAI SDK to generate structured output, can also benefit from a standard interface.
+A consortium of schema library authors have collaborated to craft a standard interface for schema libraries to benefit the entire JavaScript ecosystem. Standard Schema provides third-party libraries a uniform integration to automatically support multiple schema libraries at once, without adding a single runtime dependency. This simplifies implementation, prevents vendor lock-in, and enables innovation, especially for smaller schema libraries with new ideas. For more information on the origins and use cases of Standard Schema, see [background](#background).
 
 ## The Interface
 
-The `StandardSchema` interface defines four properties that a schema library must implement to be compatible. This includes the `~standard` property, which stores the version number and can be used to test whether an object is a Standard Schema. The `~vendor` property stores the name of the schema library. This can be useful for performing vendor-specific operations in special cases. The `~validate` property is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. The `~types` property stores the type information of the schema. This property is intentionally marked as optional, as it does not need to be included at runtime. Standard Schema also provides two utility types, `InferInput` and `InferOutput`, which can be used to easily infer the type information of a schema.
+The `StandardSchema` interface defines four properties that a schema library must implement to be compatible.
 
 ```ts
 /**
@@ -36,11 +24,19 @@ export interface StandardSchema<Input = unknown, Output = Input> {
    */
   readonly "~validate": StandardValidate<Output>;
   /**
-   * The stored type information of the schema.
+   * Inferred types associated with the schema.
    */
   readonly "~types"?: StandardTypes<Input, Output> | undefined;
 }
 ```
+
+- `~standard` stores the version number and can be used to test whether an object is a Standard Schema. 
+
+- `~vendor` stores the name of the schema libarry. This can be useful for performing vendor-specific operations in special cases. 
+
+- `~validate` is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. This can be discriminated by checking whether the `issues` property is `undefined`.
+
+- `~types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. Authors implementing the schema are encouraged to use TypeScript's `declare` keyword or other means of avoiding runtime overhead. `InferInput` and `InferOutput` can be used to extract their corresponding types.
 
 ## Implementation
 
@@ -73,7 +69,7 @@ function string(message: string = "Invalid type"): StringSchema {
         ? { value }
         : { issues: [{ message }] };
     },
-  };
+  } 
 }
 ```
 
@@ -181,9 +177,26 @@ These are the libraries that have already implemented the Standard Schema interf
 
 - [Valibot](https://github.com/fabian-hiller/valibot): The modular and type safe schema library for validating structural data 🤖
 
+- [ArkType](https://github.com/arktypeio/arktype): TypeScript's 1:1 validator, optimized from editor to runtime ⛵
+
 ### Third Parties
 
 - [tRPC](https://github.com/trpc/trpc): 🧙‍♀️ Move Fast and Break Nothing. End-to-end typesafe APIs made easy.
+
+## Background
+
+
+### The Problem
+
+Validation is an essential building block for almost any application. Therefore, it was no surprise to see more and more JavaScript frameworks and libraries start to natively support specific schema libraries. Frameworks like Astro and libraries like the OpenAI SDK have adopted Zod in recent months to streamline the experience for their users. But to be honest, the current situation is far from perfect. Either only a single schema library gets first-party support, because the implementation and maintenance of multiple schema libraries is too complicated and time-consuming, or the choice falls on an adapter or resolver pattern, which is usually maintained by a project's community in their spare time.
+
+For this reason, Colin McDonnell, the creator of Zod, came up with the [idea](https://x.com/colinhacks/status/1634284724796661761) of a standard interface for schema libraries. This interface should be minimal, easy to implement, but powerful enough to support the most important features of popular schema libraries. The goal was to make it easier for other libraries to accept user-defined schemas as part of their API, in a library-agnostic way. After much thought and consideration, Standard Schema was born.
+
+### Use Cases
+
+The first version of Standard Schemas aims to address the most common use cases of schema libraries today. This includes API libraries like tRPC and JavaScript frameworks like Astro and Qwik who secure the client/server communication in a type safe way using schemas. Or projects like the T3 Stack, which uses schemas to validate environment variables. It also includes UI libraries like Nuxt UI and form libraries like Reach Hook Form, which use schemas to validate user inputs. Especially with the rise of TypeScript, schemas became the de facto standard as they drastically improved the developer experience by providing the type information and validation in a single source of truth.
+
+At the moment, Standard Schema deliberately tries to cover only the most common use cases. However, we believe that other use cases, such as integrating schema libraries into AI SDKs like Vercel AI or the OpenAI SDK to generate structured output, can also benefit from a standard interface.
 
 ## FAQ
 
