@@ -44,7 +44,7 @@ Two parties are required for Standard Schema to work. First, the schema librarie
 
 ### Schema Library
 
-Schemas libraries that want to support Standard Schema must implement its interface. This includes adding the `~standard`, `~vendor`, `~validate`, and `~types` properties. To makes this process easier, schema libraries can optionally extend their interface from the `StandardSchema` interface.
+Schemas libraries that want to support Standard Schema must implement its interface. This includes adding the `~standard`, `~vendor`, `~validate`, and `~types` properties. To make this process easier, schema libraries can optionally extend their interface from the `StandardSchema` interface.
 
 > It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that these four properties are defined somehow.
 
@@ -208,7 +208,7 @@ No. The `@standard-schema/spec` package is completely optional. You can just cop
 
 ### Why did you choose to prefix the four property names with `~`?
 
-The goal of prefixing the key names with `~` is to both avoid conflicts with existing API surface and to de-prioritize these keys in auto-complete. The `~` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
+The goal of prefixing the key names with `~` is to both avoid conflicts with existing API surfaces and to de-prioritize these keys in auto-complete. The `~` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
 
 ![Screenshot showing the de-prioritization of the `~` prefix keys in VS Code.](https://github.com/standard-schema/standard-schema/assets/3084745/5dfc0219-7531-481e-9691-cff5bc471378)
 
@@ -233,7 +233,7 @@ As a library author, you should always use the `v1.StandardSchema` type to targe
 
 ### What should I do if I only accept synchronous validation?
 
-The `~validate` function does not necessarily have to return a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returnd value is an instance of the `Promise` class.
+The `~validate` function does not necessarily have to return a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of the `Promise` class.
 
 ```ts
 import type { StandardSchema } from "@standard-schema/spec";
