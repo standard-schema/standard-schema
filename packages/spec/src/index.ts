@@ -16,7 +16,7 @@ export declare namespace v1 {
     /**
      * The version number of the standard.
      */
-    readonly version: number;
+    readonly version: 1;
     /**
      * The vendor name of the schema library.
      */
