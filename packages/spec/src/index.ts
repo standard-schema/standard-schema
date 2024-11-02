@@ -2,7 +2,7 @@ export declare namespace v1 {
   /**
    * The Standard Schema interface.
    */
-  export interface StandardSchema<Input = unknown, Output = Input> {
+  interface StandardSchema<Input = unknown, Output = Input> {
     /**
      * The Standard Schema properties.
      */
@@ -12,7 +12,7 @@ export declare namespace v1 {
   /**
    * The Standard Schema properties interface.
    */
-  export interface StandardSchemaProps<Input = unknown, Output = Input> {
+  interface StandardSchemaProps<Input = unknown, Output = Input> {
     /**
      * The version number of the standard.
      */
@@ -26,7 +26,7 @@ export declare namespace v1 {
      */
     readonly validate: (
       value: unknown,
-    ) => StandardOutput<Output> | Promise<StandardOutput<Output>>;
+    ) => StandardResult<Output> | Promise<StandardResult<Output>>;
     /**
      * Inferred types associated with the schema.
      */
@@ -34,16 +34,16 @@ export declare namespace v1 {
   }
 
   /**
-   * The output interface of the validate function.
+   * The result interface of the validate function.
    */
-  export type StandardOutput<Output> =
-    | StandardSuccessOutput<Output>
-    | StandardFailureOutput;
+  type StandardResult<Output> =
+    | StandardSuccessResult<Output>
+    | StandardFailureResult;
 
   /**
-   * The output interface if validation succeeds.
+   * The result interface if validation succeeds.
    */
-  export interface StandardSuccessOutput<Output> {
+  interface StandardSuccessResult<Output> {
     /**
      * The typed output value.
      */
@@ -55,9 +55,9 @@ export declare namespace v1 {
   }
 
   /**
-   * The output interface if validation fails.
+   * The result interface if validation fails.
    */
-  export interface StandardFailureOutput {
+  interface StandardFailureResult {
     /**
      * The issues of failed validation.
      */
@@ -67,7 +67,7 @@ export declare namespace v1 {
   /**
    * The issue interface of the failure output.
    */
-  export interface StandardIssue {
+  interface StandardIssue {
     /**
      * The error message of the issue.
      */
@@ -83,7 +83,7 @@ export declare namespace v1 {
   /**
    * The path segment interface of the issue.
    */
-  export interface StandardPathSegment {
+  interface StandardPathSegment {
     /**
      * The key representing a path segment.
      */
@@ -93,14 +93,14 @@ export declare namespace v1 {
   /**
    * Infers the input type of a Standard Schema.
    */
-  export type InferInput<Schema extends StandardSchema> = Parameters<
+  type InferInput<Schema extends StandardSchema> = Parameters<
     NonNullable<Schema["~standard"]["types"]>
   >[0];
 
   /**
    * Infers the output type of a Standard Schema.
    */
-  export type InferOutput<Schema extends StandardSchema> = ReturnType<
+  type InferOutput<Schema extends StandardSchema> = ReturnType<
     NonNullable<Schema["~standard"]["types"]>
   >;
 }
