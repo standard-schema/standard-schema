@@ -30,7 +30,7 @@ export declare namespace v1 {
     /**
      * Inferred types associated with the schema.
      */
-    readonly types?: (input: Input) => Output;
+    readonly types?: StandardTypes<Input, Output>;
   }
 
   /**
@@ -91,16 +91,30 @@ export declare namespace v1 {
   }
 
   /**
+   * The base types interface of Standard Schema.
+   */
+  interface StandardTypes<Input, Output> {
+    /**
+     * The input type of the schema.
+     */
+    readonly input: Input;
+    /**
+     * The output type of the schema.
+     */
+    readonly output: Output;
+  }
+
+  /**
    * Infers the input type of a Standard Schema.
    */
-  type InferInput<Schema extends StandardSchema> = Parameters<
-    NonNullable<Schema["~standard"]["types"]>
-  >[0];
+  type InferInput<Schema extends StandardSchema> = NonNullable<
+    Schema["~standard"]["types"]
+  >["input"];
 
   /**
    * Infers the output type of a Standard Schema.
    */
-  type InferOutput<Schema extends StandardSchema> = ReturnType<
-    NonNullable<Schema["~standard"]["types"]>
-  >;
+  type InferOutput<Schema extends StandardSchema> = NonNullable<
+    Schema["~standard"]["types"]
+  >["output"];
 }
