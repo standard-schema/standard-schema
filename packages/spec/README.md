@@ -44,7 +44,7 @@ interface StandardSchemaProps<Input = unknown, Output = Input> {
   - `version` defines the version number of the standard. This can be used in the future to distinguish between different versions of the standard.
   - `vendor` stores the name of the schema libarry. This can be useful for performing vendor-specific operations in special cases. 
   - `validate` is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. This can be discriminated by checking whether the `issues` property is `undefined`.
-  - `types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. `InferInput` and `InferOutput` can be used to extract their corresponding types.
+  - `types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. Authors implementing a schema using a class are encouraged to use TypeScript's `declare` keyword or other means to avoid runtime overhead. `InferInput` and `InferOutput` can be used to extract their corresponding types.
 
 ## Implementation
 
