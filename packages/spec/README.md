@@ -94,6 +94,7 @@ npm install @standard-schema/spec --save-dev  # npm
 yarn add @standard-schema/spec --dev          # yarn
 pnpm add @standard-schema/spec --dev          # pnpm
 bun add @standard-schema/spec --dev           # bun
+deno add jsr:@standard-schema/spec --dev      # deno
 ```
 
 > Alternatively, you can also copy and paste [the types](https://github.com/standard-schema/standard-schema/blob/main/packages/spec/src/index.ts) into your project.
