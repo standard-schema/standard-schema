@@ -166,7 +166,7 @@ To throw an error that contains all issue information, simply pass the issues of
 ```ts
 import type { v1 } from "@standard-schema/spec";
 
-export class SchemaError extends Error {
+class SchemaError extends Error {
   public readonly issues: ReadonlyArray<v1.StandardIssue>;
   constructor(issues: ReadonlyArray<v1.StandardIssue>) {
     super(issues[0].message);
