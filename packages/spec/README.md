@@ -4,39 +4,47 @@ A consortium of schema library authors have collaborated to craft a standard int
 
 ## The Interface
 
-The `StandardSchema` interface defines four properties that a schema library must implement to be compatible.
+The `StandardSchema` interface defines one properties that a schema library must implement to be compatible.
 
 ```ts
 /**
- * The Standard Schema v1 interface.
+ * The Standard Schema interface.
  */
-export interface StandardSchema<Input = unknown, Output = Input> {
+interface StandardSchema<Input = unknown, Output = Input> {
+  /**
+   * The Standard Schema properties.
+   */
+  readonly "~standard": StandardSchemaProps<Input, Output>;
+}
+
+/**
+ * The Standard Schema properties interface.
+ */
+interface StandardSchemaProps<Input = unknown, Output = Input> {
   /**
    * The version number of the standard.
    */
-  readonly "~standard": 1;
+  readonly version: 1;
   /**
    * The vendor name of the schema library.
    */
-  readonly "~vendor": string;
+  readonly vendor: string;
   /**
    * Validates unknown input values.
    */
-  readonly "~validate": StandardValidate<Output>;
+  readonly validate: (value: unknown) => StandardResult<Output> | Promise<StandardResult<Output>>;
   /**
    * Inferred types associated with the schema.
    */
-  readonly "~types"?: StandardTypes<Input, Output> | undefined;
+  readonly types?: StandardTypes<Input, Output> | undefined;
 }
 ```
 
-- `~standard` stores the version number and can be used to test whether an object is a Standard Schema. 
-
-- `~vendor` stores the name of the schema libarry. This can be useful for performing vendor-specific operations in special cases. 
-
-- `~validate` is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. This can be discriminated by checking whether the `issues` property is `undefined`.
-
-- `~types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. Authors implementing the schema are encouraged to use TypeScript's `declare` keyword or other means of avoiding runtime overhead. `InferInput` and `InferOutput` can be used to extract their corresponding types.
+- `~standard` contains the Standard Schema properties and can be used to test whether an object is a Standard Schema. 
+  - `version` defines the version number of the standard. This can be used in the future to distinguish between different versions of the standard.
+  - `vendor` stores the name of the schema libarry. This can be useful for performing vendor-specific operations in special cases. 
+  - `validate` is a function that validates unknown input and returns the output of the schema if the input is valid or an array of issues otherwise. This can be discriminated by checking whether the `issues` property is `undefined`.
+  - `types` is used to associate type metadata with the schema. This property should be declared on the schema's type, but is not required to exist at runtime. `InferInput` and `InferOutput` can be used to extract their corresponding types.
 
 ## Implementation
 
@@ -44,9 +52,9 @@ Two parties are required for Standard Schema to work. First, the schema librarie
 
 ### Schema Library
 
-Schemas libraries that want to support Standard Schema must implement its interface. This includes adding the `~standard`, `~vendor`, `~validate`, and `~types` properties. To make this process easier, schema libraries can optionally extend their interface from the `StandardSchema` interface.
+Schemas libraries that want to support Standard Schema must implement its interface. This includes adding the `~standard` property. To make this process easier, schema libraries can optionally extend their interface from the `StandardSchema` interface.
 
-> It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that these four properties are defined somehow.
+> It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
 
 ```ts
 import type { v1 } from "@standard-schema/spec";
@@ -62,18 +70,20 @@ function string(message: string = "Invalid type"): StringSchema {
   return {
     type: "string",
     message,
-    "~standard": 1,
-    "~vendor": "valizod",
-    '~validate'({ value }) {
-      return typeof value === 'string'
-        ? { value }
-        : { issues: [{ message }] };
+    "~standard": {
+      version: 1,
+      vendor: "valizod",
+      validate(value) {
+        return typeof value === "string"
+          ? { value }
+          : { issues: [{ message }] };
+      },
     },
-  } 
+  };
 }
 ```
 
-Instead of implementing the `StandardSchema` interface natively into your library code, you can also just add these properties on top and reuse your existing functions within the `~validate` function.
+Instead of implementing the `StandardSchema` interface natively into your library code, you can also just add it on top and reuse your existing functions and methods within the `validate` function.
 
 ### Third Party
 
@@ -86,21 +96,23 @@ pnpm add @standard-schema/spec --dev          # pnpm
 bun add @standard-schema/spec --dev           # bun
 ```
 
+> Alternatively, you can also copy and paste [the types](https://github.com/standard-schema/standard-schema/blob/main/packages/spec/src/index.ts) into your project.
+
 After that you can accept any schemas that implement the Standard Schema interface as part of your API. We recommend using a generic that extends the `StandardSchema` interface in most cases to be able to infer the type information of the schema.
 
 ```ts
-import type { InferOutput, StandardSchema } from "@standard-schema/spec";
+import type { v1 } from "@standard-schema/spec";
 
 // Step 1: Define the schema generic
-function createEndpoint<TSchema extends StandardSchema, TOutput>(
+function createEndpoint<TSchema extends v1.StandardSchema, TOutput>(
   // Step 2: Use the generic to accept a schema
   schema: TSchema,
   // Step 3: Infer the output type from the generic
-  handler: (data: InferOutput<TSchema>) => Promise<TOutput>,
+  handler: (data: v1.InferOutput<TSchema>) => Promise<TOutput>,
 ) {
   return async (data: unknown) => {
     // Step 4: Use the schema to validate data
-    const result = await schema["~validate"]({ value: data });
+    const result = await schema["~standard"].validate({ value: data });
 
     // Step 5: Process the validation result
     if (result.issues) {
@@ -113,30 +125,24 @@ function createEndpoint<TSchema extends StandardSchema, TOutput>(
 
 #### Common Tasks
 
-There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information. To simplify both tasks, Standard Schema also ships a utils package that provides a `getDotPath` function and a `SchemaError` class.
-
-```sh
-npm install @standard-schema/utils   # npm
-yarn add @standard-schema/utils      # yarn
-pnpm add @standard-schema/utils      # pnpm
-bun add @standard-schema/utils       # bun
-```
+There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information.
 
 ##### Get Dot Path
 
-To generate a dot path, simply pass an issue to the `getDotPath` function. If the issue does not contain a path or the path contains a key that is not of type `string` or `number`, the function returns `null`.
+To generate a dot path, simply map and join the keys of an issue path, if available.
 
 ```ts
-import type { StandardSchema } from "@standard-schema/spec";
-import { getDotPath } from "@standard-schema/utils";
+import type { v1 } from "@standard-schema/spec";
 
-async function getFormErrors(schema: StandardSchema, data: unknown) {
-  const result = await schema["~validate"]({ value: data });
+async function getFormErrors(schema: v1.StandardSchema, data: unknown) {
+  const result = await schema["~standard"].validate({ value: data });
   const formErrors: string[] = [];
   const fieldErrors: Record<string, string[]> = {};
   if (result.issues) {
     for (const issue of result.issues) {
-      const dotPath = getDotPath(issue);
+      const dotPath = issue.path
+        ?.map((item) => (typeof item === "object" ? item.key : item))
+        .join(".");
       if (dotPath) {
         if (fieldErrors[dotPath]) {
           fieldErrors[dotPath].push(issue.message);
@@ -154,14 +160,25 @@ async function getFormErrors(schema: StandardSchema, data: unknown) {
 
 ##### Schema Error
 
-To throw an error that contains all issue information, simply pass the issues of the failed schema validation to the `SchemaError` class. The `SchemaError` class extends the `Error` class with an `issues` property that contains all the issues.
+To throw an error that contains all issue information, simply pass the issues of the failed schema validation to a `SchemaError` class. The `SchemaError` class extends the `Error` class with an `issues` property that contains all the issues.
 
 ```ts
-import type { StandardSchema } from "@standard-schema/spec";
-import { SchemaError } from "@standard-schema/utils";
+import type { v1 } from "@standard-schema/spec";
 
-async function validateInput(schema: StandardSchema, data: unknown) {
-  const result = await schema["~validate"]({ value: data });
+export class SchemaError extends Error {
+  public readonly issues: ReadonlyArray<v1.StandardIssue>;
+  constructor(issues: ReadonlyArray<v1.StandardIssue>) {
+    super(issues[0].message);
+    this.name = "SchemaError";
+    this.issues = issues;
+  }
+}
+
+async function validateInput<TSchema extends v1.StandardSchema>(
+  schema: TSchema,
+  data: unknown,
+): Promise<v1.InferOutput<TSchema>> {
+  const result = await schema["~standard"].validate({ value: data });
   if (result.issues) {
     throw new SchemaError(result.issues);
   }
@@ -188,9 +205,9 @@ These are the libraries that have already implemented the Standard Schema interf
 
 ### The Problem
 
-Validation is an essential building block for almost any application. Therefore, it was no surprise to see more and more JavaScript frameworks and libraries start to natively support specific schema libraries. Frameworks like Astro and libraries like the OpenAI SDK have adopted Zod in recent months to streamline the experience for their users. But to be honest, the current situation is far from perfect. Either only a single schema library gets first-party support, because the implementation and maintenance of multiple schema libraries is too complicated and time-consuming, or the choice falls on an adapter or resolver pattern, which is usually maintained by a project's community in their spare time.
+Validation is an essential building block for almost any application. Therefore, it was no surprise to see more and more JavaScript frameworks and libraries start to natively support specific schema libraries. Frameworks like Astro and libraries like the OpenAI SDK have adopted Zod in recent months to streamline the experience for their users. But to be honest, the current situation is far from perfect. Either only a single schema library gets first-party support, because the implementation and maintenance of multiple schema libraries is too complicated and time-consuming, or the choice falls on an adapter or resolver pattern, which is more cumbersome to implement for both sides.
 
-For this reason, Colin McDonnell, the creator of Zod, came up with the [idea](https://x.com/colinhacks/status/1634284724796661761) of a standard interface for schema libraries. This interface should be minimal, easy to implement, but powerful enough to support the most important features of popular schema libraries. The goal was to make it easier for other libraries to accept user-defined schemas as part of their API, in a library-agnostic way. After much thought and consideration, Standard Schema was born.
+For this reason, Colin McDonnell, the creator of Zod, came up with [the idea](https://x.com/colinhacks/status/1634284724796661761) of a standard interface for schema libraries. This interface should be minimal, easy to implement, but powerful enough to support the most important features of popular schema libraries. The goal was to make it easier for other libraries to accept user-defined schemas as part of their API, in a library-agnostic way. After much thought and consideration, Standard Schema was born.
 
 ### Use Cases
 
@@ -204,11 +221,11 @@ These are the most frequently asked questions about Standard Schema. If your que
 
 ### Do I need to include `@standard-schema/spec` as a dependency?
 
-No. The `@standard-schema/spec` package is completely optional. You can just copy and paste the types into your project, or manually add the four properties to your existing types. But you can include `@standard-schema/spec` as a dev dependency and consume it exclusively with `import type`. The `@standard-schema/spec` package contains no runtime code and only exports types.
+No. The `@standard-schema/spec` package is completely optional. You can just copy and paste the types into your project, or manually add the `~standard` properties to your existing types. But you can include `@standard-schema/spec` as a dev dependency and consume it exclusively with `import type`. The `@standard-schema/spec` package contains no runtime code and only exports types.
 
-### Why did you choose to prefix the four property names with `~`?
+### Why did you choose to prefix the `~standard` property with `~`?
 
-The goal of prefixing the key names with `~` is to both avoid conflicts with existing API surfaces and to de-prioritize these keys in auto-complete. The `~` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
+The goal of prefixing the key with `~` is to both avoid conflicts with existing API surfaces and to de-prioritize these keys in auto-complete. The `~` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
 
 ![Screenshot showing the de-prioritization of the `~` prefix keys in VS Code.](https://github.com/standard-schema/standard-schema/assets/3084745/5dfc0219-7531-481e-9691-cff5bc471378)
 
@@ -227,19 +244,15 @@ By contrast, declaring the symbol externally makes it "nominally typed". This me
 
 ![Screenshot showing the prioritization of external symbols in VS Code](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
 
-### Should I use the `StandardSchema` or `v1.StandardSchema` type?
-
-As a library author, you should always use the `v1.StandardSchema` type to target a specific version of Standard Schema. For third-party libraries, this doesn't matter, but `StandardSchema` may be preferable to target any version of Standard Schema, even if there is only one version at the moment.
-
 ### What should I do if I only accept synchronous validation?
 
 The `~validate` function does not necessarily have to return a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of the `Promise` class.
 
 ```ts
-import type { StandardSchema } from "@standard-schema/spec";
+import type { v1 } from "@standard-schema/spec";
 
-function validateInput(schema: StandardSchema, data: unknown) {
-  const result = schema["~validate"]({ value: data });
+function validateInput(schema: v1.StandardSchema, data: unknown) {
+  const result = schema["~standard"].validate({ value: data });
   if (result instanceof Promise) {
     throw new TypeError('Schema validation must be synchronous');
   }

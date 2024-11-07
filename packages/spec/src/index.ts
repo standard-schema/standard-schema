@@ -30,7 +30,7 @@ export declare namespace v1 {
     /**
      * Inferred types associated with the schema.
      */
-    readonly types?: StandardTypes<Input, Output>;
+    readonly types?: StandardTypes<Input, Output> | undefined;
   }
 
   /**
