@@ -4,7 +4,7 @@ A consortium of schema library authors have collaborated to craft a standard int
 
 ## The Interface
 
-The `StandardSchema` interface defines one properties that a schema library must implement to be compatible.
+The `StandardSchema` interface is a set of validation-related properties that must be defined under a key called `~standard`.
 
 ```ts
 /**
