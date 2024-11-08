@@ -1,7 +1,7 @@
 {
   "name": "@standard-schema/utils",
   "description": "The official runtime utils for Standard Schema",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "repository": {
