@@ -113,7 +113,7 @@ function createEndpoint<TSchema extends v1.StandardSchema, TOutput>(
 ) {
   return async (data: unknown) => {
     // Step 4: Use the schema to validate data
-    const result = await schema["~standard"].validate({ value: data });
+    const result = await schema["~standard"].validate(data);
 
     // Step 5: Process the validation result
     if (result.issues) {
@@ -136,7 +136,7 @@ To generate a dot path, simply map and join the keys of an issue path, if availa
 import type { v1 } from "@standard-schema/spec";
 
 async function getFormErrors(schema: v1.StandardSchema, data: unknown) {
-  const result = await schema["~standard"].validate({ value: data });
+  const result = await schema["~standard"].validate(data);
   const formErrors: string[] = [];
   const fieldErrors: Record<string, string[]> = {};
   if (result.issues) {
@@ -179,7 +179,7 @@ async function validateInput<TSchema extends v1.StandardSchema>(
   schema: TSchema,
   data: unknown,
 ): Promise<v1.InferOutput<TSchema>> {
-  const result = await schema["~standard"].validate({ value: data });
+  const result = await schema["~standard"].validate(data);
   if (result.issues) {
     throw new SchemaError(result.issues);
   }
@@ -253,7 +253,7 @@ The `~validate` function does not necessarily have to return a `Promise`. If you
 import type { v1 } from "@standard-schema/spec";
 
 function validateInput(schema: v1.StandardSchema, data: unknown) {
-  const result = schema["~standard"].validate({ value: data });
+  const result = schema["~standard"].validate(data);
   if (result instanceof Promise) {
     throw new TypeError('Schema validation must be synchronous');
   }

@@ -19,7 +19,7 @@ import type { v1 } from "@standard-schema/spec";
 import { getDotPath } from "@standard-schema/utils";
 
 async function getFormErrors(schema: v1.StandardSchema, data: unknown) {
-  const result = await schema["~standard"].validate({ value: data });
+  const result = await schema["~standard"].validate(data);
   const formErrors: string[] = [];
   const fieldErrors: Record<string, string[]> = {};
   if (result.issues) {
@@ -52,7 +52,7 @@ async function validateInput<TSchema extends v1.StandardSchema>(
   schema: TSchema,
   data: unknown,
 ): Promise<v1.InferOutput<TSchema>> {
-  const result = await schema["~standard"].validate({ value: data });
+  const result = await schema["~standard"].validate(data);
   if (result.issues) {
     throw new SchemaError(result.issues);
   }
