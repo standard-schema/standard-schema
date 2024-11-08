@@ -27,8 +27,8 @@ importers:
   packages/utils:
     devDependencies:
       '@standard-schema/spec':
-        specifier: npm:@jsr/standard-schema__spec@1.0.0-beta.0
-        version: '@jsr/standard-schema__spec@1.0.0-beta.0'
+        specifier: npm:@jsr/standard-schema__spec@1.0.0-beta.2
+        version: '@jsr/standard-schema__spec@1.0.0-beta.2'
       '@vitest/coverage-v8':
         specifier: 2.1.2
         version: 2.1.2(vitest@2.1.2)
@@ -432,8 +432,8 @@ packages:
   '@jridgewell/trace-mapping@0.3.25':
     resolution: {integrity: sha512-vNk6aEwybGtawWmy/PzwnGDOjCkLWSD2wqvjGGAgOAwCGWySYXfYoxt00IJkTF+8Lb57DwOb3Aa0o9CApepiYQ==}
 
-  '@jsr/standard-schema__spec@1.0.0-beta.0':
-    resolution: {integrity: sha512-DR+UfgQozSXdmB8yLGoCKKI1sJPBH/6zEzjcOeQ1PizBwahNkTIevzhGCYRzNfaVWMboUSoU7QetDQhpvP2ykg==, tarball: https://npm.jsr.io/~/11/@jsr/standard-schema__spec/1.0.0-beta.0.tgz}
+  '@jsr/standard-schema__spec@1.0.0-beta.2':
+    resolution: {integrity: sha512-d+60dWsgmjMKh7hmOvScFKmMrcNhhAhkISI/0jVutMMPNR1Mvd9/q5rZz3SFTBiLjSOXGUql5Mbq3TWc0f5D0g==, tarball: https://npm.jsr.io/~/11/@jsr/standard-schema__spec/1.0.0-beta.2.tgz}
 
   '@pkgjs/parseargs@0.11.0':
     resolution: {integrity: sha512-+1VkjdD0QBLPodGrJUeqarH8VAIvQODIbwh9XpP5Syisf7YoQgsJKPNFoqqLQlu+VQ/tVSshMR6loPMn8U+dPg==}
@@ -1380,7 +1380,7 @@ snapshots:
       '@jridgewell/resolve-uri': 3.1.2
       '@jridgewell/sourcemap-codec': 1.5.0
 
-  '@jsr/standard-schema__spec@1.0.0-beta.0': {}
+  '@jsr/standard-schema__spec@1.0.0-beta.2': {}
 
   '@pkgjs/parseargs@0.11.0':
     optional: true

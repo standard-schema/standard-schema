@@ -29,7 +29,12 @@ describe("getDotPath", () => {
     expect(
       getDotPath({
         message: "Error message",
-        path: [{ key: null }],
+        path: [
+          {
+            // @ts-expect-error
+            key: null,
+          },
+        ],
       }),
     ).toBeNull();
   });
@@ -50,13 +55,25 @@ describe("getDotPath", () => {
     expect(
       getDotPath({
         message: "Error message",
-        path: [{ key: new Map([["foo", "bar"]]) }, { key: "baz" }],
+        path: [
+          {
+            // @ts-expect-error
+            key: new Map([["foo", "bar"]]),
+          },
+          { key: "baz" },
+        ],
       }),
     ).toBeNull();
     expect(
       getDotPath({
         message: "Error message",
-        path: [{ key: "foo" }, { key: new Map([["bar", "baz"]]) }],
+        path: [
+          { key: "foo" },
+          {
+            // @ts-expect-error
+            key: new Map([["bar", "baz"]]),
+          },
+        ],
       }),
     ).toBeNull();
   });

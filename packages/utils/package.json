@@ -38,7 +38,7 @@
     "build": "tsup"
   },
   "devDependencies": {
-    "@standard-schema/spec": "npm:@jsr/standard-schema__spec@1.0.0-beta.0",
+    "@standard-schema/spec": "npm:@jsr/standard-schema__spec@1.0.0-beta.2",
     "@vitest/coverage-v8": "2.1.2",
     "tsup": "^8.3.0",
     "typescript": "^5.6.2",

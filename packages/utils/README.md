@@ -7,6 +7,7 @@ npm install @standard-schema/utils   # npm
 yarn add @standard-schema/utils      # yarn
 pnpm add @standard-schema/utils      # pnpm
 bun add @standard-schema/utils       # bun
+deno add jsr:@standard-schema/utils  # deno
 ```
 
 ## Get Dot Path
@@ -14,11 +15,11 @@ bun add @standard-schema/utils       # bun
 To generate a dot path, simply pass an issue to the `getDotPath` function. If the issue does not contain a path or the path contains a key that is not of type `string` or `number`, the function returns `null`.
 
 ```ts
-import type { StandardSchema } from "@standard-schema/spec";
+import type { v1 } from "@standard-schema/spec";
 import { getDotPath } from "@standard-schema/utils";
 
-async function getFormErrors(schema: StandardSchema, data: unknown) {
-  const result = await schema["~validate"]({ value: data });
+async function getFormErrors(schema: v1.StandardSchema, data: unknown) {
+  const result = await schema["~standard"].validate({ value: data });
   const formErrors: string[] = [];
   const fieldErrors: Record<string, string[]> = {};
   if (result.issues) {
@@ -44,11 +45,14 @@ async function getFormErrors(schema: StandardSchema, data: unknown) {
 To throw an error that contains all issue information, simply pass the issues of the failed schema validation to the `SchemaError` class. The `SchemaError` class extends the `Error` class with an `issues` property that contains all the issues.
 
 ```ts
-import type { StandardSchema } from "@standard-schema/spec";
+import type { v1 } from "@standard-schema/spec";
 import { SchemaError } from "@standard-schema/utils";
 
-async function validateInput(schema: StandardSchema, data: unknown) {
-  const result = await schema["~validate"]({ value: data });
+async function validateInput<TSchema extends v1.StandardSchema>(
+  schema: TSchema,
+  data: unknown,
+): Promise<v1.InferOutput<TSchema>> {
+  const result = await schema["~standard"].validate({ value: data });
   if (result.issues) {
     throw new SchemaError(result.issues);
   }
