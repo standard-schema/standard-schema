@@ -1,7 +1,7 @@
 {
   "name": "@standard-schema/spec",
   "description": "A standard interface for TypeScript schema validation libraries",
-  "version": "1.0.0-beta.2",
+  "version": "1.0.0-beta.3",
   "license": "MIT",
   "author": "Colin McDonnell",
   "repository": {
