@@ -198,6 +198,7 @@ These are the libraries that have already implemented the Standard Schema interf
 
 ### Third Parties
 
+- [Nuxt UI](https://github.com/nuxt/ui): A UI Library for Modern Web Apps, powered by Vue & Tailwind CSS.
 - [TanStack Router](https://github.com/tanstack/router): A fully type-safe React router with built-in data fetching, stale-while revalidate caching and first-class search-param APIs.
 - [tRPC](https://github.com/trpc/trpc): 🧙‍♀️ Move Fast and Break Nothing. End-to-end typesafe APIs made easy.
 
