@@ -1,1 +1,1 @@
-import type { v1 } from "./src/index.ts";
+import type { StandardSchemaV1 } from "./src/index.ts";
