@@ -3,24 +3,14 @@
  *
  * Root-level alias of StandardSchemaV1.Schema.
  */
-export type StandardSchemaV1<
-  Input = unknown,
-  Output = Input,
-> = StandardSchemaV1.Schema<Input, Output>;
+export type StandardSchemaV1<Input = unknown, Output = Input> = {
+  /**
+   * The Standard Schema properties.
+   */
+  readonly "~standard": StandardSchemaV1.Props<Input, Output>;
+};
 
 export declare namespace StandardSchemaV1 {
-  /**
-   * The Standard Schema interface.
-   *
-   * Equivalent to the root-level StandardSchemaV1 type.
-   */
-  export interface Schema<Input = unknown, Output = Input> {
-    /**
-     * The Standard Schema properties.
-     */
-    readonly "~standard": StandardSchemaV1.Props<Input, Output>;
-  }
-
   /**
    * The Standard Schema properties interface.
    */
@@ -42,7 +32,7 @@ export declare namespace StandardSchemaV1 {
     /**
      * Inferred types associated with the schema.
      */
-    readonly types?: Declaration<Input, Output> | undefined;
+    readonly types?: Types<Input, Output> | undefined;
   }
 
   /**
@@ -101,7 +91,7 @@ export declare namespace StandardSchemaV1 {
   /**
    * The base types interface of Standard Schema.
    */
-  export interface Declaration<Input = unknown, Output = Input> {
+  export interface Types<Input = unknown, Output = Input> {
     /**
      * The input type of the schema.
      */
@@ -125,4 +115,6 @@ export declare namespace StandardSchemaV1 {
   export type InferOutput<Schema extends StandardSchemaV1> = NonNullable<
     Schema["~standard"]["types"]
   >["output"];
+
+  export {};
 }

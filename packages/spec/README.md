@@ -26,7 +26,7 @@ export interface StandardSchemaV1<Input = unknown, Output = Input> {
     /**
      * Inferred types associated with the schema.
      */
-    readonly types?: Declaration<Input, Output> | undefined;
+    readonly types?: Types<Input, Output> | undefined;
   };
 }
 ```
