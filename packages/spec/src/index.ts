@@ -116,5 +116,6 @@ export declare namespace StandardSchemaV1 {
     Schema["~standard"]["types"]
   >["output"];
 
+  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
   export {};
 }
