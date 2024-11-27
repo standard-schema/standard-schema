@@ -4,39 +4,30 @@ A consortium of schema library authors have collaborated to craft a standard int
 
 ## The Interface
 
-The `StandardSchema` interface is a set of validation-related properties that must be defined under a key called `~standard`.
+The Standard Schema interface is a set of validation-related properties that must be defined under a key called `~standard`.
 
 ```ts
-/**
- * The Standard Schema interface.
- */
-interface StandardSchema<Input = unknown, Output = Input> {
-  /**
-   * The Standard Schema properties.
-   */
-  readonly "~standard": StandardSchemaProps<Input, Output>;
-}
-
-/**
- * The Standard Schema properties interface.
- */
-interface StandardSchemaProps<Input = unknown, Output = Input> {
-  /**
-   * The version number of the standard.
-   */
-  readonly version: 1;
-  /**
-   * The vendor name of the schema library.
-   */
-  readonly vendor: string;
-  /**
-   * Validates unknown input values.
-   */
-  readonly validate: (value: unknown) => StandardResult<Output> | Promise<StandardResult<Output>>;
-  /**
-   * Inferred types associated with the schema.
-   */
-  readonly types?: StandardTypes<Input, Output> | undefined;
+export interface StandardSchemaV1<Input = unknown, Output = Input> {
+  readonly "~standard": {
+    /**
+     * The version number of the standard.
+     */
+    readonly version: 1;
+    /**
+     * The vendor name of the schema library.
+     */
+    readonly vendor: string;
+    /**
+     * Validates unknown input values.
+     */
+    readonly validate: (
+      value: unknown,
+    ) => Result<Output> | Promise<Result<Output>>;
+    /**
+     * Inferred types associated with the schema.
+     */
+    readonly types?: Types<Input, Output> | undefined;
+  };
 }
 ```
 
@@ -52,15 +43,15 @@ Two parties are required for Standard Schema to work. First, the schema librarie
 
 ### Schema Library
 
-Schemas libraries that want to support Standard Schema must implement its interface. This includes adding the `~standard` property. To make this process easier, schema libraries can optionally extend their interface from the `StandardSchema` interface.
+Schemas libraries that want to support Standard Schema must implement its interface. This includes adding the `~standard` property. To make this process easier, schema libraries can optionally extend their interface from the `StandardSchemaV1` interface.
 
 > It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
 
 ```ts
-import type { v1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 // Step 1: Define the schema interface
-interface StringSchema extends v1.StandardSchema<string> {
+interface StringSchema extends StandardSchemaV1<string> {
   type: "string";
   message: string;
 }
@@ -83,11 +74,11 @@ function string(message: string = "Invalid type"): StringSchema {
 }
 ```
 
-Instead of implementing the `StandardSchema` interface natively into your library code, you can also just add it on top and reuse your existing functions and methods within the `validate` function.
+Instead of implementing the `StandardSchemaV1` interface natively into your library code, you can also just add it on top and reuse your existing functions and methods within the `validate` function.
 
 ### Third Party
 
-Other than for schema library authors, we recommend third party authors to install the `@standard-schema/spec` package when implementing Standard Schema into their libraries. This package provides the `StandardSchema` interface and the `InferInput` and `InferOutput` utility types.
+Other than for schema library authors, we recommend third party authors to install the `@standard-schema/spec` package when implementing Standard Schema into their libraries. This package provides the `StandardSchemaV1` interface and the `InferInput` and `InferOutput` utility types.
 
 ```sh
 npm install @standard-schema/spec --save-dev  # npm
@@ -99,17 +90,17 @@ deno add jsr:@standard-schema/spec --dev      # deno
 
 > Alternatively, you can also copy and paste [the types](https://github.com/standard-schema/standard-schema/blob/main/packages/spec/src/index.ts) into your project.
 
-After that you can accept any schemas that implement the Standard Schema interface as part of your API. We recommend using a generic that extends the `StandardSchema` interface in most cases to be able to infer the type information of the schema.
+After that you can accept any schemas that implement the Standard Schema interface as part of your API. We recommend using a generic that extends the `StandardSchemaV1` interface in most cases to be able to infer the type information of the schema.
 
 ```ts
-import type { v1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 // Step 1: Define the schema generic
-function createEndpoint<TSchema extends v1.StandardSchema, TOutput>(
+function createEndpoint<TSchema extends StandardSchemaV1, TOutput>(
   // Step 2: Use the generic to accept a schema
   schema: TSchema,
   // Step 3: Infer the output type from the generic
-  handler: (data: v1.InferOutput<TSchema>) => Promise<TOutput>,
+  handler: (data: StandardSchemaV1.InferOutput<TSchema>) => Promise<TOutput>,
 ) {
   return async (data: unknown) => {
     // Step 4: Use the schema to validate data
@@ -133,9 +124,9 @@ There are two common tasks that third-party libraries perform after validation f
 To generate a dot path, simply map and join the keys of an issue path, if available.
 
 ```ts
-import type { v1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
-async function getFormErrors(schema: v1.StandardSchema, data: unknown) {
+async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
   const result = await schema["~standard"].validate(data);
   const formErrors: string[] = [];
   const fieldErrors: Record<string, string[]> = {};
@@ -164,21 +155,21 @@ async function getFormErrors(schema: v1.StandardSchema, data: unknown) {
 To throw an error that contains all issue information, simply pass the issues of the failed schema validation to a `SchemaError` class. The `SchemaError` class extends the `Error` class with an `issues` property that contains all the issues.
 
 ```ts
-import type { v1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 class SchemaError extends Error {
-  public readonly issues: ReadonlyArray<v1.StandardIssue>;
-  constructor(issues: ReadonlyArray<v1.StandardIssue>) {
+  public readonly issues: ReadonlyArray<StandardSchemaV1.Issue>;
+  constructor(issues: ReadonlyArray<StandardSchemaV1.Issue>) {
     super(issues[0].message);
     this.name = "SchemaError";
     this.issues = issues;
   }
 }
 
-async function validateInput<TSchema extends v1.StandardSchema>(
+async function validateInput<TSchema extends StandardSchemaV1>(
   schema: TSchema,
   data: unknown,
-): Promise<v1.InferOutput<TSchema>> {
+): Promise<StandardSchemaV1.InferOutput<TSchema>> {
   const result = await schema["~standard"].validate(data);
   if (result.issues) {
     throw new SchemaError(result.issues);
@@ -204,7 +195,6 @@ These are the libraries that have already implemented the Standard Schema interf
 - [tRPC](https://github.com/trpc/trpc): 🧙‍♀️ Move Fast and Break Nothing. End-to-end typesafe APIs made easy.
 
 ## Background
-
 
 ### The Problem
 
@@ -252,9 +242,9 @@ By contrast, declaring the symbol externally makes it "nominally typed". This me
 The `~validate` function does not necessarily have to return a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of the `Promise` class.
 
 ```ts
-import type { v1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
-function validateInput(schema: v1.StandardSchema, data: unknown) {
+function validateInput(schema: StandardSchemaV1, data: unknown) {
   const result = schema["~standard"].validate(data);
   if (result instanceof Promise) {
     throw new TypeError('Schema validation must be synchronous');
