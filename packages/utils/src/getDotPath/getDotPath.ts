@@ -1,4 +1,4 @@
-import type { v1 } from "@standard-schema/spec";
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 /**
  * Creates and returns the dot path of an issue if possible.
@@ -7,7 +7,7 @@ import type { v1 } from "@standard-schema/spec";
  *
  * @returns The dot path or null.
  */
-export function getDotPath(issue: v1.StandardIssue): string | null {
+export function getDotPath(issue: StandardSchemaV1.Issue): string | null {
   if (issue.path?.length) {
     let dotPath = "";
     for (const item of issue.path) {
