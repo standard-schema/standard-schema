@@ -1,7 +1,5 @@
 /**
  * The Standard Schema interface.
- *
- * Root-level alias of StandardSchemaV1.Schema.
  */
 export type StandardSchemaV1<Input = unknown, Output = Input> = {
   /**
@@ -89,7 +87,7 @@ export declare namespace StandardSchemaV1 {
   }
 
   /**
-   * The base types interface of Standard Schema.
+   * The Standard Schema types interface.
    */
   export interface Types<Input = unknown, Output = Input> {
     /**
