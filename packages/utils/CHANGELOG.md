@@ -2,7 +2,7 @@
 
 All notable changes to the library will be documented in this file.
 
-## vX.X.X (Month DD, YYYY)
+## v0.3.0 (November 27, 2024)
 
 - Update utils to new Standard Schema spec
 
