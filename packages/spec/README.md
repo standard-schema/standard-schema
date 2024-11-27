@@ -4,7 +4,7 @@ A consortium of schema library authors have collaborated to craft a standard int
 
 ## The Interface
 
-The `StandardSchema` interface is a set of validation-related properties that must be defined under a key called `~standard`.
+The Standard Schema interface is a set of validation-related properties that must be defined under a key called `~standard`.
 
 ```ts
 export interface StandardSchemaV1<Input = unknown, Output = Input> {
@@ -43,7 +43,7 @@ Two parties are required for Standard Schema to work. First, the schema librarie
 
 ### Schema Library
 
-Schemas libraries that want to support Standard Schema must implement its interface. This includes adding the `~standard` property. To make this process easier, schema libraries can optionally extend their interface from the `StandardSchema` interface.
+Schemas libraries that want to support Standard Schema must implement its interface. This includes adding the `~standard` property. To make this process easier, schema libraries can optionally extend their interface from the `StandardSchemaV1` interface.
 
 > It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
 
@@ -74,11 +74,11 @@ function string(message: string = "Invalid type"): StringSchema {
 }
 ```
 
-Instead of implementing the `StandardSchema` interface natively into your library code, you can also just add it on top and reuse your existing functions and methods within the `validate` function.
+Instead of implementing the `StandardSchemaV1` interface natively into your library code, you can also just add it on top and reuse your existing functions and methods within the `validate` function.
 
 ### Third Party
 
-Other than for schema library authors, we recommend third party authors to install the `@standard-schema/spec` package when implementing Standard Schema into their libraries. This package provides the `StandardSchema` interface and the `InferInput` and `InferOutput` utility types.
+Other than for schema library authors, we recommend third party authors to install the `@standard-schema/spec` package when implementing Standard Schema into their libraries. This package provides the `StandardSchemaV1` interface and the `InferInput` and `InferOutput` utility types.
 
 ```sh
 npm install @standard-schema/spec --save-dev  # npm
@@ -90,7 +90,7 @@ deno add jsr:@standard-schema/spec --dev      # deno
 
 > Alternatively, you can also copy and paste [the types](https://github.com/standard-schema/standard-schema/blob/main/packages/spec/src/index.ts) into your project.
 
-After that you can accept any schemas that implement the Standard Schema interface as part of your API. We recommend using a generic that extends the `StandardSchema` interface in most cases to be able to infer the type information of the schema.
+After that you can accept any schemas that implement the Standard Schema interface as part of your API. We recommend using a generic that extends the `StandardSchemaV1` interface in most cases to be able to infer the type information of the schema.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
@@ -194,7 +194,6 @@ These are the libraries that have already implemented the Standard Schema interf
 - [tRPC](https://github.com/trpc/trpc): 🧙‍♀️ Move Fast and Break Nothing. End-to-end typesafe APIs made easy.
 
 ## Background
-
 
 ### The Problem
 
