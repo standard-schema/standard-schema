@@ -190,6 +190,7 @@ These are the libraries that have already implemented the Standard Schema interf
 
 ### Third Parties
 
+- [Formwerk](https://github.com/formwerkjs/formwerk): A Vue.js Framework for building high-quality, accessible, delightful forms.
 - [GQLoom](https://github.com/modevol-com/gqloom): Weave GraphQL schema and resolvers using Standard Schema.
 - [Nuxt UI](https://github.com/nuxt/ui): A UI Library for Modern Web Apps, powered by Vue & Tailwind CSS.
 - [TanStack Form](https://github.com/TanStack/form): 🤖 Headless, performant, and type-safe form state management for TS/JS, React, Vue, Angular, Solid, and Lit.
