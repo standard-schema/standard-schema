@@ -196,7 +196,7 @@ These are the libraries that have already implemented the Standard Schema interf
 - [TanStack Router](https://github.com/tanstack/router): A fully type-safe React router with built-in data fetching, stale-while revalidate caching and first-class search-param APIs.
 - [tRPC](https://github.com/trpc/trpc): 🧙‍♀️ Move Fast and Break Nothing. End-to-end typesafe APIs made easy.
 - [UploadThing](https://github.com/pingdotgg/uploadthing): File uploads for modern web devs
-- [Formwerk](https://github.com/formwerkjs/formwerk): Vue.js Composable Forms Library
+- [Formwerk](https://github.com/formwerkjs/formwerk): A Vue.js Framework for building high-quality, accessible, delightful forms.
 
 ## Background
 
