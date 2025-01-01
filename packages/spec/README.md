@@ -197,6 +197,7 @@ These are the libraries that have already implemented the Standard Schema interf
 - [TanStack Router](https://github.com/tanstack/router): A fully type-safe React router with built-in data fetching, stale-while revalidate caching and first-class search-param APIs.
 - [tRPC](https://github.com/trpc/trpc): 🧙‍♀️ Move Fast and Break Nothing. End-to-end typesafe APIs made easy.
 - [UploadThing](https://github.com/pingdotgg/uploadthing): File uploads for modern web devs
+- [oRPC](https://github.com/unnoq/orpc): Typesafe API's Made Simple 🪄
 
 ## Background
 
