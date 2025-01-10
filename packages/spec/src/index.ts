@@ -1,12 +1,12 @@
 /**
  * The Standard Schema interface.
  */
-export type StandardSchemaV1<Input = unknown, Output = Input> = {
+export interface StandardSchemaV1<Input = unknown, Output = Input> {
   /**
    * The Standard Schema properties.
    */
   readonly "~standard": StandardSchemaV1.Props<Input, Output>;
-};
+}
 
 export declare namespace StandardSchemaV1 {
   /**
