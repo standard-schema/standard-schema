@@ -185,6 +185,7 @@ These are the libraries that have already implemented the Standard Schema interf
 ### Schema Libraries
 
 - [ArkType](https://github.com/arktypeio/arktype): TypeScript's 1:1 validator, optimized from editor to runtime ⛵
+- [Arri Schema](https://github.com/modiimedia/arri): Type safe validator and schema builder that can be compiled to other languages
 - [Valibot](https://github.com/fabian-hiller/valibot): The modular and type safe schema library for validating structural data 🤖
 - [Zod](https://github.com/colinhacks/zod) (v3.24+): TypeScript-first schema validation with static type inference
 
