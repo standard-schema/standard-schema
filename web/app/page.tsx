@@ -50,10 +50,11 @@ export default async function Home() {
         </div>
 
         <div className="h-[10vh]" />
-        <hr className="border-t-[1px] border-gray-700 w-full" />
+        <hr className="border-t-2 border-gray-500 w-full" />
         <div className="h-[10vh]" />
         <article
-          className="flex flex-col gap-4 prose prose-gray dark:prose-invert !max-w-none text-gray-300"
+          className="flex flex-col gap-4 prose prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm"
+
           /* biome-ignore lint */
           // dangerouslySetInnerHTML={{
           //   __html: html,
@@ -496,7 +497,7 @@ export default async function Home() {
         </article>
       </main>
       <div className="h-[15vh]" />
-      <hr className="border-t-[1px] border-gray-900 w-full" />
+      <hr className="border-t-2 border-gray-500 w-full" />
       <div className="h-6" />
       <footer className="flex flex-row justify-between first-letter:gap-6 flex-wrap items-center">
         <div className="text-sm">
