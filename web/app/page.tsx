@@ -1,24 +1,53 @@
 // import {Button} from '@/components/ui/button';
-import { Button, buttonVariants } from "@/components/ui/button";
+import { buttonVariants } from "@/components/ui/button";
 import { CodeBlock } from "@/components/ui/codeblock";
-import { parseMarkdown } from "@/lib/markdown";
-import { Check, File, Github } from "lucide-react";
-import Image from "next/image";
+import { Github } from "lucide-react";
 import Link from "next/link";
-import { readFileSync } from "node:fs";
-import { join } from "node:path";
+
+import { getUrl } from "@/lib/utils";
+import type { Metadata } from "next";
+
+// export const metadata: Metadata = {
+//   title: "Standard Schema",
+//   description: "A common interface for TypeScript validation libraries",
+//   ''
+// };
+
+// or Dynamic metadata
+export async function generateMetadata() {
+  const title = "Standard Schema";
+  const description = "A common interface for TypeScript validation libraries";
+  const url = getUrl();
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      siteName: "Standard Schema",
+      url,
+      locale: "en_US",
+      images: [
+        {
+          url: `${url}/og.png`,
+          width: 1200,
+          height: 630,
+          alt: "Introducing Standard Schema",
+        },
+      ],
+    },
+
+    twitter: {
+      card: "summary_large_image",
+      creator: "@colinhacks",
+      title,
+      description,
+      images: [`${url}/og.png`],
+    },
+  } satisfies Metadata;
+}
 
 export default async function Home() {
-  // const content = readFileSync(join(process.cwd(), "index.md"), "utf-8");
-
-  // const lines = content.split("\n").filter((line) => {
-  //   // filter h1
-  //   if (line.startsWith("# ")) return false;
-  //   return true;
-  // });
-
-  // const html = parseMarkdown(lines.join("\n"));
-
   return (
     <div className="min-h-screen font-[family-name:var(--font-ibm-plex-mono)] max-w-[800px] px-4 py-8 w-full mx-auto">
       <main className="flex flex-col gap-8 items-start px-4">
@@ -40,13 +69,13 @@ export default async function Home() {
           </h2>
           <div className="h-8" />
 
-          <Link
+          {/* <Link
             href="https://github.com/standard-schema/standard-schema"
             className={buttonVariants({ variant: "outline" })}
           >
             <Github />
             Go to repo
-          </Link>
+          </Link> */}
         </div>
 
         <div className="h-[10vh]" />
@@ -55,7 +84,6 @@ export default async function Home() {
         <article
           className="flex flex-col gap-4 prose prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm"
 
-          /* biome-ignore lint */
           // dangerouslySetInnerHTML={{
           //   __html: html,
           // }}

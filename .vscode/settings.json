@@ -2,5 +2,9 @@
   "editor.defaultFormatter": "biomejs.biome",
   "[css]": {
     "editor.defaultFormatter": "vscode.css-language-features"
+  },
+  "editor.codeActionsOnSave": {
+    "quickfix.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
   }
 }
