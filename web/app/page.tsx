@@ -21,18 +21,18 @@ export default async function Home() {
 
   return (
     <div className="min-h-screen font-[family-name:var(--font-ibm-plex-mono)] max-w-[800px] px-4 py-8 w-full mx-auto">
-      <main className="flex flex-col gap-8 row-start-2 items-start px-4">
+      <main className="flex flex-col gap-8 items-start px-4">
         <div className="h-[15vh]" />
         <div className="flex flex-col items-center mx-auto">
           <p
-            className="flex text-center text-sm font-small uppercase text-gray-200 px-4 bg-[hsl(var(--accent))] rounded"
+            className="flex text-center text-sm font-small uppercase text-gray-900 px-4 bg-[hsl(var(--foreground))] rounded"
             style={{
               fontVariant: "small-caps",
             }}
           >
             Introducing
           </p>
-          <div className="h-2" />
+          <div className="h-4" />
           <h1 className="flex text-center text-4xl">Standard Schema</h1>
           <div className="h-4" />
           <h2 className="text-gray-200">
@@ -53,8 +53,8 @@ export default async function Home() {
         <hr className="border-t-[1px] border-gray-700 w-full" />
         <div className="h-[10vh]" />
         <article
-          className="flex flex-col gap-4 prose prose-gray dark:prose-invert !max-w-none"
-          /* biome-ignore lint: */
+          className="flex flex-col gap-4 prose prose-gray dark:prose-invert !max-w-none text-gray-300"
+          /* biome-ignore lint */
           // dangerouslySetInnerHTML={{
           //   __html: html,
           // }}
@@ -100,13 +100,21 @@ export default async function Home() {
             type Result<Output> = 
               | { value: Output; issues?: undefined }
               | { issues: Array<{ message: string; path?: ReadonlyArray<PropertyKey | PathSegment> }> }
-            
           `}</CodeBlock>
 
-          <h2>Implementers</h2>
+          <h2>What libraries implement the spec?</h2>
           <p>
             The following validation libraries have implemented the Standard
             Schema specification.
+          </p>
+          <p>
+            If you maintain a schema library that has implemented Standard
+            Schema, please{" "}
+            <Link href="https://github.com/standard-schema/standard-schema/compare">
+              open a PR
+            </Link>{" "}
+            to add it to this list. If you have questions about implementation,
+            reach out on GitHub or contact
           </p>
 
           <table className="table-auto">
@@ -184,10 +192,56 @@ export default async function Home() {
             </tbody>
           </table>
 
-          <h2>Integrators</h2>
+          <h2>
+            How do I accept Standard Schemas in my framework/library/tool?
+          </h2>
           <p>
-            The following frameworks and libraries have added support for
-            schemas that conform to the Standard Schema specification.
+            Let's run through a simple example of how to write a generic
+            function that accepts any Standard Schema-compliant validator,
+            extracts its inferred type, and uses it to validate data.
+          </p>
+          <CodeBlock lang="ts">
+            {`
+          import type { StandardSchemaV1 } from "@standard-schema/spec";
+          
+          export async function standardValidate<T extends StandardSchemaV1>(
+            schema: T,
+            input: StandardSchemaV1.InferInput<T>,
+          ): Promise<StandardSchemaV1.InferOutput<T>> {
+            let result = schema["~standard"].validate(input);
+            if (result instanceof Promise) result = await result;
+
+            // if the \`issues\` field exists, the validation failed
+            if (result.issues) {
+              throw new Error(JSON.stringify(result.issues, null, 2));
+            }
+
+            return result.value;
+          }`}
+          </CodeBlock>
+          <p>
+            This simple function can be used to accept any standard-compliant
+            schema and use it to parse data in a type-safe way.
+          </p>
+          <CodeBlock lang="ts">
+            {`
+            import * as z from "zod";
+            import * as v from "valibot";
+            import { type } from "arktype";
+
+            const zodResult = await standardValidate(z.string(), "hello");
+            // => "hello"
+            const valibotResult = await standardValidate(v.string(), "hello");
+            // => "hello"
+            const arktypeResult = await standardValidate(type("string"), "hello");
+            // => "hello"
+            `}
+          </CodeBlock>
+
+          <h2>What tools accept Standard Schema-compliant schemas?</h2>
+          <p>
+            The following frameworks and libraries have added support for any
+            schema that conform to the Standard Schema specification.
           </p>
 
           <table className="table-auto">
@@ -286,8 +340,15 @@ export default async function Home() {
               </tr>
             </tbody>
           </table>
+          <blockquote>
+            If you've implemented Standard Schema in your library, please{" "}
+            <Link href="https://github.com/standard-schema/standard-schema/compare">
+              open a PR
+            </Link>{" "}
+            to add it to this list.
+          </blockquote>
 
-          <h2>Who is doing this?</h2>
+          <h2>Who wrote the spec?</h2>
           <p>
             The original concept was proposed in a 2023 tweet by{" "}
             <Link href="https://x.com/colinhacks">Colin McDonnell</Link>{" "}
@@ -299,7 +360,7 @@ export default async function Home() {
             dangerouslySetInnerHTML={{
               __html: `<blockquote class="twitter-tweet" data-theme="dark"><p lang="en" dir="ltr">What if all the type validation libraries in the ecosystem implemented a shared interface? <br><br>Then other libraries that accept user-provided schemas (e.g. tRPC) could accept any &quot;spec-compliant&quot; validator and not need to implement special logic for each lib<br><br>Proposal: <a href="https://t.co/GTTcanOoFW">pic.twitter.com/GTTcanOoFW</a></p>&mdash; Colin McDonnell (@colinhacks) <a href="https://twitter.com/colinhacks/status/1634284724796661761?ref_src=twsrc%5Etfw">March 10, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
             }}
-          ></div>
+          />
           <p>
             The final version of the spec was designed by Colin,{" "}
             <Link href="https://x.com/fabianHiller">Fabian Hiller</Link>{" "}
@@ -434,16 +495,37 @@ export default async function Home() {
           `}</CodeBlock> */}
         </article>
       </main>
-      <div className="h-[10vh]" />
+      <div className="h-[15vh]" />
       <hr className="border-t-[1px] border-gray-900 w-full" />
       <div className="h-6" />
-      <footer className="row-start-3 flex gap-6 flex-wrap items-center justify-center">
+      <footer className="flex flex-row justify-between first-letter:gap-6 flex-wrap items-center">
+        <div className="text-sm">
+          <p>
+            by{" "}
+            <Link href="https://twitter.com/colinhacks" className="underline">
+              @colinhacks
+            </Link>
+            ,{" "}
+            <Link href="https://twitter.com/fabianHiller" className="underline">
+              @fabianhiller
+            </Link>
+            , and{" "}
+            <Link href="https://twitter.com/ssalbdivad" className="underline">
+              @ssalbdivad
+            </Link>
+          </p>
+          <p>© {new Date().getFullYear()}</p>
+        </div>
+
         <Link
           href="https://github.com/standard-schema/standard-schema"
-          className={`${buttonVariants({ variant: "ghost", size: "lg" })}`}
+          className={`${buttonVariants({
+            variant: "ghost",
+            size: "lg",
+          })} flex-none`}
         >
           <Github />
-          Go to repo
+          Go to repo →
         </Link>
         {/* <Github color="white" size={50} /> */}
 

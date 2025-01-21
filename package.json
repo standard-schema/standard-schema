@@ -11,6 +11,9 @@
   "private": true,
   "devDependencies": {
     "@biomejs/biome": "^1.9.2",
-    "typescript": "^5.6.2"
+    "arktype": "^2.0.0",
+    "typescript": "^5.6.2",
+    "valibot": "1.0.0-beta.12",
+    "zod": "^3.24.1"
   }
 }

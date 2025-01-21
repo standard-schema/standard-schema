@@ -10,7 +10,7 @@ async function createMarkdown() {
     await Shiki({
       themes: {
         light: "vitesse-light",
-        dark: "vitesse-black",
+        dark: "vitesse-dark",
       },
     }),
   );
