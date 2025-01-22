@@ -92,33 +92,6 @@ export default async function Home() {
           </p>
 
           <h2>The specification</h2>
-          <p>The specification has a few primary design goals.</p>
-          <ol>
-            <li>
-              <b>Support runtime validation.</b> Given a Standard Schema
-              compatible validator, you should be able to validate data with it
-              (duh). Validation errors should be presented a standardized
-              format.
-            </li>
-            <li>
-              <b>Support static type inference.</b> For TypeScript libraries
-              that do type inference, the specification provides a standard way
-              for them to "advertise" their inferred type, so it can be inferred
-              by external tools. compatible validator should "expose" an
-              inferred type that can be should be able to infer an validate data
-              with it (duh).
-            </li>
-            <li>
-              <b>Easy to implement.</b> It should be simple for schema libraries
-              to implement, ideally only requiring a few lines of code.
-            </li>
-            <li>
-              <b>Do no harm to DX.</b> The specification must avoid conflicts
-              with the existing API surfaces of all existing libraries. It
-              should be minimal to avoid unnecessary clutter in
-              Intellisense/autocompletion.
-            </li>
-          </ol>
           <p>
             Below is a simplified version of the specification designed for
             digestibility. The complete spec can be found{" "}
@@ -147,13 +120,45 @@ export default async function Home() {
               | { value: Output; issues?: undefined }
               | { issues: Array<{ 
                     message: string; 
-                    path?: ReadonlyArray<PropertyKey | PathSegment> 
+                    path?: Array<PropertyKey | PathSegment> 
                   }> 
                 }
           `}</CodeBlock>
-          <p>
-            The entire spec is tucked into a <code>~standard</code> property.
-          </p>
+          <p>The specification meets a few primary design objectives.</p>
+          <ol>
+            <li>
+              <b>Supports runtime validation.</b> Given a Standard Schema
+              compatible validator, you should be able to validate data with it
+              (duh). Any validation errors should be presented a standardized
+              format.
+            </li>
+            <li>
+              <b>Supports static type inference.</b> For TypeScript libraries
+              that do type inference, the specification provides a standard way
+              for them to "advertise" their inferred type, so it can be
+              extracted and used by external tools.
+            </li>
+            <li>
+              <b>Minimal.</b> It should be easy for libraries to implement this
+              spec in a few lines of code that call their existing{" "}
+              <code>parse/validate</code> methods.
+            </li>
+            <li>
+              <b>Avoids API conflicts.</b> The entire spec is tucked inside a
+              single object property called <code>~standard</code>, which avoids
+              potential naming conflicts with the API surface of existing
+              libraries.
+            </li>
+            <li>
+              <b>Does no harm to DX.</b> The <code>~standard</code> property is
+              tilde-prefixed to{" "}
+              <Link href="https://x.com/colinhacks/status/1816860780459073933">
+                de-prioritize it in autocompletion
+              </Link>
+              . By contrast an underscrore-prefixed property should show up
+              before properties/methods with alphanumeric names.
+            </li>
+          </ol>
 
           <h2>What libraries implement the spec?</h2>
           <p>
