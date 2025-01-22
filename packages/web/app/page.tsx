@@ -97,7 +97,8 @@ export default async function Home() {
             <li>
               <b>Support runtime validation.</b> Given a Standard Schema
               compatible validator, you should be able to validate data with it
-              (duh).
+              (duh). Validation errors should be presented a standardized
+              format.
             </li>
             <li>
               <b>Support static type inference.</b> For TypeScript libraries
