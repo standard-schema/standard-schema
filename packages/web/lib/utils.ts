@@ -10,8 +10,12 @@ export function isLocalhost(): boolean {
   return process.env.NODE_ENV !== "production";
 }
 
+export function isPreview(): boolean {
+  // cloudflare pages
+  return process.env.DEPLOYMENT === "preview";
+}
 export function isProduction(): boolean {
-  return !isLocalhost() && process.env.VERCEL_ENV === "production";
+  return !isPreview() && !isLocalhost();
 }
 
 export function getDomain(): string {
@@ -21,12 +25,16 @@ export function getDomain(): string {
   if (isProduction()) {
     return domain;
   }
-  return process.env.VERCEL_URL || domain;
+  return process.env.VERCEL_URL ?? process.env.CF_PAGES_URL;
 }
 
-export function getUrl(): URL {
+export function getUrl(): string {
   if (isLocalhost()) {
-    return new URL("http://localhost:3000");
+    return "http://localhost:3000";
   }
-  return new URL(`https://${getDomain()}`);
+  if (isProduction()) return `https://${getDomain()}`;
+  const preview = process.env.VERCEL_URL ?? process.env.CF_PAGES_URL;
+  if (!preview) throw new Error("Preview URL not found");
+  return `https://${preview}`;
+  // return new URL(`https://${getDomain()}`);
 }
