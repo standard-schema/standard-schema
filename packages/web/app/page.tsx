@@ -144,7 +144,11 @@ export default async function Home() {
 
             type Result<Output> = 
               | { value: Output; issues?: undefined }
-              | { issues: Array<{ message: string; path?: ReadonlyArray<PropertyKey | PathSegment> }> }
+              | { issues: Array<{ 
+                    message: string; 
+                    path?: ReadonlyArray<PropertyKey | PathSegment> 
+                  }> 
+                }
           `}</CodeBlock>
           <p>
             The entire spec is tucked into a <code>~standard</code> property.
