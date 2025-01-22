@@ -405,7 +405,7 @@ export default async function Home() {
 
           <h2>Who wrote the spec?</h2>
           <p>
-            The original concept was
+            The original concept was{" "}
             <Link href="https://twitter.com/colinhacks/status/1634284724796661761">
               proposed on Twitter
             </Link>{" "}
