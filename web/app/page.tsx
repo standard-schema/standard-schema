@@ -1,19 +1,10 @@
-// import {Button} from '@/components/ui/button';
 import { buttonVariants } from "@/components/ui/button";
 import { CodeBlock } from "@/components/ui/codeblock";
+import { getUrl } from "@/lib/utils";
 import { Github } from "lucide-react";
+import type { Metadata } from "next";
 import Link from "next/link";
 
-import { getUrl } from "@/lib/utils";
-import type { Metadata } from "next";
-
-// export const metadata: Metadata = {
-//   title: "Standard Schema",
-//   description: "A common interface for TypeScript validation libraries",
-//   ''
-// };
-
-// or Dynamic metadata
 export async function generateMetadata() {
   const title = "Standard Schema";
   const description = "A common interface for TypeScript validation libraries";
