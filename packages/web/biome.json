@@ -11,14 +11,11 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "correctness": {
-        "noUnusedImports": "error"
-      },
-      "security": {
-        "noDangerouslySetInnerHtml": "off"
-      },
       "style": {
-        "noNonNullAssertion": "off"
+        "useSelfClosingElements": "off"
+      },
+      "suspicious": {
+        "noExplicitAny": "off"
       }
     }
   }
