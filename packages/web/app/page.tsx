@@ -41,7 +41,7 @@ export async function generateMetadata() {
 export default async function Home() {
   return (
     <div className="min-h-screen font-[family-name:var(--font-ibm-plex-mono)] max-w-[800px] px-4 py-8 w-full mx-auto">
-      <main className="flex flex-col gap-8 items-start px-4">
+      <main className="flex flex-col gap-8 items-start">
         <div className="h-[15vh]" />
         <div className="flex flex-col items-center mx-auto">
           <p
@@ -54,8 +54,8 @@ export default async function Home() {
           </p>
           <div className="h-4" />
           <h1 className="flex text-center text-4xl">Standard Schema</h1>
-          <div className="h-4" />
-          <h2 className="text-gray-200">
+          <div className="h-4 text-center" />
+          <h2 className="text-gray-200 text-center">
             A common interface for TypeScript validation libraries
           </h2>
           <div className="h-8" />
@@ -72,7 +72,7 @@ export default async function Home() {
         <hr className="border-t-2 border-gray-500 w-full" />
         <div className="h-[10vh]" />
         <article
-          className="flex flex-col gap-4 prose prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm"
+          className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm"
 
           // dangerouslySetInnerHTML={{
           //   __html: html,
@@ -86,20 +86,46 @@ export default async function Home() {
           <p>
             The goal is to make it easier for other frameworks and libraries to
             accept user-defined schemas, without needing to implement a custom
-            adapter for each schema library.Because Standard Schema is a
-            *specification*, they can do so with no additional runtime
+            adapter for each schema library. Because Standard Schema is a
+            <em>specification</em>, they can do so with no additional runtime
             dependencies.
           </p>
 
           <h2>The specification</h2>
+          <p>The specification has a few primary design goals.</p>
+          <ol>
+            <li>
+              <b>Support runtime validation.</b> Given a Standard Schema
+              compatible validator, you should be able to validate data with it
+              (duh).
+            </li>
+            <li>
+              <b>Support static type inference.</b> For TypeScript libraries
+              that do type inference, the specification provides a standard way
+              for them to "advertise" their inferred type, so it can be inferred
+              by external tools. compatible validator should "expose" an
+              inferred type that can be should be able to infer an validate data
+              with it (duh).
+            </li>
+            <li>
+              <b>Easy to implement.</b> It should be simple for schema libraries
+              to implement, ideally only requiring a few lines of code.
+            </li>
+            <li>
+              <b>Do no harm to DX.</b> The specification must avoid conflicts
+              with the existing API surfaces of all existing libraries. It
+              should be minimal to avoid unnecessary clutter in
+              Intellisense/autocompletion.
+            </li>
+          </ol>
           <p>
-            The specification is designed to be minimal, to avoid conflicts with
-            the API surface of existing, and to provide a mechanism for both{" "}
-            <em>runtime validation</em> and <em>static type inference</em>.
-            Ideally, it will require only a handful of lines of code for any
-            existing library to implement this specification.
+            Below is a simplified version of the specification designed for
+            digestibility. The complete spec can be found{" "}
+            <Link href="https://github.com/standard-schema/standard-schema/blob/main/packages/spec/src/index.ts">
+              here
+            </Link>
+            .
           </p>
-          <p>Below is a simplified version of the specification.</p>
           <CodeBlock lang="ts">{`
             interface StandardSchemaV1<Input = unknown, Output = Input> {
               "~standard": {
@@ -120,6 +146,9 @@ export default async function Home() {
               | { value: Output; issues?: undefined }
               | { issues: Array<{ message: string; path?: ReadonlyArray<PropertyKey | PathSegment> }> }
           `}</CodeBlock>
+          <p>
+            The entire spec is tucked into a <code>~standard</code> property.
+          </p>
 
           <h2>What libraries implement the spec?</h2>
           <p>
@@ -136,18 +165,19 @@ export default async function Home() {
             reach out on GitHub or contact
           </p>
 
-          <table className="table-auto">
-            <thead>
-              <tr>
-                <th>Implementer</th>
-                <th>Version(s)</th>
-                <th>Docs</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>Zod</td>
-                {/* <td>
+          <div className="overflow-x-scroll">
+            <table className="table-auto">
+              <thead>
+                <tr>
+                  <th>Implementer</th>
+                  <th>Version(s)</th>
+                  <th>Docs</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>Zod</td>
+                  {/* <td>
                   <Link href="https://valibot.dev/">
                     <Image
                       aria-hidden
@@ -158,14 +188,14 @@ export default async function Home() {
                     />
                   </Link>
                 </td> */}
-                <td>3.24.0+</td>
-                <td>
-                  <Link href="https://zod.dev/">zod.dev</Link>
-                </td>
-              </tr>
-              <tr>
-                <td>Valibot</td>
-                {/* <td>
+                  <td>3.24.0+</td>
+                  <td>
+                    <Link href="https://zod.dev/">zod.dev</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Valibot</td>
+                  {/* <td>
                   <Link href="https://valibot.dev/">
                     <Image
                       aria-hidden
@@ -176,14 +206,14 @@ export default async function Home() {
                     />
                   </Link>
                 </td> */}
-                <td>v1.0 (including RCs)</td>
-                <td>
-                  <Link href="https://valibot.dev/">valibot.dev</Link>
-                </td>
-              </tr>
-              <tr>
-                <td>ArkType</td>
-                {/* <td>
+                  <td>v1.0 (including RCs)</td>
+                  <td>
+                    <Link href="https://valibot.dev/">valibot.dev</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td>ArkType</td>
+                  {/* <td>
                   <Link href="https://arktype.io/">
                     <Image
                       aria-hidden
@@ -194,26 +224,25 @@ export default async function Home() {
                     />
                   </Link>
                 </td> */}
-                <td>v2.0+</td>
-                <td>
-                  <Link href="https://arktype.io/">arktype.io</Link>
-                </td>
-              </tr>
-              <tr>
-                <td>Arri Schema</td>
-                <td>v0.71.0+</td>
-                <td>
-                  <Link href="https://github.com/modiimedia/arri">
-                    github.com/modiimedia/arri
-                  </Link>
-                </td>
-              </tr>
-            </tbody>
-          </table>
+                  <td>v2.0+</td>
+                  <td>
+                    <Link href="https://arktype.io/">arktype.io</Link>
+                  </td>
+                </tr>
+                <tr>
+                  <td>Arri Schema</td>
+                  <td>v0.71.0+</td>
+                  <td>
+                    <Link href="https://github.com/modiimedia/arri">
+                      github.com/modiimedia/arri
+                    </Link>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
 
-          <h2>
-            How do I accept Standard Schemas in my framework/library/tool?
-          </h2>
+          <h2>How do I accept Standard Schemas in my framework / library?</h2>
           <p>
             Let's run through a simple example of how to write a generic
             function that accepts any Standard Schema-compliant validator,
@@ -263,102 +292,104 @@ export default async function Home() {
             schema that conform to the Standard Schema specification.
           </p>
 
-          <table className="table-auto">
-            <thead>
-              <tr>
-                <th>Integrator</th>
-                <th>Description</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td>
-                  <Link href="https://github.com/trpc/trpc">tRPC</Link>
-                </td>
-                <td>
-                  🧙‍♀️ Move fast and break nothing. End-to-end typesafe APIs made
-                  easy
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Link href="https://github.com/TanStack/form">
-                    TanStack Form
-                  </Link>
-                </td>
-                <td>
-                  🤖 Headless, performant, and type-safe form state management
-                  for TS/JS, React, Vue, Angular, Solid, and Lit
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Link href="https://github.com/tanstack/router">
-                    TanStack Router
-                  </Link>
-                </td>
-                <td>
-                  A fully type-safe React router with built-in data fetching,
-                  stale-while revalidate caching and first-class search-param
-                  APIs
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Link href="https://github.com/pingdotgg/uploadthing">
-                    UploadThing
-                  </Link>
-                </td>
-                <td>File uploads for modern web devs</td>
-              </tr>
-              <tr>
-                <td>
-                  <Link href="https://github.com/formwerkjs/formwerk">
-                    Formwerk
-                  </Link>
-                </td>
-                <td>
-                  A Vue.js Framework for building high-quality, accessible,
-                  delightful forms.
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Link href="https://github.com/modevol-com/gqloom">
-                    GQLoom
-                  </Link>
-                </td>
-                <td>
-                  Weave GraphQL schema and resolvers using Standard Schema
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Link href="https://github.com/nuxt/ui">Nuxt UI</Link>
-                </td>
-                <td>
-                  A UI Library for modern web apps, powered by Vue & Tailwind
-                  CSS
-                </td>
-              </tr>
-              <tr>
-                <td>
-                  <Link href="https://github.com/unnoq/orpc">oRPC</Link>
-                </td>
-                <td>Typesafe APIs made simple 🪄</td>
-              </tr>
-              <tr>
-                <td>
-                  <Link href="https://github.com/victorgarciaesgi/regle">
-                    Regle
-                  </Link>
-                </td>
-                <td>
-                  Type-safe model-based form validation library for Vue.js
-                </td>
-              </tr>
-            </tbody>
-          </table>
+          <div className="overflow-x-scroll">
+            <table className="table-auto">
+              <thead>
+                <tr>
+                  <th>Integrator</th>
+                  <th>Description</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/trpc/trpc">tRPC</Link>
+                  </td>
+                  <td>
+                    🧙‍♀️ Move fast and break nothing. End-to-end typesafe APIs
+                    made easy
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/TanStack/form">
+                      TanStack Form
+                    </Link>
+                  </td>
+                  <td>
+                    🤖 Headless, performant, and type-safe form state management
+                    for TS/JS, React, Vue, Angular, Solid, and Lit
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/tanstack/router">
+                      TanStack Router
+                    </Link>
+                  </td>
+                  <td>
+                    A fully type-safe React router with built-in data fetching,
+                    stale-while revalidate caching and first-class search-param
+                    APIs
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/pingdotgg/uploadthing">
+                      UploadThing
+                    </Link>
+                  </td>
+                  <td>File uploads for modern web devs</td>
+                </tr>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/formwerkjs/formwerk">
+                      Formwerk
+                    </Link>
+                  </td>
+                  <td>
+                    A Vue.js Framework for building high-quality, accessible,
+                    delightful forms.
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/modevol-com/gqloom">
+                      GQLoom
+                    </Link>
+                  </td>
+                  <td>
+                    Weave GraphQL schema and resolvers using Standard Schema
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/nuxt/ui">Nuxt UI</Link>
+                  </td>
+                  <td>
+                    A UI Library for modern web apps, powered by Vue & Tailwind
+                    CSS
+                  </td>
+                </tr>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/unnoq/orpc">oRPC</Link>
+                  </td>
+                  <td>Typesafe APIs made simple 🪄</td>
+                </tr>
+                <tr>
+                  <td>
+                    <Link href="https://github.com/victorgarciaesgi/regle">
+                      Regle
+                    </Link>
+                  </td>
+                  <td>
+                    Type-safe model-based form validation library for Vue.js
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
           <blockquote>
             If you've implemented Standard Schema in your library, please{" "}
             <Link href="https://github.com/standard-schema/standard-schema/compare">
@@ -517,7 +548,18 @@ export default async function Home() {
       <div className="h-[15vh]" />
       <hr className="border-t-2 border-gray-500 w-full" />
       <div className="h-6" />
-      <footer className="flex flex-row justify-between first-letter:gap-6 flex-wrap items-center">
+      <footer className="flex flex-col text-center align-center md:flex-row-reverse md:text-start md:justify-between first-letter:gap-6 flex-wrap items-center">
+        <Link
+          href="https://github.com/standard-schema/standard-schema"
+          className={`${buttonVariants({
+            variant: "ghost",
+            size: "lg",
+          })} flex-none`}
+        >
+          <Github />
+          Go to repo →
+        </Link>
+        <div className="h-4" />
         <div className="text-sm">
           <p>
             by{" "}
@@ -533,19 +575,10 @@ export default async function Home() {
               @ssalbdivad
             </Link>
           </p>
+          <div className="h-2" />
           <p>© {new Date().getFullYear()}</p>
         </div>
 
-        <Link
-          href="https://github.com/standard-schema/standard-schema"
-          className={`${buttonVariants({
-            variant: "ghost",
-            size: "lg",
-          })} flex-none`}
-        >
-          <Github />
-          Go to repo →
-        </Link>
         {/* <Github color="white" size={50} /> */}
 
         {/* <a

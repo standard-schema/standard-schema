@@ -3,8 +3,6 @@ import { twMerge } from "tailwind-merge";
 
 export const DOMAIN = "standardschema.dev";
 
-console.log(process.env);
-
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
