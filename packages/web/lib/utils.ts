@@ -3,6 +3,8 @@ import { twMerge } from "tailwind-merge";
 
 export const DOMAIN = "standardschema.dev";
 
+console.log(process.env);
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -24,7 +26,7 @@ export function getUrl(): string {
     return "http://localhost:3000";
   }
 
-  if (!isPreview()) {
+  if (isPreview()) {
     return process.env.CF_PAGES_URL!;
   }
 
