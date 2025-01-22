@@ -1,7 +1,8 @@
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
-export const domain = "standardschema.dev";
+export const DOMAIN = "standardschema.dev";
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
@@ -27,5 +28,5 @@ export function getUrl(): string {
     return process.env.CF_PAGES_URL!;
   }
 
-  return `https://${getDomain()}`;
+  return `https://${DOMAIN}`;
 }
