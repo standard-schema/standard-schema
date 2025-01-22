@@ -22,19 +22,18 @@ export function getDomain(): string {
   if (isLocalhost()) {
     return "localhost";
   }
-  if (isProduction()) {
-    return domain;
+  if (isPreview()) {
+    const prevDomain = process.env.VERCEL_URL ?? process.env.CF_PAGES_URL;
+    if (!prevDomain) throw new Error("Preview URL not found");
+    return prevDomain;
   }
-  return process.env.VERCEL_URL ?? process.env.CF_PAGES_URL;
+
+  return domain;
 }
 
 export function getUrl(): string {
   if (isLocalhost()) {
     return "http://localhost:3000";
   }
-  if (isProduction()) return `https://${getDomain()}`;
-  const preview = process.env.VERCEL_URL ?? process.env.CF_PAGES_URL;
-  if (!preview) throw new Error("Preview URL not found");
-  return `https://${preview}`;
-  // return new URL(`https://${getDomain()}`);
+  return `https://${getDomain()}`;
 }
