@@ -6,6 +6,8 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
+console.log(process.env);
+
 export function isDevelopment(): boolean {
   return process.env.NODE_ENV === "development";
 }
