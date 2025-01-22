@@ -59,14 +59,13 @@ export default async function Home() {
             A common interface for TypeScript validation libraries
           </h2>
           <div className="h-8" />
-
-          {/* <Link
+          <Link
             href="https://github.com/standard-schema/standard-schema"
             className={buttonVariants({ variant: "outline" })}
           >
             <Github />
             Go to repo
-          </Link> */}
+          </Link>
         </div>
 
         <div className="h-[10vh]" />
