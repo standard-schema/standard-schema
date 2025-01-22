@@ -6,34 +6,32 @@ export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs));
 }
 
-export function isLocalhost(): boolean {
-  return process.env.NODE_ENV !== "production";
+export function isDevelopment(): boolean {
+  return process.env.NODE_ENV === "development";
 }
 
 export function isPreview(): boolean {
-  // cloudflare pages
-  return process.env.DEPLOYMENT === "preview";
+  return process.env.CF_PAGES_BRANCH !== "main";
 }
+
 export function isProduction(): boolean {
-  return !isPreview() && !isLocalhost();
+  return process.env.CF_PAGES_BRANCH === "main";
 }
 
 export function getDomain(): string {
-  if (isLocalhost()) {
+  if (isDevelopment()) {
     return "localhost";
   }
   if (isPreview()) {
-    const prevDomain = process.env.VERCEL_URL ?? process.env.CF_PAGES_URL;
-    if (!prevDomain) throw new Error("Preview URL not found");
-    return prevDomain;
+    return process.env.CF_PAGES_URL!;
   }
-
   return domain;
 }
 
 export function getUrl(): string {
-  if (isLocalhost()) {
+  if (isDevelopment()) {
     return "http://localhost:3000";
   }
+
   return `https://${getDomain()}`;
 }
