@@ -12,8 +12,8 @@ async function initMarkdownParser() {
   md.use(
     await Shiki({
       themes: {
-        light: "vitesse-light",
-        dark: "vitesse-dark",
+        light: "github-light-default",
+        dark: "github-dark-default",
       },
     }),
   );

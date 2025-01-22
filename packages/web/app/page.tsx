@@ -123,7 +123,7 @@ export default async function Home() {
             Below is a simplified version of the specification designed for
             digestibility. The complete spec can be found{" "}
             <Link href="https://github.com/standard-schema/standard-schema/blob/main/packages/spec/src/index.ts">
-              here
+              in the repository
             </Link>
             .
           </p>
@@ -437,7 +437,7 @@ export default async function Home() {
               If you want to dig into the spec, it's defined as a single
               TypeScript file, available on GitHub{" "}
               <Link href="https://github.com/standard-schema/standard-schema/blob/main/packages/spec/src/index.ts">
-                here
+                in the repository
               </Link>
               .
             </li>

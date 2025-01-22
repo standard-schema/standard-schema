@@ -1,6 +1,6 @@
+import dedent from "dedent";
 import type { BundledLanguage } from "shiki";
 import { codeToHtml } from "shiki";
-import dedent from "dedent";
 
 interface Props {
   children: string;
@@ -11,11 +11,10 @@ export async function CodeBlock(props: Props) {
   const out = await codeToHtml(dedent(props.children), {
     lang: props.lang,
     themes: {
-      light: "vitesse-light",
-      dark: "vitesse-black",
+      light: "github-light-default",
+      dark: "github-dark-default",
     },
   });
 
-  // biome-ignore lint:
   return <div dangerouslySetInnerHTML={{ __html: out }} />;
 }
