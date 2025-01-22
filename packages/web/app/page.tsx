@@ -405,18 +405,20 @@ export default async function Home() {
 
           <h2>Who wrote the spec?</h2>
           <p>
-            The original concept was proposed in a 2023 tweet by{" "}
-            <Link href="https://x.com/colinhacks">Colin McDonnell</Link>{" "}
+            The original concept was
+            <Link href="https://twitter.com/colinhacks/status/1634284724796661761">
+              proposed on Twitter
+            </Link>{" "}
+            by <Link href="https://x.com/colinhacks">Colin McDonnell</Link>{" "}
             (creator of Zod).
-          </p>
+            {/* </p>
           <div
             className="mx-auto"
-            // biome-ignore lint:
             dangerouslySetInnerHTML={{
               __html: `<blockquote class="twitter-tweet" data-theme="dark"><p lang="en" dir="ltr">What if all the type validation libraries in the ecosystem implemented a shared interface? <br><br>Then other libraries that accept user-provided schemas (e.g. tRPC) could accept any &quot;spec-compliant&quot; validator and not need to implement special logic for each lib<br><br>Proposal: <a href="https://t.co/GTTcanOoFW">pic.twitter.com/GTTcanOoFW</a></p>&mdash; Colin McDonnell (@colinhacks) <a href="https://twitter.com/colinhacks/status/1634284724796661761?ref_src=twsrc%5Etfw">March 10, 2023</a></blockquote> <script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`,
             }}
           />
-          <p>
+          <p> */}{" "}
             The final version of the spec was designed by Colin,{" "}
             <Link href="https://x.com/fabianHiller">Fabian Hiller</Link>{" "}
             (creator of Valibot), and{" "}
