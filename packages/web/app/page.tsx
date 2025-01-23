@@ -96,7 +96,7 @@ export default async function Home() {
           <p>
             The goal is to make it easier for other frameworks and libraries to
             accept user-defined schemas, without needing to implement a custom
-            adapter for each schema library. Because Standard Schema is a
+            adapter for each schema library. Because Standard Schema is a{" "}
             <em>specification</em>, they can do so with no additional runtime
             dependencies.
           </p>
@@ -150,14 +150,12 @@ export default async function Home() {
             </li>
             <li>
               <b>Minimal.</b> It should be easy for libraries to implement this
-              spec in a few lines of code that call their existing{" "}
-              <code>parse/validate</code> methods.
+              spec in a few lines of code.
             </li>
             <li>
               <b>Avoids API conflicts.</b> The entire spec is tucked inside a
-              single object property called <code>~standard</code>, which avoids
-              potential naming conflicts with the API surface of existing
-              libraries.
+              single property called <code>~standard</code> to avoid name
+              conflicts with the API surface of existing libraries.
             </li>
             <li>
               <b>Does no harm to DX.</b> The <code>~standard</code> property is
@@ -165,7 +163,7 @@ export default async function Home() {
               <Link href="https://x.com/colinhacks/status/1816860780459073933">
                 de-prioritize it in autocompletion
               </Link>
-              . By contrast an underscrore-prefixed property should show up
+              . By contrast, an underscrore-prefixed property should show up
               before properties/methods with alphanumeric names.
             </li>
           </ol>
