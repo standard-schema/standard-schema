@@ -3,6 +3,7 @@ import { CodeBlock } from "@/components/ui/codeblock";
 import { getUrl } from "@/lib/utils";
 import { Github } from "lucide-react";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 
 export async function generateMetadata() {
@@ -42,10 +43,17 @@ export default async function Home() {
   return (
     <div className="min-h-screen font-[family-name:var(--font-ibm-plex-mono)] max-w-[800px] px-4 py-8 w-full mx-auto">
       <main className="flex flex-col gap-8 items-start">
-        <div className="h-[15vh]" />
+        <div className="h-[5vw]" />
         <div className="flex flex-col items-center mx-auto">
+          <Image
+            src="/favicon.svg"
+            width="50"
+            height="50"
+            alt="Standard Schema fire logo"
+          />
+          <div className="h-4" />
           <p
-            className="flex text-center text-sm font-small uppercase text-gray-900 px-4 bg-[hsl(var(--foreground))] rounded"
+            className="flex text-center text-sm font-small uppercase text-gray-900 px-12 bg-[hsl(var(--foreground))] rounded"
             style={{
               fontVariant: "small-caps",
             }}
@@ -53,7 +61,9 @@ export default async function Home() {
             Introducing
           </p>
           <div className="h-4" />
-          <h1 className="flex text-center text-4xl">Standard Schema</h1>
+          <h1 className="flex text-center text-3xl sm:text-4xl">
+            Standard Schema
+          </h1>
           <div className="h-4 text-center" />
           <h2 className="text-gray-200 text-center">
             A common interface for TypeScript validation libraries
@@ -68,9 +78,9 @@ export default async function Home() {
           </Link>
         </div>
 
-        <div className="h-[10vh]" />
+        <div className="h-[3vw]" />
         <hr className="border-t-2 border-gray-500 w-full" />
-        <div className="h-[10vh]" />
+        <div className="h-[3vw]" />
         <article
           className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm"
 
