@@ -459,18 +459,15 @@ export default async function Home() {
               <Link href="https://github.com/standard-schema/standard-schema">
                 README
               </Link>{" "}
-              for more a more comprehensive integration guide & FAQs.
+              for more a more comprehensive implementation guide & FAQs.
             </li>
             <li>
-              For other maintainers who are interested in integrating with
-              Standard Schema compatible libraries, refer to the README or refer
-              to other implementations like{" "}
+              For framework/library maintainers interested in accepting
+              spec-compliant user-defined schemas, refer to the README or other
+              implementations like{" "}
+              <Link href="https://github.com/trpc/trpc/pull/6079">tRPC</Link> or{" "}
               <Link href="https://github.com/TanStack/form/pull/1020">
                 Tanstack Form
-              </Link>{" "}
-              or{" "}
-              <Link href="https://github.com/honojs/middleware/pull/887">
-                Hono Middleware
               </Link>
               .
             </li>
