@@ -347,9 +347,9 @@ By contrast, declaring the symbol externally makes it "nominally typed". This me
 
 ![Screenshot showing the prioritization of external symbols in VS Code](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
 
-### What should I do if I only accept synchronous validation?
+### How to only allow synchronous validation?
 
-The `~validate` function does not necessarily have to return a `Promise` . If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of the `Promise` class.
+The `~validate` function might return a synchronous value *or* a `Promise` . If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise` .
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
