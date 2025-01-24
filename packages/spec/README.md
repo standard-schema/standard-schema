@@ -102,11 +102,11 @@ export declare namespace StandardSchemaV1 {
 
 The specification meets a few primary design objectives:
 
-- Given a Standard Schema compatible validator, you should be able to validate data with it. Any validation errors should be presented in a standardized format.
-- **Supports static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" their inferred type, so it can be extracted and used by external tools.
+- **Support runtime validation.** Given a Standard Schema compatible validator, you should be able to validate data with it (duh). Any validation errors should be presented in a standardized format.
+- **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" their inferred type, so it can be extracted and used by external tools.
 - **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing functions/methods.
-- **Avoids API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
-- **Does no harm to DX.** The `~standard` property is tilde-prefixed to [de-prioritize it in autocompletion](https://x.com/colinhacks/status/1816860780459073933). By contrast, an underscore-prefixed property would show up before properties/methods with alphanumeric names.
+- **Avoid API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
+- **Do no harm to DX.** The `~standard` property is tilde-prefixed to [de-prioritize it in autocompletion](https://x.com/colinhacks/status/1816860780459073933). By contrast, an underscore-prefixed property would show up before properties/methods with alphanumeric names.
 
 ## What schema libraries implement the spec?
 
@@ -139,9 +139,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 
 Schemas libraries that want to support Standard Schema must implement the `StandardSchemaV1` interface. Start by copying the specification file above into your library. It consists of types only. 
 
-Then implement the spec by adding the `~standard` property to your validator objects/instances. We recommend using `extends` / `implements` to ensure static agreement with the interface.
-
-It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
+Then implement the spec by adding the `~standard` property to your validator objects/instances. We recommend using `extends` / `implements` to ensure static agreement with the interface. It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
 
 Here's a simple worked example of a string validator that implements the spec.
 
@@ -178,7 +176,7 @@ We recommend defining the `~standard.validate()` function in terms of your libra
 
 Third-party libraries and frameworks can leverage the Standard Schema spec to accept user-defined schemas in a type-safe way. 
 
-To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm as a dependency (*not a dev dependency*, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency) for details).
+To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm as a dependency (*not a dev dependency*, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency%3F) for details).
 
 ```sh
 npm install @standard-schema/spec  # npm
@@ -229,7 +227,7 @@ These are the most frequently asked questions about Standard Schema. If your que
 
 No. The `@standard-schema/spec` package is completely optional. You can just copy and paste the types into your project. We guarantee no breaking changes without a major version bump. 
 
-But if you don't mind additional dependencies, you can include `@standard-schema/spec` as a dependency and consume it exclusively with `import type` . The `@standard-schema/spec` package contains no runtime code and only exports types.
+If you don't mind additional dependencies, you can add `@standard-schema/spec` as a dependency and use `import type` to consume it. The `@standard-schema/spec` package contains no runtime code and only exports types.
 
 ### Can I add it as a dev dependency?
 
@@ -252,7 +250,7 @@ const object = {
 // { [k: symbol]: string }
 ```
 
-By contrast, declaring the symbol externally makes it "nominally typed". This means that the key is sorted in autocomplete under the variable name (e.g. `testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike `~` -prefixed string keys.
+By contrast, declaring the symbol externally makes it "nominally typed". This means that the key is sorted in autocomplete under the variable name (e.g. `testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike tilde-prefixed string keys.
 
 ![Screenshot showing the prioritization of external symbols in VS Code](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
 
