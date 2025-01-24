@@ -179,7 +179,7 @@ Third-party libraries and frameworks can leverage the Standard Schema spec to ac
 To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm as a dependency (*not a dev dependency*, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency%3F) for details).
 
 ```sh
-npm install @standard-schema/spec  # npm
+npm install @standard-schema/spec       # npm
 yarn add @standard-schema/spec          # yarn
 pnpm add @standard-schema/spec          # pnpm
 bun add @standard-schema/spec           # bun
