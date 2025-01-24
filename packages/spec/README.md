@@ -4,8 +4,8 @@
   Standard Schema</h1>
 <p align="center">
   A common interface for TypeScript validation libraries
-  <br/>
-  <a href="https://standardschema.dev">standardschema.dev</a>
+  <!-- <br/>
+  <a href="https://standardschema.dev">standardschema.dev</a> -->
 </p>
 <br/>
 
@@ -15,13 +15,13 @@ Standard Schema is a specification designed to be implemented by JavaScript and 
 
 The goal is to make it easier for ecosystem tools to accept user-defined schemas, without needing custom logic or adapter for each schema library. Because Standard Schema is a specification, they can do so with no additional runtime dependencies.
 
-## Who designed it? 
+## Who designed it?
 
 The spec was designed by the creators of Zod, Valibot, and ArkType. Recent versions of these libraries already implement the spec (see the [full list](#implementation) of implementers below).
 
 ## The interface
 
-The specification consists of a single TypeScript interface `StandardSchemaV1` to be implemented by any schema library wishing to be spec-compliant. This interface is defined below in its entirety. 
+The specification consists of a single TypeScript interface `StandardSchemaV1` to be implemented by any schema library wishing to be spec-compliant. This interface is defined below in its entirety.
 
 Libraries wishing to implement the spec can copy/paste the code block below into their codebase. There will be zero changes without a major version bump. It's also available at `@standard-schema/spec` on npm and JSR.
 
@@ -29,7 +29,7 @@ Libraries wishing to implement the spec can copy/paste the code block below into
 /** The Standard Schema interface. */
 export interface StandardSchemaV1<Input = unknown, Output = Input> {
   /** The Standard Schema properties. */
-  readonly "~standard": StandardSchemaV1.Props<Input, Output>;
+  readonly '~standard': StandardSchemaV1.Props<Input, Output>;
 }
 
 export declare namespace StandardSchemaV1 {
@@ -41,7 +41,7 @@ export declare namespace StandardSchemaV1 {
     readonly vendor: string;
     /** Validates unknown input values. */
     readonly validate: (
-      value: unknown,
+      value: unknown
     ) => Result<Output> | Promise<Result<Output>>;
     /** Inferred types associated with the schema. */
     readonly types?: Types<Input, Output> | undefined;
@@ -88,13 +88,13 @@ export declare namespace StandardSchemaV1 {
 
   /** Infers the input type of a Standard Schema. */
   export type InferInput<Schema extends StandardSchemaV1> = NonNullable<
-    Schema["~standard"]["types"]
-  >["input"];
+    Schema['~standard']['types']
+  >['input'];
 
   /** Infers the output type of a Standard Schema. */
   export type InferOutput<Schema extends StandardSchemaV1> = NonNullable<
-    Schema["~standard"]["types"]
-  >["output"];
+    Schema['~standard']['types']
+  >['output'];
 }
 ```
 
@@ -112,58 +112,56 @@ The specification meets a few primary design objectives:
 
 These are the libraries that have already implemented the Standard Schema interface. (If you maintain a library that implements the spec, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
-  | Implementer | Version(s) | Docs |
-  |-------------|-------------|------|
-  | Zod         | 3.24.0+     | [zod.dev](https://zod.dev/) |
-  | Valibot     | v1.0 (including RCs) | [valibot.dev](https://valibot.dev/) |
-  | ArkType     | v2.0+       | [arktype.io](https://arktype.io/) |
-  | Arri Schema | v0.71.0+    | [github.com/modiimedia/arri](https://github.com/modiimedia/arri) |
+| Implementer | Version(s)           | Docs                                                             |
+| ----------- | -------------------- | ---------------------------------------------------------------- |
+| Zod         | 3.24.0+              | [zod.dev](https://zod.dev/)                                      |
+| Valibot     | v1.0 (including RCs) | [valibot.dev](https://valibot.dev/)                              |
+| ArkType     | v2.0+                | [arktype.io](https://arktype.io/)                                |
+| Arri Schema | v0.71.0+             | [github.com/modiimedia/arri](https://github.com/modiimedia/arri) |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
 The following tools accept user-defined schemas conforming to the Standard Schema spec. (If you maintain a tool that supports Standard Schemas, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
-| Integrator | Description |
-|------------|-------------|
-| [tRPC](https://github.com/trpc/trpc) | 🧙‍♀️ Move fast and break nothing. End-to-end typesafe APIs made easy |
-| [TanStack Form](https://github.com/TanStack/form) | 🤖 Headless, performant, and type-safe form state management for TS/JS, React, Vue, Angular, Solid, and Lit |
-| [TanStack Router](https://github.com/tanstack/router) | A fully type-safe React router with built-in data fetching, stale-while revalidate caching and first-class search-param APIs |
-| [UploadThing](https://github.com/pingdotgg/uploadthing) | File uploads for modern web devs |
-| [Formwerk](https://github.com/formwerkjs/formwerk) | A Vue.js Framework for building high-quality, accessible, delightful forms. |
-| [GQLoom](https://github.com/modevol-com/gqloom) | Weave GraphQL schema and resolvers using Standard Schema |
-| [Nuxt UI](https://github.com/nuxt/ui) | A UI Library for modern web apps, powered by Vue & Tailwind CSS |
-| [oRPC](https://github.com/unnoq/orpc) | Typesafe APIs made simple 🪄 |
-| [Regle](https://github.com/victorgarciaesgi/regle) | Type-safe model-based form validation library for Vue.js |
+| Integrator                                              | Description                                                                                                                  |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| [tRPC](https://github.com/trpc/trpc)                    | 🧙‍♀️ Move fast and break nothing. End-to-end typesafe APIs made easy                                                           |
+| [TanStack Form](https://github.com/TanStack/form)       | 🤖 Headless, performant, and type-safe form state management for TS/JS, React, Vue, Angular, Solid, and Lit                  |
+| [TanStack Router](https://github.com/tanstack/router)   | A fully type-safe React router with built-in data fetching, stale-while revalidate caching and first-class search-param APIs |
+| [UploadThing](https://github.com/pingdotgg/uploadthing) | File uploads for modern web devs                                                                                             |
+| [Formwerk](https://github.com/formwerkjs/formwerk)      | A Vue.js Framework for building high-quality, accessible, delightful forms.                                                  |
+| [GQLoom](https://github.com/modevol-com/gqloom)         | Weave GraphQL schema and resolvers using Standard Schema                                                                     |
+| [Nuxt UI](https://github.com/nuxt/ui)                   | A UI Library for modern web apps, powered by Vue & Tailwind CSS                                                              |
+| [oRPC](https://github.com/unnoq/orpc)                   | Typesafe APIs made simple 🪄                                                                                                 |
+| [Regle](https://github.com/victorgarciaesgi/regle)      | Type-safe model-based form validation library for Vue.js                                                                     |
 
 ## How can my schema library implement the spec?
 
-Schemas libraries that want to support Standard Schema must implement the `StandardSchemaV1` interface. Start by copying the specification file above into your library. It consists of types only. 
+Schemas libraries that want to support Standard Schema must implement the `StandardSchemaV1` interface. Start by copying the specification file above into your library. It consists of types only.
 
 Then implement the spec by adding the `~standard` property to your validator objects/instances. We recommend using `extends` / `implements` to ensure static agreement with the interface. It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
 
 Here's a simple worked example of a string validator that implements the spec.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type {StandardSchemaV1} from '@standard-schema/spec';
 
 // Step 1: Define the schema interface
 interface StringSchema extends StandardSchemaV1<string> {
-  type: "string";
+  type: 'string';
   message: string;
 }
 
 // Step 2: Implement the schema interface
-function string(message: string = "Invalid type"): StringSchema {
+function string(message: string = 'Invalid type'): StringSchema {
   return {
-    type: "string",
+    type: 'string',
     message,
-    "~standard": {
+    '~standard': {
       version: 1,
-      vendor: "valizod",
+      vendor: 'valizod',
       validate(value) {
-        return typeof value === "string"
-          ? { value }
-          : { issues: [{ message }] };
+        return typeof value === 'string' ? {value} : {issues: [{message}]};
       },
     },
   };
@@ -174,9 +172,9 @@ We recommend defining the `~standard.validate()` function in terms of your libra
 
 ## How do I accept Standard Schemas in my library?
 
-Third-party libraries and frameworks can leverage the Standard Schema spec to accept user-defined schemas in a type-safe way. 
+Third-party libraries and frameworks can leverage the Standard Schema spec to accept user-defined schemas in a type-safe way.
 
-To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm as a dependency (*not a dev dependency*, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency%3F) for details).
+To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm as a dependency (_not a dev dependency_, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency%3F) for details).
 
 ```sh
 npm install @standard-schema/spec       # npm
@@ -189,13 +187,13 @@ deno add jsr:@standard-schema/spec      # deno
 Here's is an simple example of a generic function that accepts an arbitrary spec-compliant validator and uses it to parse some data.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type {StandardSchemaV1} from '@standard-schema/spec';
 
 export async function standardValidate<T extends StandardSchemaV1>(
   schema: T,
-  input: StandardSchemaV1.InferInput<T>,
+  input: StandardSchemaV1.InferInput<T>
 ): Promise<StandardSchemaV1.InferOutput<T>> {
-  let result = schema["~standard"].validate(input);
+  let result = schema['~standard'].validate(input);
   if (result instanceof Promise) result = await result;
 
   // if the `issues` field exists, the validation failed
@@ -210,13 +208,13 @@ export async function standardValidate<T extends StandardSchemaV1>(
 This concise function can accept inputs from any spec-compliant schema library.
 
 ```ts
-import * as z from "zod";
-import * as v from "valibot";
-import { type } from "arktype";
+import * as z from 'zod';
+import * as v from 'valibot';
+import {type} from 'arktype';
 
-const zodResult = await standardValidate(z.string(), "hello");
-const valibotResult = await standardValidate(v.string(), "hello");
-const arktypeResult = await standardValidate(type("string"), "hello");
+const zodResult = await standardValidate(z.string(), 'hello');
+const valibotResult = await standardValidate(v.string(), 'hello');
+const arktypeResult = await standardValidate(type('string'), 'hello');
 ```
 
 ## FAQ
@@ -225,15 +223,15 @@ These are the most frequently asked questions about Standard Schema. If your que
 
 ### Do I need to add `@standard-schema/spec` as a dependency?
 
-No. The `@standard-schema/spec` package is completely optional. You can just copy and paste the types into your project. We guarantee no breaking changes without a major version bump. 
+No. The `@standard-schema/spec` package is completely optional. You can just copy and paste the types into your project. We guarantee no breaking changes without a major version bump.
 
-If you don't mind additional dependencies, you can add `@standard-schema/spec` as a dependency and use `import type` to consume it. The `@standard-schema/spec` package contains no runtime code and only exports types.
+If you don't mind additional dependencies, you can add `@standard-schema/spec` as a dependency and consume it with `import type`. The `@standard-schema/spec` package contains no runtime code and only exports types.
 
 ### Can I add it as a dev dependency?
 
-Despite being types-only, you should *not* install `@standard-schema/spec` as a dev dependency. By accepting Standard Schemas as part of your public API, the Standard Schema interface becomes a part of your library's public API. As such, it *must* be available whenever/wherever your library gets installed, even in production installs. For this to happen, it must be installed as a regular dependency.
+Despite being types-only, you should _not_ install `@standard-schema/spec` as a dev dependency. By accepting Standard Schemas as part of your public API, the Standard Schema interface becomes a part of your library's public API. As such, it _must_ be available whenever/wherever your library gets installed, even in production installs. For this to happen, it must be installed as a regular dependency.
 
-### Why did you prefix the `~standard` property with `~` ?
+### Why did you prefix the `~standard` property with `~`?
 
 The goal of prefixing the key with `~` is to both avoid conflicts with existing API surfaces and to de-prioritize these keys in auto-complete. The `~` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
 
@@ -250,7 +248,7 @@ const object = {
 // { [k: symbol]: string }
 ```
 
-Unique symbols can also be declared in a "nominal" way that won't collapse. In this case the symbol key is sorted alphabetically in autocomplete according to the symbol's variable name. 
+Unique symbols can also be declared in a "nominal" way that won't collapse. In this case the symbol key is sorted alphabetically in autocomplete according to the symbol's variable name.
 
 ![Screenshot showing the prioritization of external symbols in VS Code](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
 
@@ -258,13 +256,13 @@ Thus, these symbol keys don't get sorted to the bottom of the autocomplete list,
 
 ### How to only allow synchronous validation?
 
-The `~validate` function might return a synchronous value *or* a Promise. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of Promise. Libraries are encouraged to preferentially use synchronous validation whenever possible.
+The `~validate` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous validation whenever possible.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type {StandardSchemaV1} from '@standard-schema/spec';
 
 function validateInput(schema: StandardSchemaV1, data: unknown) {
-  const result = schema["~standard"].validate(data);
+  const result = schema['~standard'].validate(data);
   if (result instanceof Promise) {
     throw new TypeError('Schema validation must be synchronous');
   }

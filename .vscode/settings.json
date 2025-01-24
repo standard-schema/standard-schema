@@ -11,6 +11,6 @@
     "editor.defaultFormatter": "vscode.html-language-features"
   },
   "[markdown]": {
-    "editor.defaultFormatter": "mervin.markdown-formatter"
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
   }
 }
