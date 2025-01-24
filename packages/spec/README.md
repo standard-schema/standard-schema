@@ -250,9 +250,11 @@ const object = {
 // { [k: symbol]: string }
 ```
 
-By contrast, declaring the symbol externally makes it "nominally typed". This means that the key is sorted in autocomplete under the variable name (e.g. `testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike tilde-prefixed string keys.
+Unique symbols can also be declared in a "nominal" way that won't collapse. In this case the symbol key is sorted alphabetically in autocomplete according to the symbol's variable name. 
 
 ![Screenshot showing the prioritization of external symbols in VS Code](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
+
+Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike tilde-prefixed string keys.
 
 ### How to only allow synchronous validation?
 
