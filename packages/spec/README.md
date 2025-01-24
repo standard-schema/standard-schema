@@ -4,8 +4,8 @@
   Standard Schema</h1>
 <p align="center">
   A common interface for TypeScript validation libraries
-  <br/>
-  <a href="https://standardschema.dev">standardschema.dev</a>
+  <!-- <br/>
+  <a href="https://standardschema.dev">standardschema.dev</a> -->
 </p>
 <br/>
 
