@@ -8,7 +8,9 @@ declare global {
 
 async function initMarkdownParser() {
   if (globalThis.md) return globalThis.md;
-  const md = MarkdownIt();
+  const md = MarkdownIt({
+    html: true,
+  });
   md.use(
     await Shiki({
       themes: {
