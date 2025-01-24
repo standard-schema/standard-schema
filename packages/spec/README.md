@@ -1,5 +1,8 @@
 <h1 align="center">Standard Schema</h1>
-<p align="center">A common interface for TypeScript validation libraries
+<p align="center">
+  A common interface for TypeScript validation libraries
+  <br/>
+  <a href="https://standardschema.dev">standardschema.dev</a>
 </p>
 
 Standard Schema is a specification designed to be implemented by JavaScript and TypeScript schema libraries.
