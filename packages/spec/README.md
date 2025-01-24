@@ -12,7 +12,7 @@ For more information on the origins and use cases of Standard Schema, see [backg
 
 ## The interface
 
-The specification consists of a single TypeScript interface (`StandardSchemaV1`) that must be implemented by any schema library wishing to be spec-compliant. This interface is defined below in it's entirety. 
+The specification consists of a single TypeScript interface ( `StandardSchemaV1` ) that must be implemented by any schema library wishing to be spec-compliant. This interface is defined below in it's entirety. 
 
 > Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on npm and JSR.
 
@@ -99,8 +99,6 @@ The specification meets a few primary design objectives:
 4. **Avoids API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
 5. **Does no harm to DX.** The `~standard` property is tilde-prefixed to [de-prioritize it in autocompletion](https://x.com/colinhacks/status/1816860780459073933). By contrast, an underscore-prefixed property would show up before properties/methods with alphanumeric names.
 
-
-
 <!-- #### Common Tasks
 
 There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information.
@@ -168,7 +166,6 @@ async function validateInput<TSchema extends StandardSchemaV1>(
 
 These are the libraries that have already implemented the Standard Schema interface. Feel free to add your library to the list **in ascending order** by creating a pull request.
 
-
   | Implementer | Version(s) | Docs |
   |-------------|-------------|------|
   | Zod         | 3.24.0+     | [zod.dev](https://zod.dev/) |
@@ -221,11 +218,7 @@ The first version of Standard Schemas aims to address the most common use cases 
 
 At the moment, Standard Schema deliberately tries to cover only the most common use cases. However, we believe that other use cases, such as integrating schema libraries into AI SDKs like Vercel AI or the OpenAI SDK to generate structured output, can also benefit from a standard interface. -->
 
-## Integration
-
-Standard Schema requires buy-in from two parties: schema libraries (henceforth "implementors") and the various frameworks/libraries that accept user-defined schemas ("integrators").
-
-### Implementers
+## How can my schema library implement the spec?
 
 Schemas libraries that want to support Standard Schema must implement the `StandardSchemaV1` interface. Start by copying the specification file above into your library. It consists of types only. 
 
@@ -264,12 +257,11 @@ function string(message: string = "Invalid type"): StringSchema {
 
 We recommend defining the `~standard.validate()` function in terms of your library's existing validation functions/methods. Ideally implementing the spec only requires a handful of lines of code.
 
-### Integrators
+## How do I accept Standard Schemas in my library?
 
 Third-party libraries and frameworks can take advantage of Standard Schema to accept user-defined schemas in a type-safe way. 
 
 To get started, copy/paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm.
-
 
 ```sh
 npm install @standard-schema/spec --save-dev  # npm
@@ -312,7 +304,6 @@ const valibotResult = await standardValidate(v.string(), "hello");
 const arktypeResult = await standardValidate(type("string"), "hello");
 ```
 
-
 ## FAQ
 
 These are the most frequently asked questions about Standard Schema. If your question is not listed, feel free to create an issue.
@@ -321,12 +312,11 @@ These are the most frequently asked questions about Standard Schema. If your que
 
 No. The `@standard-schema/spec` package is completely optional. You can just copy and paste the types into your project. We guarantee no breaking changes without a major version bump. 
 
-But if you don't mind additional dependencies, you can include `@standard-schema/spec` as a dependency and consume it exclusively with `import type`. The `@standard-schema/spec` package contains no runtime code and only exports types.
+But if you don't mind additional dependencies, you can include `@standard-schema/spec` as a dependency and consume it exclusively with `import type` . The `@standard-schema/spec` package contains no runtime code and only exports types.
 
 Despite being types-only, you should *not* install `@standard-schema/spec` as a devDependency. By accepting Standard Schemas as part of your public API, the Standard Schema interface becomes a part of your library's public API in non-development builds. For this to happen, it must be installed as a regular dependency.
 
-
-### Why did you choose to prefix the `~standard` property with `~`?
+### Why did you choose to prefix the `~standard` property with `~` ?
 
 The goal of prefixing the key with `~` is to both avoid conflicts with existing API surfaces and to de-prioritize these keys in auto-complete. The `~` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
 
@@ -343,13 +333,13 @@ const object = {
 // { [k: symbol]: string }
 ```
 
-By contrast, declaring the symbol externally makes it "nominally typed". This means that the key is sorted in autocomplete under the variable name (e.g. `testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike `~`-prefixed string keys.
+By contrast, declaring the symbol externally makes it "nominally typed". This means that the key is sorted in autocomplete under the variable name (e.g. `testSymbol` below). Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike `~` -prefixed string keys.
 
 ![Screenshot showing the prioritization of external symbols in VS Code](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
 
 ### What should I do if I only accept synchronous validation?
 
-The `~validate` function does not necessarily have to return a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of the `Promise` class.
+The `~validate` function does not necessarily have to return a `Promise` . If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of the `Promise` class.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";

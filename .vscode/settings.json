@@ -9,5 +9,8 @@
   },
   "[html]": {
     "editor.defaultFormatter": "vscode.html-language-features"
+  },
+  "[markdown]": {
+    "editor.defaultFormatter": "mervin.markdown-formatter"
   }
 }
