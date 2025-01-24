@@ -1,7 +1,10 @@
 <p align="center">
   <img alt="Standard Schema fire logo" loading="lazy" width="50" height="50" decoding="async" data-nimg="1" style="color:transparent" src="https://standardschema.dev/favicon.svg">
 </div>
-<h1 align="center">Standard Schema</h1>
+<h1 align="center">
+  <img alt="Standard Schema fire logo" loading="lazy" width="50" height="50" decoding="async" data-nimg="1" style="color:transparent" src="https://standardschema.dev/favicon.svg">
+  </br>
+  Standard Schema</h1>
 <p align="center">
   A common interface for TypeScript validation libraries
   <br/>
