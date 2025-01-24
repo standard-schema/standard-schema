@@ -349,7 +349,7 @@ By contrast, declaring the symbol externally makes it "nominally typed". This me
 
 ### How to only allow synchronous validation?
 
-The `~validate` function might return a synchronous value *or* a `Promise` . If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise` .
+The `~validate` function might return a synchronous value *or* a `Promise` . If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise` . Libraries are encouraged to preferentially use synchronous validation whenever possible.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
