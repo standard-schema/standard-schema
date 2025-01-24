@@ -20,9 +20,9 @@ For more information on the origins and use cases of Standard Schema, see [backg
 
 ## The interface
 
-The specification consists of a single TypeScript interface ( `StandardSchemaV1` ) that must be implemented by any schema library wishing to be spec-compliant. This interface is defined below in it's entirety. 
+The specification consists of a single TypeScript interface ( `StandardSchemaV1` ) to be implemented by any schema library wishing to be spec-compliant. This interface is defined below in its entirety. 
 
-> Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on npm and JSR.
+> Libraries wishing to implement the spec can copy/paste the code block below into their codebase. There will be no zero changes without a major version bump. It's also available at `@standard-schema/spec` on npm and JSR.
 
 ```ts
 /** The Standard Schema interface. */
@@ -103,7 +103,7 @@ The specification meets a few primary design objectives:
 
 1. **Supports runtime validation.** Given a Standard Schema compatible validator, you should be able to validate data with it. Any validation errors should be presented in a standardized format.
 2. **Supports static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" their inferred type, so it can be extracted and used by external tools.
-3. **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing `parse/validate` methods.
+3. **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing functions/methods.
 4. **Avoids API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
 5. **Does no harm to DX.** The `~standard` property is tilde-prefixed to [de-prioritize it in autocompletion](https://x.com/colinhacks/status/1816860780459073933). By contrast, an underscore-prefixed property would show up before properties/methods with alphanumeric names.
 
@@ -267,9 +267,9 @@ We recommend defining the `~standard.validate()` function in terms of your libra
 
 ## How do I accept Standard Schemas in my library?
 
-Third-party libraries and frameworks can take advantage of Standard Schema to accept user-defined schemas in a type-safe way. 
+Third-party libraries and frameworks can leverage the Standard Schema spec to accept user-defined schemas in a type-safe way. 
 
-To get started, copy/paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm.
+To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm.
 
 ```sh
 npm install @standard-schema/spec --save-dev  # npm
@@ -316,21 +316,23 @@ const arktypeResult = await standardValidate(type("string"), "hello");
 
 These are the most frequently asked questions about Standard Schema. If your question is not listed, feel free to create an issue.
 
-### Do I need to include `@standard-schema/spec` as a dependency?
+### Do I need to add `@standard-schema/spec` as a dependency?
 
 No. The `@standard-schema/spec` package is completely optional. You can just copy and paste the types into your project. We guarantee no breaking changes without a major version bump. 
 
 But if you don't mind additional dependencies, you can include `@standard-schema/spec` as a dependency and consume it exclusively with `import type` . The `@standard-schema/spec` package contains no runtime code and only exports types.
 
-Despite being types-only, you should *not* install `@standard-schema/spec` as a devDependency. By accepting Standard Schemas as part of your public API, the Standard Schema interface becomes a part of your library's public API in non-development builds. For this to happen, it must be installed as a regular dependency.
+### Can I add it as a dev dependency?
 
-### Why did you choose to prefix the `~standard` property with `~` ?
+Despite being types-only, you should *not* install `@standard-schema/spec` as a dev dependency. By accepting Standard Schemas as part of your public API, the Standard Schema interface becomes a part of your library's public API. As such, it *must* be available whenever/wherever your library gets installed, even in production installs. For this to happen, it must be installed as a regular dependency.
+
+### Why did you prefix the `~standard` property with `~` ?
 
 The goal of prefixing the key with `~` is to both avoid conflicts with existing API surfaces and to de-prioritize these keys in auto-complete. The `~` character is one of the few ASCII characters that occurs after `A-Za-z0-9` lexicographically, so VS Code puts these suggestions at the bottom of the list.
 
 ![Screenshot showing the de-prioritization of the `~` prefix keys in VS Code.](https://github.com/standard-schema/standard-schema/assets/3084745/5dfc0219-7531-481e-9691-cff5bc471378)
 
-### Why don't you use symbols for the keys instead of the `~` prefix?
+### Why not use a symbol key?
 
 In TypeScript, using a plain `Symbol` inline as a key always collapses to a simple `symbol` type. This would cause conflicts with other schema properties that use symbols.
 
