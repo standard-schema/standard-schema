@@ -7,7 +7,7 @@
   <br/>
   <a href="https://standardschema.dev">standardschema.dev</a>
 </p>
-
+<br/>
 Standard Schema is a specification designed to be implemented by JavaScript and TypeScript schema libraries.
 
 The goal is to make it easier for ecosystem tools to accept user-defined schemas, without needing custom logic or adapter for each schema library. Because Standard Schema is a specification, they can do so with no additional runtime dependencies.
