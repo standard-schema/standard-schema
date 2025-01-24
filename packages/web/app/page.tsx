@@ -88,7 +88,7 @@ export default async function Home() {
         <hr className="border-t-2 border-gray-500 w-full" />
         <div className="h-[3vw]" />
         <article
-          className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm"
+          className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm prose-quoteless"
           dangerouslySetInnerHTML={{
             __html: html,
           }}

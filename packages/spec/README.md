@@ -23,7 +23,7 @@ The spec was designed by the creators of Zod, Valibot, and ArkType. Recent versi
 
 The specification consists of a single TypeScript interface `StandardSchemaV1` to be implemented by any schema library wishing to be spec-compliant. This interface is defined below in its entirety. 
 
-> Libraries wishing to implement the spec can copy/paste the code block below into their codebase. There will be zero changes without a major version bump. It's also available at `@standard-schema/spec` on npm and JSR.
+Libraries wishing to implement the spec can copy/paste the code block below into their codebase. There will be zero changes without a major version bump. It's also available at `@standard-schema/spec` on npm and JSR.
 
 ```ts
 /** The Standard Schema interface. */
@@ -141,7 +141,7 @@ Schemas libraries that want to support Standard Schema must implement the `Stand
 
 Then implement the spec by adding the `~standard` property to your validator objects/instances. We recommend using `extends` / `implements` to ensure static agreement with the interface.
 
-> It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
+It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
 
 Here's a simple worked example of a string validator that implements the spec.
 
