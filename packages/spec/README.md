@@ -21,7 +21,7 @@ The spec was designed by the creators of Zod, Valibot, and ArkType. Recent versi
 
 ## The interface
 
-The specification consists of a single TypeScript interface ( `StandardSchemaV1` ) to be implemented by any schema library wishing to be spec-compliant. This interface is defined below in its entirety. 
+The specification consists of a single TypeScript interface `StandardSchemaV1` to be implemented by any schema library wishing to be spec-compliant. This interface is defined below in its entirety. 
 
 > Libraries wishing to implement the spec can copy/paste the code block below into their codebase. There will be zero changes without a major version bump. It's also available at `@standard-schema/spec` on npm and JSR.
 
