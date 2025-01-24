@@ -94,7 +94,11 @@ article {
     @apply rounded-none relative right-4 border-y-2 w-screen overflow-x-scroll md:w-auto md:right-0 md:left-0 md:rounded md:border-2 border-gray-500 !bg-background;
 
     code {
-      @apply !text-[97%];
+      @apply !text-[100%];
     }
+  }
+
+  table {
+    @apply !text-[97%];
   }
 }
