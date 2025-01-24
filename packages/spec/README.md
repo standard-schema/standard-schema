@@ -4,8 +4,8 @@
   Standard Schema</h1>
 <p align="center">
   A common interface for TypeScript validation libraries
-  <!-- <br/>
-  <a href="https://standardschema.dev">standardschema.dev</a> -->
+  <br/>
+  <a href="https://standardschema.dev">standardschema.dev</a>
 </p>
 <br/>
 
@@ -13,17 +13,17 @@
 
 Standard Schema is a specification designed to be implemented by JavaScript and TypeScript schema libraries.
 
-The goal is to make it easier for ecosystem tools to accept user-defined schemas, without needing custom logic or adapter for each schema library. Because Standard Schema is a specification, they can do so with no additional runtime dependencies.
+The goal is to make it easier for ecosystem tools to accept user-defined schemas, without needing custom logic or adapters for each supported library. And since Standard Schema is a specification, they can do so with no additional runtime dependencies. Integrate once, validate anywhere.
 
 ## Who designed it?
 
-The spec was designed by the creators of Zod, Valibot, and ArkType. Recent versions of these libraries already implement the spec (see the [full list](#implementation) of implementers below).
+The spec was designed by the creators of Zod, Valibot, and ArkType. Recent versions of these libraries already implement the spec (see the [full list of compatible libraries](#what-schema-libraries-implement-the-spec) below).
 
 ## The interface
 
-The specification consists of a single TypeScript interface `StandardSchemaV1` to be implemented by any schema library wishing to be spec-compliant. This interface is defined below in its entirety.
+The specification consists of a single TypeScript interface `StandardSchemaV1` to be implemented by any schema library wishing to be spec-compliant.
 
-Libraries wishing to implement the spec can copy/paste the code block below into their codebase. There will be zero changes without a major version bump. It's also available at `@standard-schema/spec` on npm and JSR.
+This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on npm and JSR. There will be zero changes without a major version bump.
 
 ```ts
 /** The Standard Schema interface. */
@@ -170,11 +170,13 @@ function string(message: string = 'Invalid type'): StringSchema {
 
 We recommend defining the `~standard.validate()` function in terms of your library's existing validation functions/methods. Ideally implementing the spec only requires a handful of lines of code.
 
+Avoid returning `Promise` from `~standard.validate()` unless absolutely necessary. Some third-party libraries may not support async validation.
+
 ## How do I accept Standard Schemas in my library?
 
 Third-party libraries and frameworks can leverage the Standard Schema spec to accept user-defined schemas in a type-safe way.
 
-To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm as a dependency (_not a dev dependency_, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency%3F) for details).
+To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm as a dependency (_not a dev dependency_, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency) for details).
 
 ```sh
 npm install @standard-schema/spec       # npm

@@ -19,7 +19,18 @@ async function initMarkdownParser() {
       },
     }),
   );
-  md.use(AnchorPlugin);
+  md.use(AnchorPlugin, {
+    slugify(s) {
+      const slug = encodeURIComponent(
+        String(s)
+          .toLowerCase()
+          .replaceAll(/[^a-z0-9 ]+/g, "")
+          .replaceAll(/ +/g, "-"),
+      );
+
+      return slug;
+    },
+  });
   globalThis.md = md;
   return md;
 }
