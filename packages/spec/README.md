@@ -4,8 +4,8 @@
   Standard Schema</h1>
 <p align="center">
   A common interface for TypeScript validation libraries
-  <!-- <br/>
-  <a href="https://standardschema.dev">standardschema.dev</a> -->
+  <br/>
+  <a href="https://standardschema.dev">standardschema.dev</a>
 </p>
 <br/>
 
@@ -112,33 +112,34 @@ The specification meets a few primary design objectives:
 
 These are the libraries that have already implemented the Standard Schema interface. (If you maintain a library that implements the spec, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
-| Implementer | Version(s)           | Docs                                                                               |
-| ----------- | -------------------- | ---------------------------------------------------------------------------------- |
-| Zod         | 3.24.0+              | [zod.dev](https://zod.dev/)                                                        |
-| Valibot     | v1.0 (including RCs) | [valibot.dev](https://valibot.dev/)                                                |
-| ArkType     | v2.0+                | [arktype.io](https://arktype.io/)                                                  |
-| Arri Schema | v0.71.0+             | [github.com/modiimedia/arri](https://github.com/modiimedia/arri)                   |
-| TypeMap     | v0.8.0+              | [github.com/sinclairzx81/typemap](https://github.com/sinclairzx81/typemap)         |
+| Implementer | Version(s)           | Docs                                                                       |
+| ----------- | -------------------- | -------------------------------------------------------------------------- |
+| Zod         | 3.24.0+              | [zod.dev](https://zod.dev/)                                                |
+| Valibot     | v1.0 (including RCs) | [valibot.dev](https://valibot.dev/)                                        |
+| ArkType     | v2.0+                | [arktype.io](https://arktype.io/)                                          |
+| Arri Schema | v0.71.0+             | [github.com/modiimedia/arri](https://github.com/modiimedia/arri)           |
+| TypeMap     | v0.8.0+              | [github.com/sinclairzx81/typemap](https://github.com/sinclairzx81/typemap) |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
 The following tools accept user-defined schemas conforming to the Standard Schema spec. (If you maintain a tool that supports Standard Schemas, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
-| Integrator                                              | Description                                                                                                                  |
-| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
-| [tRPC](https://github.com/trpc/trpc)                    | 🧙‍♀️ Move fast and break nothing. End-to-end typesafe APIs made easy                                                           |
-| [TanStack Form](https://github.com/TanStack/form)       | 🤖 Headless, performant, and type-safe form state management for TS/JS, React, Vue, Angular, Solid, and Lit                  |
-| [TanStack Router](https://github.com/tanstack/router)   | A fully type-safe React router with built-in data fetching, stale-while revalidate caching and first-class search-param APIs |
-| [UploadThing](https://github.com/pingdotgg/uploadthing) | File uploads for modern web devs                                                                                             |
-| [T3 Env](https://github.com/t3-oss/t3-env)              | Framework agnostic validation for type-safe environment variables                                                            |
-| [OpenAuth](https://github.com/openauthjs/openauth)      | Universal, standards-based auth provider                                                                                     |
-| [renoun](https://www.renoun.dev/)                       | The Documentation Toolkit for React                                                                                          |
-| [Formwerk](https://github.com/formwerkjs/formwerk)      | A Vue.js Framework for building high-quality, accessible, delightful forms.                                                  |
-| [GQLoom](https://github.com/modevol-com/gqloom)         | Weave GraphQL schema and resolvers using Standard Schema                                                                     |
-| [Nuxt UI](https://github.com/nuxt/ui)                   | A UI Library for modern web apps, powered by Vue & Tailwind CSS                                                              |
-| [Qwik](https://github.com/QwikDev/qwik)                 | Instant-loading web apps, without effort                                                                                     |
-| [oRPC](https://github.com/unnoq/orpc)                   | Typesafe APIs made simple 🪄                                                                                                 |
-| [Regle](https://github.com/victorgarciaesgi/regle)      | Type-safe model-based form validation library for Vue.js                                                                     |
+| Integrator                                              | Description                                                                                                                  | Link                                                                          |
+| ------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------- |
+| tRPC                                                    | 🧙‍♀️ Move fast and break nothing. End-to-end typesafe APIs made easy                                                           | [PR](https://github.com/trpc/trpc/pull/6079)                                  |
+| [TanStack Form](https://github.com/TanStack/form)       | 🤖 Headless, performant, and type-safe form state management for TS/JS, React, Vue, Angular, Solid, and Lit                  | [PR](https://github.com/TanStack/form/issues/1015)                            |
+| [TanStack Router](https://github.com/tanstack/router)   | A fully type-safe React router with built-in data fetching, stale-while revalidate caching and first-class search-param APIs | [PR](https://github.com/TanStack/router/pull/2602)                            |
+| [UploadThing](https://github.com/pingdotgg/uploadthing) | File uploads for modern web devs                                                                                             | [Docs](https://docs.uploadthing.com/working-with-files#other-file-operations) |
+| [T3 Env](https://github.com/t3-oss/t3-env)              | Framework agnostic validation for type-safe environment variables                                                            | [PR](https://github.com/t3-oss/t3-env/pull/299)                               |
+| [OpenAuth](https://github.com/openauthjs/openauth)      | Universal, standards-based auth provider                                                                                     | [Docs](https://openauth.js.org/docs/#server)                                  |
+| [renoun](https://www.renoun.dev/)                       | The Documentation Toolkit for React                                                                                          | [Docs](https://www.renoun.dev/utilities/file-system#schema-validation)        |
+| [Formwerk](https://github.com/formwerkjs/formwerk)      | A Vue.js Framework for building high-quality, accessible, delightful forms.                                                  | [PR](https://github.com/formwerkjs/formwerk/pull/68)                          |
+| [GQLoom](https://github.com/modevol-com/gqloom)         | Weave GraphQL schema and resolvers using Standard Schema                                                                     | [PR](https://github.com/modevol-com/gqloom/pull/7)                            |
+| [Nuxt UI](https://github.com/nuxt/ui)                   | A UI Library for modern web apps, powered by Vue & Tailwind CSS                                                              | [PR](https://github.com/nuxt/ui/pull/2880)                                    |
+| [oRPC](https://github.com/unnoq/orpc)                   | Typesafe APIs made simple 🪄                                                                                                 | [PR](https://github.com/unnoq/orpc/pull/50)                                   |
+| [Regle](https://github.com/victorgarciaesgi/regle)      | Type-safe model-based form validation library for Vue.js                                                                     | [PR](https://github.com/victorgarciaesgi/regle/pull/46)                       |
+
+<!-- | [Qwik](https://github.com/QwikDev/qwik)                 | Instant-loading web apps, without effort                                                                                     | [PR](https://github.com/QwikDev/qwik/pull/7281)                          | -->
 
 ## How can my schema library implement the spec?
 
