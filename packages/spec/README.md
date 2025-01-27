@@ -139,7 +139,9 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [oRPC](https://github.com/unnoq/orpc)                   | Typesafe APIs made simple 🪄                                                                                                 | [PR](https://github.com/unnoq/orpc/pull/50)                                   |
 | [Regle](https://github.com/victorgarciaesgi/regle)      | Type-safe model-based form validation library for Vue.js                                                                     | [PR](https://github.com/victorgarciaesgi/regle/pull/46)                       |
 
-<!-- | [Qwik](https://github.com/QwikDev/qwik)                 | Instant-loading web apps, without effort                                                                                     | [PR](https://github.com/QwikDev/qwik/pull/7281)                          | -->
+<!-- | [Hono Middleware](https://hono.dev)                     | Fast, lightweight server, built on Web Standards                                                                             | [PR](https://github.com/honojs/middleware/pull/887)                           | -->
+
+ <!--                                                    | [Qwik](https://github.com/QwikDev/qwik)                                                                                      | Instant-loading web apps, without effort                                      | [PR](https://github.com/QwikDev/qwik/pull/7281) | -->
 
 ## How can my schema library implement the spec?
 
