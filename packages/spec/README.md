@@ -112,13 +112,13 @@ The specification meets a few primary design objectives:
 
 These are the libraries that have already implemented the Standard Schema interface. (If you maintain a library that implements the spec, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
-| Implementer | Version(s) | Docs                                                                       |
-| ----------- | ---------- | -------------------------------------------------------------------------- |
-| Zod         | 3.24.0+    | [zod.dev](https://zod.dev/)                                                |
-| Valibot     | v1.0+      | [valibot.dev](https://valibot.dev/)                                        |
-| ArkType     | v2.0+      | [arktype.io](https://arktype.io/)                                          |
-| Arri Schema | v0.71.0+   | [github.com/modiimedia/arri](https://github.com/modiimedia/arri)           |
-| TypeMap     | v0.8.0+    | [github.com/sinclairzx81/typemap](https://github.com/sinclairzx81/typemap) |
+| Implementer                                        | Version(s) | Link                                                       |
+| -------------------------------------------------- | ---------- | ---------------------------------------------------------- |
+| [Zod](https://zod.dev)                             | 3.24.0+    | [PR](https://github.com/colinhacks/zod/pull/3850)          |
+| [Valibot](https://valibot.dev/)                    | v1.0+      | [PR](https://github.com/fabian-hiller/valibot/pull/845)    |
+| [ArkType](https://arktype.io/)                     | v2.0+      | [PR](https://github.com/arktypeio/arktype/pull/1194/files) |
+| [Arri Schema](https://github.com/modiimedia/arri)  | v0.71.0+   | [PR](https://github.com/modiimedia/arri/pull/130)          |
+| [TypeMap](https://github.com/sinclairzx81/typemap) | v0.8.0+    | [PR](https://github.com/sinclairzx81/typemap/pull/9)       |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -126,8 +126,8 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 
 | Integrator                                            | Description                                                                                                                  | Link                                                                   |
 | ----------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- |
-| [tRPC](https://trpc.io)                               | 🧙‍♀️ Move fast and break nothing. End-to-end typesafe APIs made easy                                                           | [PR](https://github.com/trpc/trpc/pull/6079)                           |
-| [TanStack Form](https://tanstack.com/form)            | 🤖 Headless, performant, and type-safe form state management for TS/JS, React, Vue, Angular, Solid, and Lit                  | [PR](https://github.com/TanStack/form/issues/1015)                     |
+| [tRPC](https://trpc.io)                               | Move fast and break nothing. End-to-end typesafe APIs made easy                                                              | [PR](https://github.com/trpc/trpc/pull/6079)                           |
+| [TanStack Form](https://tanstack.com/form)            | Headless, performant, and type-safe form state management for TS/JS, React, Vue, Angular, Solid, and Lit                     | [PR](https://github.com/TanStack/form/issues/1015)                     |
 | [TanStack Router](https://tanstack.com/router/latest) | A fully type-safe React router with built-in data fetching, stale-while revalidate caching and first-class search-param APIs | [PR](https://github.com/TanStack/router/pull/2602)                     |
 | [Hono Middleware 🚧](https://hono.dev)                | Fast, lightweight server, built on Web Standards                                                                             | [PR](https://github.com/honojs/middleware/pull/887)                    |
 | [Qwik 🚧](https://qwik.dev/)                          | Instant-loading web apps, without effort                                                                                     | [PR](https://github.com/QwikDev/qwik/pull/7281)                        |
