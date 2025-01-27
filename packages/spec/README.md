@@ -11,9 +11,9 @@
 
 <!-- start -->
 
-Standard Schema is a specification designed to be implemented by JavaScript and TypeScript schema libraries.
+Standard Schema is a common interface designed to be implemented by JavaScript and TypeScript schema libraries.
 
-The goal is to make it easier for ecosystem tools to accept user-defined schemas, without needing custom logic or adapters for each supported library. And since Standard Schema is a specification, they can do so with no additional runtime dependencies. Integrate once, validate anywhere.
+The goal is to make it easier for ecosystem tools to accept user-defined type validators, without needing to write custom logic or adapters for each supported library. And since Standard Schema is a specification, they can do so with no additional runtime dependencies. Integrate once, validate anywhere.
 
 ## Who designed it?
 
