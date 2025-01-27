@@ -182,7 +182,7 @@ Avoid returning `Promise` from `~standard.validate()` unless absolutely necessar
 
 Third-party libraries and frameworks can leverage the Standard Schema spec to accept user-defined schemas in a type-safe way.
 
-To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm as a dependency (_not a dev dependency_, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency) for details).
+To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm or JSR as a dependency (_not a dev dependency_, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency) for details).
 
 ```sh
 npm install @standard-schema/spec       # npm
