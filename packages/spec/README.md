@@ -23,7 +23,7 @@ The spec was designed by the creators of Zod, Valibot, and ArkType. Recent versi
 
 The specification consists of a single TypeScript interface `StandardSchemaV1` to be implemented by any schema library wishing to be spec-compliant.
 
-This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on npm and JSR. There will be zero changes without a major version bump.
+This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec). There will be zero changes without a major version bump.
 
 ```ts
 /** The Standard Schema interface. */
@@ -182,7 +182,7 @@ Avoid returning `Promise` from `~standard.validate()` unless absolutely necessar
 
 Third-party libraries and frameworks can leverage the Standard Schema spec to accept user-defined schemas in a type-safe way.
 
-To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from npm or JSR as a dependency (_not a dev dependency_, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency) for details).
+To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from [npm](https://www.npmjs.com/package/@standard-schema/spec) or [JSR](https://jsr.io/@standard-schema/spec) as a dependency. _It is not recommended to install as a dev dependency, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency) for details_.
 
 ```sh
 npm install @standard-schema/spec       # npm
