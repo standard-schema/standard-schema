@@ -101,4 +101,9 @@ article {
   table {
     @apply !text-[97%];
   }
+
+  table td a {
+    /* no line break */
+    @apply whitespace-nowrap;
+  }
 }

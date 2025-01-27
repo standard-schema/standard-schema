@@ -1,9 +1,10 @@
 {
   "name": "@standard-schema/spec",
   "description": "A standard interface for TypeScript schema validation libraries",
-  "version": "1.0.0-rc.0",
+  "version": "1.0.0",
   "license": "MIT",
   "author": "Colin McDonnell",
+  "homepage": "https://standardschema.dev",
   "repository": {
     "type": "git",
     "url": "https://github.com/standard-schema/standard-schema"
