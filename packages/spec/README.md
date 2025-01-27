@@ -112,13 +112,13 @@ The specification meets a few primary design objectives:
 
 These are the libraries that have already implemented the Standard Schema interface. (If you maintain a library that implements the spec, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
-| Implementer | Version(s)           | Docs                                                                       |
-| ----------- | -------------------- | -------------------------------------------------------------------------- |
-| Zod         | 3.24.0+              | [zod.dev](https://zod.dev/)                                                |
-| Valibot     | v1.0 (including RCs) | [valibot.dev](https://valibot.dev/)                                        |
-| ArkType     | v2.0+                | [arktype.io](https://arktype.io/)                                          |
-| Arri Schema | v0.71.0+             | [github.com/modiimedia/arri](https://github.com/modiimedia/arri)           |
-| TypeMap     | v0.8.0+              | [github.com/sinclairzx81/typemap](https://github.com/sinclairzx81/typemap) |
+| Implementer | Version(s) | Docs                                                                       |
+| ----------- | ---------- | -------------------------------------------------------------------------- |
+| Zod         | 3.24.0+    | [zod.dev](https://zod.dev/)                                                |
+| Valibot     | v1.0+      | [valibot.dev](https://valibot.dev/)                                        |
+| ArkType     | v2.0+      | [arktype.io](https://arktype.io/)                                          |
+| Arri Schema | v0.71.0+   | [github.com/modiimedia/arri](https://github.com/modiimedia/arri)           |
+| TypeMap     | v0.8.0+    | [github.com/sinclairzx81/typemap](https://github.com/sinclairzx81/typemap) |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
