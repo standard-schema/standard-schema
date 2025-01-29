@@ -141,6 +141,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [oRPC](https://orpc.unnoq.com/)                       | Typesafe APIs made simple 🪄                                                                                                 | [PR](https://github.com/unnoq/orpc/pull/50)                            |
 | [Regle](https://reglejs.dev/)                         | Type-safe model-based form validation library for Vue.js                                                                     | [PR](https://github.com/victorgarciaesgi/regle/pull/46)                |
 | [upfetch](https://github.com/L-Blondy/up-fetch)       | Tiny & composable fetch configuration tool with sensible defaults and built-in schema validation                             | [PR](https://github.com/L-Blondy/up-fetch/pull/11)                     |
+| [rest-client](https://github.com/logione/rest-client) | Ultra-lightweight and easy-to-use http(s) client for node.js supporting JSON and streams with no external dependencies       | [Docs](https://github.com/logione/rest-client)                         |
 
 ## How can my schema library implement the spec?
 
