@@ -140,7 +140,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [Nuxt UI (v3)](https://ui.nuxt.com/)                  | A UI Library for modern web apps, powered by Vue & Tailwind CSS                                                              | [PR](https://github.com/nuxt/ui/pull/2303)                             |
 | [oRPC](https://orpc.unnoq.com/)                       | Typesafe APIs made simple 🪄                                                                                                 | [PR](https://github.com/unnoq/orpc/pull/50)                            |
 | [Regle](https://reglejs.dev/)                         | Type-safe model-based form validation library for Vue.js                                                                     | [PR](https://github.com/victorgarciaesgi/regle/pull/46)                |
-| [upfetch](https://github.com/L-Blondy/up-fetch)       | Tiny & Composable fetch configuration tool with sensible defaults and built-in schema validation.                            | [PR](https://github.com/L-Blondy/up-fetch/pull/11)                |
+| [upfetch](https://github.com/L-Blondy/up-fetch)       | Tiny & composable fetch configuration tool with sensible defaults and built-in schema validation                             | [PR](https://github.com/L-Blondy/up-fetch/pull/11)                     |
 
 ## How can my schema library implement the spec?
 
