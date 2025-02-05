@@ -112,15 +112,16 @@ The specification meets a few primary design objectives:
 
 These are the libraries that have already implemented the Standard Schema interface. (If you maintain a library that implements the spec, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
-| Implementer                                        | Version(s) | Link                                                       |
-| -------------------------------------------------- | ---------- | ---------------------------------------------------------- |
-| [Zod](https://zod.dev)                             | 3.24.0+    | [PR](https://github.com/colinhacks/zod/pull/3850)          |
-| [Valibot](https://valibot.dev/)                    | v1.0+      | [PR](https://github.com/fabian-hiller/valibot/pull/845)    |
-| [ArkType](https://arktype.io/)                     | v2.0+      | [PR](https://github.com/arktypeio/arktype/pull/1194/files) |
-| [Arri Schema](https://github.com/modiimedia/arri)  | v0.71.0+   | [PR](https://github.com/modiimedia/arri/pull/130)          |
-| [TypeMap](https://github.com/sinclairzx81/typemap) | v0.8.0+    | [PR](https://github.com/sinclairzx81/typemap/pull/9)       |
-| [Formgator](https://github.com/GauBen/formgator)   | v0.1.0+    | [PR](https://github.com/GauBen/formgator/commit/12c8a90)   |
-| [decoders](https://github.com/nvie/decoders)       | v2.6.0+    | [PR](https://github.com/nvie/decoders/pull/1213)           |
+| Implementer                                                       | Version(s) | Link                                                       |
+| ----------------------------------------------------------------- | ---------- | ---------------------------------------------------------- |
+| [Zod](https://zod.dev)                                            | 3.24.0+    | [PR](https://github.com/colinhacks/zod/pull/3850)          |
+| [Valibot](https://valibot.dev/)                                   | v1.0+      | [PR](https://github.com/fabian-hiller/valibot/pull/845)    |
+| [ArkType](https://arktype.io/)                                    | v2.0+      | [PR](https://github.com/arktypeio/arktype/pull/1194/files) |
+| [Effect Schema](https://effect.website/docs/schema/introduction/) | 🚧         | [PR](https://github.com/Effect-TS/effect/pull/4359)        |
+| [Arri Schema](https://github.com/modiimedia/arri)                 | v0.71.0+   | [PR](https://github.com/modiimedia/arri/pull/130)          |
+| [TypeMap](https://github.com/sinclairzx81/typemap)                | v0.8.0+    | [PR](https://github.com/sinclairzx81/typemap/pull/9)       |
+| [Formgator](https://github.com/GauBen/formgator)                  | v0.1.0+    | [PR](https://github.com/GauBen/formgator/commit/12c8a90)   |
+| [decoders](https://github.com/nvie/decoders)                      | v2.6.0+    | [PR](https://github.com/nvie/decoders/pull/1213)           |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
