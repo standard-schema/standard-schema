@@ -145,7 +145,8 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [Regle](https://reglejs.dev/)                         | Type-safe model-based form validation library for Vue.js                                                                     | [PR](https://github.com/victorgarciaesgi/regle/pull/46)                |
 | [upfetch](https://github.com/L-Blondy/up-fetch)       | Tiny & composable fetch configuration tool with sensible defaults and built-in schema validation                             | [PR](https://github.com/L-Blondy/up-fetch/pull/11)                     |
 | [rest-client](https://github.com/logione/rest-client) | Ultra-lightweight and easy-to-use http(s) client for node.js supporting JSON and streams with no external dependencies       | [Docs](https://github.com/logione/rest-client)                         |
-| [call-api](https://github.com/zayne-labs/callapi)       | A lightweight fetching library packed with essential features - retries, interceptors, request deduplication and much more, all while still retaining a similar API surface with regular Fetch.                           | [PR](https://github.com/zayne-labs/call-api/pull/131)        
+| [call-api](https://github.com/zayne-labs/callapi)       | A lightweight fetching library packed with essential features - retries, interceptors, request deduplication and much more, all while still retaining a similar API surface with regular Fetch.                           | [PR](https://github.com/zayne-labs/call-api/pull/131) |
+| [cachified](https://github.com/epicweb-dev/cachified) | Use everything as a cache with type-safety (by Standard Schema), stale-while-revalidate, parallel-fetch deduplication, ...   | [Docs](https://github.com/epicweb-dev/cachified?tab=readme-ov-file#type-safety-with-schema-libraries) |
 
 ## How can my schema library implement the spec?
 
