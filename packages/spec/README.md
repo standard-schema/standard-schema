@@ -122,6 +122,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [TypeMap](https://github.com/sinclairzx81/typemap)                | v0.8.0+    | [PR](https://github.com/sinclairzx81/typemap/pull/9)       |
 | [Formgator](https://github.com/GauBen/formgator)                  | v0.1.0+    | [PR](https://github.com/GauBen/formgator/commit/12c8a90)   |
 | [decoders](https://github.com/nvie/decoders)                      | v2.6.0+    | [PR](https://github.com/nvie/decoders/pull/1213)           |
+| [ReScript Schema](https://github.com/DZakh/rescript-schema)       | v9.2.0+    | [PR](https://github.com/DZakh/rescript-schema/pull/105)    |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
