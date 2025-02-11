@@ -122,6 +122,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [TypeMap](https://github.com/sinclairzx81/typemap)                | v0.8.0+    | [PR](https://github.com/sinclairzx81/typemap/pull/9)       |
 | [Formgator](https://github.com/GauBen/formgator)                  | v0.1.0+    | [PR](https://github.com/GauBen/formgator/commit/12c8a90)   |
 | [decoders](https://github.com/nvie/decoders)                      | v2.6.0+    | [PR](https://github.com/nvie/decoders/pull/1213)           |
+| [ReScript Schema](https://github.com/DZakh/rescript-schema)       | v9.2.0+    | [PR](https://github.com/DZakh/rescript-schema/pull/105)    |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -149,6 +150,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [call-api](https://github.com/zayne-labs/callapi)                     | A lightweight fetching library packed with essential features - retries, interceptors, request deduplication and much more, all while still retaining a similar API surface with regular Fetch. | [PR](https://github.com/zayne-labs/call-api/pull/131)                                                 |
 | [cachified](https://github.com/epicweb-dev/cachified)                 | Use everything as a cache with type-safety (by Standard Schema), stale-while-revalidate, parallel-fetch deduplication, ...                                                                      | [Docs](https://github.com/epicweb-dev/cachified?tab=readme-ov-file#type-safety-with-schema-libraries) |
 | [React Hook Form](https://github.com/react-hook-form/react-hook-form) | React Hooks for form state management and validation (Web + React Native).                                                                                                                      | [PR](https://github.com/react-hook-form/resolvers/pull/738)                                           |
+| [Mage](https://github.com/deno-mage/server)                           | Build web applications with Deno and Preact                                                                                                                                                     | [Docs](https://deno-mage.com/validation)                                                              |
 
 ## How can my schema library implement the spec?
 
