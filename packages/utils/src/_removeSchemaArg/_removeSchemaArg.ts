@@ -16,7 +16,8 @@ export function _removeSchemaArg<Args extends unknown[]>(
   args: SchemaArgs<Args>,
 ): Args {
   const schema = args[0];
-  if (schema && (schema as StandardSchemaV1)["~standard"]) {
+  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+  if ((schema as any)?.["~standard"]) {
     return args.slice(1) as never;
   }
   return args as Args;
