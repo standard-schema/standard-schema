@@ -1,4 +1,6 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type { SchemaArgs } from "../_removeSchemaArg/_removeSchemaArg.ts";
+import { _removeSchemaArg } from "../_removeSchemaArg/_removeSchemaArg.ts";
 import { getPathSegmentKey } from "../getPathSegmentKey/getPathSegmentKey.ts";
 
 type KeyofUnion<T> = T extends unknown ? keyof T : never;
@@ -39,7 +41,7 @@ export function flattenIssues<MappedIssue>(
 /**
  * Flatten issues into form and field errors. Useful for schemas that are one level deep.
  *
- * @param schema The schema to use for inferring the shape of the field errors.
+ * @param schema The schema the issues came from (for inferring the shape of the field errors).
  *
  * @param issues The issues to flatten.
  */
@@ -50,7 +52,7 @@ export function flattenIssues<Schema extends StandardSchemaV1>(
 /**
  * Flatten issues into form and field errors. Useful for schemas that are one level deep.
  *
- * @param schema The schema to use for inferring the shape of the field errors.
+ * @param schema The schema the issues came from (for inferring the shape of the field errors).
  *
  * @param issues The issues to flatten.
  *
@@ -62,18 +64,12 @@ export function flattenIssues<Schema extends StandardSchemaV1, MappedIssue>(
   mapIssue: IssueMapper<MappedIssue>,
 ): InferFlattenedIssues<Schema, MappedIssue>;
 export function flattenIssues(
-  schemaOrIssues: StandardSchemaV1 | readonly StandardSchemaV1.Issue[],
-  issuesOrMapper?: readonly StandardSchemaV1.Issue[] | IssueMapper<unknown>,
-  mapIssue: IssueMapper<unknown> = (issue) => issue.message,
+  ...args: SchemaArgs<
+    [issues: readonly StandardSchemaV1.Issue[], mapIssue?: IssueMapper<unknown>]
+  >
 ): FlattenedIssues<unknown, unknown> {
-  if (Array.isArray(schemaOrIssues)) {
-    return flattenIssues(
-      {} as StandardSchemaV1,
-      schemaOrIssues,
-      (issuesOrMapper as IssueMapper<unknown>) ?? mapIssue,
-    );
-  }
-  const issues = issuesOrMapper as readonly StandardSchemaV1.Issue[];
+  const [issues, mapIssue = (issue: StandardSchemaV1.Issue) => issue.message] =
+    _removeSchemaArg(args);
   const formIssues: unknown[] = [];
   const fieldIssues: Record<PropertyKey, unknown[]> = {};
 
