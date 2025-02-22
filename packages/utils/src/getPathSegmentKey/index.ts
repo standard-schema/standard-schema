@@ -1,1 +1,1 @@
-export * from "./getPathSegmentKey.ts"
+export * from "./getPathSegmentKey.ts";
