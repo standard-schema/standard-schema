@@ -1,6 +1,6 @@
 # Standard Schema Utils
 
-There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information. To simplify both tasks, Standard Schema also ships a utils package that provides a `getDotPath` function and a `SchemaError` class.
+A utils package for common operations after validation fails. Includes mapping issues to dot paths, throwing errors, and flattening/formatting issues.
 
 ```sh
 npm install @standard-schema/utils   # npm
@@ -50,12 +50,117 @@ import { SchemaError } from "@standard-schema/utils";
 
 async function validateInput<TSchema extends StandardSchemaV1>(
   schema: TSchema,
-  data: unknown,
+  data: unknown
 ): Promise<StandardSchemaV1.InferOutput<TSchema>> {
   const result = await schema["~standard"].validate(data);
   if (result.issues) {
     throw new SchemaError(result.issues);
   }
   return result.value;
+}
+```
+
+## Get Path Segment Key
+
+Extract a key from a path segment, accounting for path segment objects.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { getPathSegmentKey } from "@standard-schema/utils";
+
+async function getIssueKeys(issue: StandardSchemaV1.Issue) {
+  const keys = issue.path?.map((segment) => getPathSegmentKey(segment));
+  return keys;
+}
+```
+
+## Flatten Issues
+
+Flatten issues into form and field errors. Field errors are only one level deep - deeper issues are included under their first key. (for example, `tags.0.name` issues are in `fieldIssues.tags`).
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { flattenIssues } from "@standard-schema/utils";
+
+async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
+  const result = await schema["~standard"].validate(data);
+  const { formIssues, fieldIssues } = flattenIssues(result.issues);
+  return { formIssues, fieldIssues };
+}
+```
+
+A mapper function can be passed to map issues to a different value (by default, the message is used).
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { flattenIssues } from "@standard-schema/utils";
+
+async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
+  const result = await schema["~standard"].validate(data);
+  const { formIssues, fieldIssues } = flattenIssues(
+    result.issues,
+    (issue) => issue.message
+  );
+  return { formIssues, fieldIssues };
+}
+```
+
+For better type inference, pass the schema as the first argument.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { flattenIssues } from "@standard-schema/utils";
+
+async function getFormErrors<Schema extends StandardSchemaV1>(
+  schema: Schema,
+  data: unknown
+) {
+  const result = await schema["~standard"].validate(data);
+  const { formIssues, fieldIssues } = flattenIssues(schema, result.issues);
+  return { formIssues, fieldIssues };
+}
+```
+
+## Format Issues
+
+Formats a set of issues into a nested object. Issues will be under an `_issues` key.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { formatIssues } from "@standard-schema/utils";
+
+async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
+  const result = await schema["~standard"].validate(data);
+  const fieldIssues = formatIssues(result.issues);
+  return fieldIssues;
+}
+```
+
+A mapper function can be passed to map issues to a different value (by default, the message is used).
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { formatIssues } from "@standard-schema/utils";
+
+async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
+  const result = await schema["~standard"].validate(data);
+  const fieldIssues = formatIssues(result.issues, (issue) => issue.message);
+  return fieldIssues;
+}
+```
+
+For better type inference, pass the schema as the first argument.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { formatIssues } from "@standard-schema/utils";
+
+async function getFormErrors<Schema extends StandardSchemaV1>(
+  schema: Schema,
+  data: unknown
+) {
+  const result = await schema["~standard"].validate(data);
+  const fieldIssues = formatIssues(schema, result.issues);
+  return fieldIssues;
 }
 ```
