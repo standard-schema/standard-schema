@@ -73,16 +73,16 @@ export function formatIssues(
 ): FormattedIssues<unknown, unknown> {
   const [issues, mapIssue = (issue: StandardSchemaV1.Issue) => issue.message] =
     _removeSchemaArg(args);
-  const fieldErrors: FormattedIssues<unknown, unknown> = {
+  const fieldIssues: FormattedIssues<unknown, unknown> = {
     _issues: [],
   };
   for (const issue of issues) {
     if (!issue.path?.length) {
-      (fieldErrors._issues as unknown[]).push(mapIssue(issue));
+      (fieldIssues._issues as unknown[]).push(mapIssue(issue));
       continue;
     }
     // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    let cursor: any = fieldErrors;
+    let cursor: any = fieldIssues;
     for (const segment of issue.path) {
       const key = getPathSegmentKey(segment);
       cursor[key] ??= { _issues: [] };
@@ -90,5 +90,5 @@ export function formatIssues(
     }
     cursor._issues.push(mapIssue(issue));
   }
-  return fieldErrors;
+  return fieldIssues;
 }
