@@ -17,7 +17,7 @@ export function _removeSchemaArg<Args extends unknown[]>(
 ): Args {
   const schema = args[0];
   if (schema && (schema as StandardSchemaV1)["~standard"]) {
-    return args.slice(1) as Args;
+    return args.slice(1) as never;
   }
   return args as Args;
 }
