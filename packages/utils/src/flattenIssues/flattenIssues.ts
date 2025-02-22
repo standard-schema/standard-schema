@@ -3,6 +3,11 @@ import { getPathSegmentKey } from "../getPathSegmentKey/getPathSegmentKey.ts";
 
 type KeyofUnion<T> = T extends unknown ? keyof T : never;
 
+export type InferFlattenedIssues<
+  Schema extends StandardSchemaV1,
+  MappedIssue = string,
+> = FlattenedIssues<StandardSchemaV1.InferOutput<Schema>, MappedIssue>;
+
 export interface FlattenedIssues<Fields, MappedIssue = string> {
   formIssues: readonly MappedIssue[];
   fieldIssues: Partial<Record<KeyofUnion<Fields>, readonly MappedIssue[]>>;
@@ -41,7 +46,7 @@ export function flattenIssues<MappedIssue>(
 export function flattenIssues<Schema extends StandardSchemaV1>(
   schema: Schema,
   issues: readonly StandardSchemaV1.Issue[],
-): FlattenedIssues<StandardSchemaV1.InferOutput<Schema>>;
+): InferFlattenedIssues<Schema>;
 /**
  * Flatten issues into form and field errors. Useful for schemas that are one level deep.
  *
@@ -55,7 +60,7 @@ export function flattenIssues<Schema extends StandardSchemaV1, MappedIssue>(
   schema: Schema,
   issues: readonly StandardSchemaV1.Issue[],
   mapIssue: IssueMapper<MappedIssue>,
-): FlattenedIssues<StandardSchemaV1.InferOutput<Schema>, MappedIssue>;
+): InferFlattenedIssues<Schema, MappedIssue>;
 export function flattenIssues(
   schemaOrIssues: StandardSchemaV1 | readonly StandardSchemaV1.Issue[],
   issuesOrMapper?: readonly StandardSchemaV1.Issue[] | IssueMapper<unknown>,
