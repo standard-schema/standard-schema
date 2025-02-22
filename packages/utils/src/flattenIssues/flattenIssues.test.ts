@@ -8,7 +8,13 @@ describe("flattenIssues", () => {
     foo: string;
     bar: number;
   }
-  const schema = {} as StandardSchemaV1<Fields>;
+  const schema: StandardSchemaV1<Fields> = {
+    "~standard": {
+      vendor: "custom",
+      version: 1,
+      validate: () => ({ issues: [] }),
+    },
+  };
   test("should return empty object if no issues are passed", () => {
     const expected = {
       formIssues: [],
