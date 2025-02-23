@@ -1,6 +1,6 @@
 # Standard Schema Utils
 
-A utils package for common operations after validation fails. Includes mapping issues to dot paths, throwing errors, and flattening/formatting issues.
+A utils package for common operations after validation fails. Includes mapping issues to dot paths, throwing errors, type guards and flattening/formatting issues.
 
 ```sh
 npm install @standard-schema/utils   # npm
@@ -57,6 +57,52 @@ async function validateInput<TSchema extends StandardSchemaV1>(
     throw new SchemaError(result.issues);
   }
   return result.value;
+}
+```
+
+## Is Standard Schema
+
+Check whether an object is a Standard Schema.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { isStandardSchema, SchemaError } from "@standard-schema/utils";
+
+interface Parser<Output> {
+  parse(value: unknown): Output;
+}
+
+async function parseString(
+  schema: Parser<string> | StandardSchemaV1<string>,
+  data: unknown
+) {
+  if (isStandardSchema(schema)) {
+    const result = await schema["~standard"].validate(data);
+    if (result.issues) {
+      throw new SchemaError(result.issues);
+    }
+    return result.value;
+  }
+  return schema.parse(data);
+}
+```
+
+Also includes attached methods for checking specific versions.
+
+```ts
+// some point in future...
+import type { StandardSchemaV1, StandardSchemaV2 } from "@standard-schema/spec";
+import { isStandardSchema } from "@standard-schema/utils";
+
+async function parseString(
+  schema: StandardSchemaV1<string> | StandardSchemaV2<string>,
+  data: unknown
+) {
+  if (isStandardSchema.v1(schema)) {
+    // handle v1
+  } else {
+    // handle v2
+  }
 }
 ```
 
