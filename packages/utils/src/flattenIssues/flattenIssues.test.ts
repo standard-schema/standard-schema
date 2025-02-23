@@ -1,20 +1,11 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { describe, expect, expectTypeOf, test } from "vitest";
+import type { Fields } from "../__test_fixtures/index.ts";
+import { fieldsSchema } from "../__test_fixtures/index.ts";
 import type { FlattenedIssues } from "./flattenIssues.ts";
 import { flattenIssues } from "./flattenIssues.ts";
 
 describe("flattenIssues", () => {
-  interface Fields {
-    foo: string;
-    bar: number;
-  }
-  const schema: StandardSchemaV1<Fields> = {
-    "~standard": {
-      vendor: "custom",
-      version: 1,
-      validate: () => ({ issues: [] }),
-    },
-  };
   test("should return empty object if no issues are passed", () => {
     const expected = {
       formIssues: [],
@@ -22,13 +13,13 @@ describe("flattenIssues", () => {
     };
     expect(flattenIssues([])).toStrictEqual(expected);
 
-    expect(flattenIssues(schema, [])).toStrictEqual(expected);
+    expect(flattenIssues(fieldsSchema, [])).toStrictEqual(expected);
 
     // biome-ignore lint/correctness/noConstantCondition: type-only tests
     if (0 > 1) {
       expectTypeOf(flattenIssues([])).toEqualTypeOf<FlattenedIssues<unknown>>();
 
-      expectTypeOf(flattenIssues(schema, [])).toEqualTypeOf<
+      expectTypeOf(flattenIssues(fieldsSchema, [])).toEqualTypeOf<
         FlattenedIssues<Fields>
       >();
     }
@@ -45,7 +36,7 @@ describe("flattenIssues", () => {
     };
     expect(flattenIssues(issues)).toStrictEqual(expected);
 
-    expect(flattenIssues(schema, issues)).toStrictEqual(expected);
+    expect(flattenIssues(fieldsSchema, issues)).toStrictEqual(expected);
   });
 
   test("should return field errors if issues have path", () => {
@@ -62,7 +53,7 @@ describe("flattenIssues", () => {
     };
     expect(flattenIssues(issues)).toStrictEqual(expected);
 
-    expect(flattenIssues(schema, issues)).toStrictEqual(expected);
+    expect(flattenIssues(fieldsSchema, issues)).toStrictEqual(expected);
   });
   test("allows mapping issues", () => {
     const issues = [{ message: "a", path: ["foo"] }, { message: "ab" }];
@@ -77,7 +68,7 @@ describe("flattenIssues", () => {
 
     expect(flattenIssues(issues, mapper)).toStrictEqual(expected);
 
-    expect(flattenIssues(schema, issues, mapper)).toStrictEqual(expected);
+    expect(flattenIssues(fieldsSchema, issues, mapper)).toStrictEqual(expected);
 
     // biome-ignore lint/correctness/noConstantCondition: type-only tests
     if (0 > 1) {
@@ -85,7 +76,7 @@ describe("flattenIssues", () => {
         FlattenedIssues<unknown, StandardSchemaV1.Issue>
       >();
 
-      expectTypeOf(flattenIssues(schema, issues, mapper)).toEqualTypeOf<
+      expectTypeOf(flattenIssues(fieldsSchema, issues, mapper)).toEqualTypeOf<
         FlattenedIssues<Fields, StandardSchemaV1.Issue>
       >();
     }
