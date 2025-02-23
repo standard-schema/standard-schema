@@ -1,4 +1,5 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { isStandardSchema } from "../isStandardSchema/isStandardSchema.ts";
 
 export type SchemaArgs<Args extends unknown[]> =
   | Args
@@ -16,9 +17,8 @@ export function _removeSchemaArg<Args extends unknown[]>(
   args: SchemaArgs<Args>,
 ): Args {
   const schema = args[0];
-  // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-  if ((schema as any)?.["~standard"]) {
-    return args.slice(1) as never;
+  if (isStandardSchema(schema)) {
+    return args.slice(1) as Args;
   }
   return args as Args;
 }
