@@ -1,6 +1,18 @@
 # Standard Schema Utils
 
-A utils package for common operations after validation fails. Includes mapping issues to dot paths, throwing errors, type guards and flattening/formatting issues.
+A utils package for common operations with Standard Schema.
+
+- [Get Dot Path](#get-dot-path)
+- [Schema Error](#schema-error)
+- [Basic Parsing](#basic-parsing)
+  - [`parse`](#parse)
+  - [`parseSync`](#parsesync)
+  - [`safeParse`](#safeparse)
+  - [`safeParseSync`](#safeparsesync)
+- [Is Standard Schema](#is-standard-schema)
+- [Get Path Segment Key](#get-path-segment-key)
+- [Flatten Issues](#flatten-issues)
+- [Format Issues](#format-issues)
 
 ```sh
 npm install @standard-schema/utils   # npm
@@ -57,6 +69,80 @@ async function validateInput<TSchema extends StandardSchemaV1>(
     throw new SchemaError(result.issues);
   }
   return result.value;
+}
+```
+
+## Basic Parsing
+
+### `parse`
+
+Use a schema to parse asynchronously. Resolves to the parsed data, or rejects with a `SchemaError` if the data is invalid.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { parse, SchemaError } from "@standard-schema/utils";
+
+try {
+  const parsed = await parse(schema, data);
+} catch (error) {
+  if (error instanceof SchemaError) {
+    // handle error
+  }
+}
+```
+
+### `parseSync`
+
+Use a schema to parse synchronously. Returns the parsed data, or throws a `SchemaError` if the data is invalid.
+Throws a `TypeError` if the schema validation is asynchronous.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { parseSync, SchemaError } from "@standard-schema/utils";
+
+try {
+  const parsed = parseSync(schema, data);
+} catch (error) {
+  if (error instanceof SchemaError) {
+    // handle error
+  }
+  // schema validation is asynchronous
+}
+```
+
+### `safeParse`
+
+Use a schema to parse asynchronously. Resolves to a result object containing the parsed data or issues.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { safeParse } from "@standard-schema/utils";
+
+const result = await safeParse(schema, data);
+if (result.issues) {
+  // handle error
+} else {
+  const parsed = result.value;
+}
+```
+
+### `safeParseSync`
+
+Use a schema to parse synchronously. Returns a result object containing the parsed data or issues.
+Throws a `TypeError` if the schema validation is asynchronous.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { safeParseSync } from "@standard-schema/utils";
+try {
+  const result = safeParseSync(schema, data);
+  if (result.issues) {
+    // handle error
+  } else {
+    const parsed = result.value;
+  }
+} catch (error) {
+  // schema validation is asynchronous
 }
 ```
 
