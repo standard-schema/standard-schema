@@ -17,6 +17,23 @@ export const stringSchema: StandardSchemaV1<string> = {
   },
 };
 
+export const asyncStringSchema: StandardSchemaV1<string> = {
+  "~standard": {
+    version: 1,
+    vendor: "custom",
+    validate: async (value) => {
+      const pass = typeof value === "string";
+      return pass
+        ? { value }
+        : {
+            issues: [
+              { message: `Expected string, got ${typeof value}`, path: [] },
+            ],
+          };
+    },
+  },
+};
+
 export interface Fields {
   foo: string;
   bar: number;
