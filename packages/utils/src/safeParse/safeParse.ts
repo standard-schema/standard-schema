@@ -1,5 +1,5 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import type { LooseAutocomplete } from "../types.ts";
+import type { LooseAutocomplete } from "../_types/index.ts";
 
 /**
  * Parse unknown data with a schema, returning a result object.

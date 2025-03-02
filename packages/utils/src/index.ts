@@ -6,3 +6,4 @@ export * from "./formatIssues/index.ts";
 export * from "./isStandardSchema/index.ts";
 export * from "./parse/index.ts";
 export * from "./safeParse/index.ts";
+export * from "./types/index.ts";
