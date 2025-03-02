@@ -13,6 +13,9 @@ A utils package for common operations with Standard Schema.
 - [Get Path Segment Key](#get-path-segment-key)
 - [Flatten Issues](#flatten-issues)
 - [Format Issues](#format-issues)
+- [Typescript Utilities](#typescript-utilities)
+  - [Standard Schema Dictionary/Tuple](#standard-schema-dictionarytuple)
+  - [Inferring with a default](#inferring-with-a-default)
 
 ```sh
 npm install @standard-schema/utils   # npm
@@ -295,4 +298,71 @@ async function getFormErrors<Schema extends StandardSchemaV1>(
   const fieldIssues = formatIssues(schema, result.issues);
   return fieldIssues;
 }
+```
+
+## Typescript Utilities
+
+### Standard Schema Dictionary/Tuple
+
+Describes a dictionary or tuple of Standard Schemas.
+
+```ts
+import type { StandardSchemaV1Dictionary } from "@standard-schema/utils";
+
+type Schemas = StandardSchemaV1Dictionary<
+  {
+    foo: string;
+    bar: number;
+  },
+  {
+    foo: number;
+    bar: string;
+  }
+>;
+// type Schemas = {
+//   foo: StandardSchemaV1<string, number>;
+//   bar: StandardSchemaV1<number, string>;
+// }
+
+type Input = StandardSchemaV1Dictionary.InferInput<Schemas>;
+// type Input = {
+//   foo: string;
+//   bar: number;
+// }
+
+type Output = StandardSchemaV1Dictionary.InferOutput<Schemas>;
+// type Output = {
+//   foo: number;
+//   bar: string;
+// }
+
+type Schemas = StandardSchemaV1Tuple<[string, number], [number, string]>;
+// type Schemas = [StandardSchemaV1<string, number>, StandardSchemaV1<number, string>]
+
+type Input = StandardSchemaV1Tuple.InferInput<Schemas>;
+// type Input = [string, number]
+
+type Output = StandardSchemaV1Tuple.InferOutput<Schemas>;
+// type Output = [number, string]
+```
+
+### Inferring with a default
+
+Provides a way to infer from a value that may be a Standard Schema, using a default type if it is not.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type {
+  InferInputWithDefault,
+  InferOutputWithDefault,
+} from "@standard-schema/utils";
+
+interface Config {
+  schema?: StandardSchemaV1;
+}
+
+// if we have a schema, use that for types, otherwise use our defaults
+type MyCustomFunction<CustomConfig extends Config> = (
+  input: InferInputWithDefault<CustomConfig["schema"], string>
+) => InferOutputWithDefault<CustomConfig["schema"], string>;
 ```
