@@ -1,8 +1,8 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import type { SchemaArgs } from "../_removeSchemaArg/_removeSchemaArg.ts";
 import { _removeSchemaArg } from "../_removeSchemaArg/_removeSchemaArg.ts";
+import type { KeyofUnion } from "../_types/index.ts";
 import { getPathSegmentKey } from "../getPathSegmentKey/getPathSegmentKey.ts";
-import type { KeyofUnion } from "../types.ts";
 
 export type InferFlattenedIssues<
   Schema extends StandardSchemaV1,
