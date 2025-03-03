@@ -19,7 +19,7 @@ export type InferFormattedIssues<
   MappedIssue = string,
 > = FormattedIssues<StandardSchemaV1.InferOutput<Schema>, MappedIssue>;
 export type FormattedIssues<T, MappedIssue = string> = {
-  _issues: MappedIssue[];
+  _issues: readonly MappedIssue[];
 } & RecursiveFormattedIssues<NonNullable<T>, MappedIssue>;
 
 /**

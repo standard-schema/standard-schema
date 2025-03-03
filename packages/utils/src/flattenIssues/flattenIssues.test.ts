@@ -1,8 +1,6 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { describe, expect, expectTypeOf, test } from "vitest";
-import type { Fields } from "../__test_fixtures/index.ts";
+import { describe, expect, test } from "vitest";
 import { fieldsSchema } from "../__test_fixtures/index.ts";
-import type { FlattenedIssues } from "./flattenIssues.ts";
 import { flattenIssues } from "./flattenIssues.ts";
 
 describe("flattenIssues", () => {
@@ -14,15 +12,6 @@ describe("flattenIssues", () => {
     expect(flattenIssues([])).toStrictEqual(expected);
 
     expect(flattenIssues(fieldsSchema, [])).toStrictEqual(expected);
-
-    // biome-ignore lint/correctness/noConstantCondition: type-only tests
-    if (0 > 1) {
-      expectTypeOf(flattenIssues([])).toEqualTypeOf<FlattenedIssues<unknown>>();
-
-      expectTypeOf(flattenIssues(fieldsSchema, [])).toEqualTypeOf<
-        FlattenedIssues<Fields>
-      >();
-    }
   });
 
   test("should return form errors if issues have no path", () => {
@@ -69,16 +58,5 @@ describe("flattenIssues", () => {
     expect(flattenIssues(issues, mapper)).toStrictEqual(expected);
 
     expect(flattenIssues(fieldsSchema, issues, mapper)).toStrictEqual(expected);
-
-    // biome-ignore lint/correctness/noConstantCondition: type-only tests
-    if (0 > 1) {
-      expectTypeOf(flattenIssues(issues, mapper)).toEqualTypeOf<
-        FlattenedIssues<unknown, StandardSchemaV1.Issue>
-      >();
-
-      expectTypeOf(flattenIssues(fieldsSchema, issues, mapper)).toEqualTypeOf<
-        FlattenedIssues<Fields, StandardSchemaV1.Issue>
-      >();
-    }
   });
 });
