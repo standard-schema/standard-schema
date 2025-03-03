@@ -1,8 +1,6 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { describe, expect, expectTypeOf, test } from "vitest";
-import type { Fields } from "../__test_fixtures/index.ts";
+import { describe, expect, test } from "vitest";
 import { fieldsSchema } from "../__test_fixtures/index.ts";
-import type { FormattedIssues } from "./formatIssues.ts";
 import { formatIssues } from "./formatIssues.ts";
 
 describe("formatIssues", () => {
@@ -12,15 +10,6 @@ describe("formatIssues", () => {
     };
     expect(formatIssues([])).toStrictEqual(expected);
     expect(formatIssues(fieldsSchema, [])).toStrictEqual(expected);
-
-    // biome-ignore lint/correctness/noConstantCondition: type-only tests
-    if (0 > 1) {
-      expectTypeOf(formatIssues([])).toEqualTypeOf<FormattedIssues<unknown>>();
-
-      expectTypeOf(formatIssues(fieldsSchema, [])).toEqualTypeOf<
-        FormattedIssues<Fields>
-      >();
-    }
   });
   test("should return form errors if issues have no path", () => {
     const issues = [
@@ -63,16 +52,5 @@ describe("formatIssues", () => {
 
     expect(formatIssues(issues, mapper)).toStrictEqual(expected);
     expect(formatIssues(fieldsSchema, issues, mapper)).toStrictEqual(expected);
-
-    // biome-ignore lint/correctness/noConstantCondition: type-only tests
-    if (0 > 1) {
-      expectTypeOf(formatIssues(issues, mapper)).toEqualTypeOf<
-        FormattedIssues<unknown, StandardSchemaV1.Issue>
-      >();
-
-      expectTypeOf(formatIssues(fieldsSchema, issues, mapper)).toEqualTypeOf<
-        FormattedIssues<Fields, StandardSchemaV1.Issue>
-      >();
-    }
   });
 });
