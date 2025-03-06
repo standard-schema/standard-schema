@@ -124,6 +124,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [decoders](https://github.com/nvie/decoders)                      | v2.6.0+    | [PR](https://github.com/nvie/decoders/pull/1213)           |
 | [ReScript Schema](https://github.com/DZakh/rescript-schema)       | v9.2.0+    | [PR](https://github.com/DZakh/rescript-schema/pull/105)    |
 | [Skunkteam Types](https://github.com/skunkteam/types)             | v9.0.0+    | [PR](https://github.com/skunkteam/types/pull/108)          |
+| [DreamIt GraphQL-Std-Schema](https://github.com/dreamit-de/graphql-std-schema)             | v0.1.0+    | [Commit](https://github.com/dreamit-de/graphql-std-schema/commit/c948d4f56ea72d57744976735bedcaea43d33ae1)          |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -157,6 +158,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [xink](https://github.com/xinkjs/xink)                                   | A filesystem API router, inspired by SvelteKit                                                                                                                                                  | [Docs](https://github.com/xinkjs/xink?tab=readme-ov-file#using-standard-schema)                       |
 | [xsai](https://github.com/moeru-ai/xsai)                                 | extra-small AI SDK for Browser, Node.js, Deno, Bun or Edge Runtime.                                                                                                                             | [PR](https://github.com/moeru-ai/xsai/pull/40)                                                        |
 | [xsschema](https://github.com/moeru-ai/xsai/blob/main/packages/xsschema) | extra-small, Standard Schema-based alternative to typeschema.                                                                                                                                   | [PR](https://github.com/moeru-ai/xsai/pull/40)                                                        |
+| [DreamIT GraphQL-Server](https://github.com/dreamit-de/graphql-server) | GraphQL server written in NodeJS/Typescript.                                                                                                                                   | [PR](https://github.com/dreamit-de/graphql-server/pull/479)                                                        |
 
 ## How can my schema library implement the spec?
 
