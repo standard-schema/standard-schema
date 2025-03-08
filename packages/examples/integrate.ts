@@ -16,7 +16,7 @@ export async function standardValidate<T extends StandardSchemaV1>(
   if (result instanceof Promise) result = await result;
 
   // if the `issues` field exists, the validation failed
-  if (result.issues) {
+  if ("issues" in result) {
     throw new Error(JSON.stringify(result.issues, null, 2));
   }
 
