@@ -125,6 +125,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [ReScript Schema](https://github.com/DZakh/rescript-schema)                    | v9.2.0+    | [PR](https://github.com/DZakh/rescript-schema/pull/105)                                                    |
 | [Skunkteam Types](https://github.com/skunkteam/types)                          | v9.0.0+    | [PR](https://github.com/skunkteam/types/pull/108)                                                          |
 | [DreamIt GraphQL-Std-Schema](https://github.com/dreamit-de/graphql-std-schema) | v0.1.0+    | [Commit](https://github.com/dreamit-de/graphql-std-schema/commit/c948d4f56ea72d57744976735bedcaea43d33ae1) |
+| [ts.data.json](https://github.com/joanllenas/ts.data.json)                     | v2.3.0+    | [PR](https://github.com/joanllenas/ts.data.json/pull/35)                                                   |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -161,6 +162,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [DreamIT GraphQL-Server](https://github.com/dreamit-de/graphql-server)   | GraphQL server written in NodeJS/Typescript.                                                                                                                                                    | [PR](https://github.com/dreamit-de/graphql-server/pull/479)                                           |
 | [Astro Typesafe Routes](https://github.com/feelixe/astro-typesafe-routes)| An Astro integration for typesafe URL generation and routing.                                                                                                                                   | [PR](https://github.com/feelixe/astro-typesafe-routes/pull/52)                                        |
 | [Muppet](https://github.com/feelixe/astro-typesafe-routes)| Build MCPs (Model Context Protocol) on top of hono                                                                                                                                   | [Repo](https://github.com/muppet-dev/muppet)                                        |
+| [ts-ics](https://github.com/Neuvernetzung/ts-ics)                        | Parse and generate iCalendar with Typescript                                                                                                                                                    | [PR](https://github.com/Neuvernetzung/ts-ics/pull/148)                                                |
 
 ## How can my schema library implement the spec?
 
