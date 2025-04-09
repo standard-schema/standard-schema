@@ -126,6 +126,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [Skunkteam Types](https://github.com/skunkteam/types)                          | v9.0.0+    | [PR](https://github.com/skunkteam/types/pull/108)                                                          |
 | [DreamIt GraphQL-Std-Schema](https://github.com/dreamit-de/graphql-std-schema) | v0.1.0+    | [Commit](https://github.com/dreamit-de/graphql-std-schema/commit/c948d4f56ea72d57744976735bedcaea43d33ae1) |
 | [ts.data.json](https://github.com/joanllenas/ts.data.json)                     | v2.3.0+    | [PR](https://github.com/joanllenas/ts.data.json/pull/35)                                                   |
+| [quartet](https://github.com/whiteand/ts-quartet)                              | v11.0.3+   | [PR](https://github.com/whiteand/ts-quartet/pull/9/files)                                                  |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
