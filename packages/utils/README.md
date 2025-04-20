@@ -4,6 +4,7 @@ A utils package for common operations with Standard Schema.
 
 - [Get Dot Path](#get-dot-path)
 - [Schema Error](#schema-error)
+- [Summarize Issues](#summarize-issues)
 - [Basic Parsing](#basic-parsing)
   - [`parse`](#parse)
   - [`parseSync`](#parsesync)
@@ -72,6 +73,26 @@ async function validateInput<TSchema extends StandardSchemaV1>(
     throw new SchemaError(result.issues);
   }
   return result.value;
+}
+```
+
+## Summarize Issues
+
+Summarize the error messages of issues in a pretty-printable multi-line string.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { summarize } from "@standard-schema/utils";
+
+async function tryParse<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
+  data: unknown
+): Promise<StandardSchemaV1.Result<StandardSchemaV1.InferOutput<TSchema>>> {
+  const result = await schema["~standard"].validate(data);
+  if (result.issues) {
+    console.error(summarize(result.issues));
+  }
+  return result;
 }
 ```
 
