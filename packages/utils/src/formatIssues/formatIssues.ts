@@ -4,11 +4,12 @@ import { _removeSchemaArg } from "../_removeSchemaArg/_removeSchemaArg.ts";
 import type { IssueMapper } from "../flattenIssues/flattenIssues.ts";
 import { getPathSegmentKey } from "../getPathSegmentKey/getPathSegmentKey.ts";
 
-// biome-ignore lint/suspicious/noExplicitAny: <explanation>
-type RecursiveFormattedIssues<T, MappedIssue> = T extends [any, ...any[]]
+type RecursiveFormattedIssues<T, MappedIssue> = T extends readonly [
+  unknown,
+  ...unknown[],
+]
   ? { [K in keyof T]?: FormattedIssues<T[K], MappedIssue> }
-  : // biome-ignore lint/suspicious/noExplicitAny: <explanation>
-    T extends any[]
+  : T extends readonly unknown[]
     ? { [k: number]: FormattedIssues<T[number], MappedIssue> }
     : T extends object
       ? { [K in keyof T]?: FormattedIssues<T[K], MappedIssue> }
@@ -81,7 +82,7 @@ export function formatIssues(
       (fieldIssues._issues as unknown[]).push(mapIssue(issue));
       continue;
     }
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: recursive structures are hard to type
     let cursor: any = fieldIssues;
     for (const segment of issue.path) {
       const key = getPathSegmentKey(segment);

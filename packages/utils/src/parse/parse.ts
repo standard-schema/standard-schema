@@ -1,6 +1,6 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { SchemaError } from "../SchemaError/SchemaError.ts";
 import type { LooseAutocomplete } from "../_types/index.ts";
+import { SchemaError } from "../SchemaError/SchemaError.ts";
 import { safeParse, safeParseSync } from "../safeParse/safeParse.ts";
 
 /**
