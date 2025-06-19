@@ -10,6 +10,16 @@ A utils package for common operations with Standard Schema.
   - [`parseSync`](#parsesync)
   - [`safeParse`](#safeparse)
   - [`safeParseSync`](#safeparsesync)
+- [Parsing Dictionaries](#parsing-dictionaries)
+  - [`parseDictionary`](#parsedictionary)
+  - [`parseDictionarySync`](#parsedictionarysync)
+  - [`safeParseDictionary`](#safeparsedictionary)
+  - [`safeParseDictionarySync`](#safeparsedictionarysync)
+- [Parsing Tuples](#parsing-tuples)
+  - [`parseTuple`](#parsetuple)
+  - [`parseTupleSync`](#parsetuplesync)
+  - [`safeParseTuple`](#safeparsetuple)
+  - [`safeParseTupleSync`](#safeparsetuplesync)
 - [Is Standard Schema](#is-standard-schema)
 - [Get Path Segment Key](#get-path-segment-key)
 - [Flatten Issues](#flatten-issues)
@@ -167,6 +177,174 @@ try {
   }
 } catch (error) {
   // schema validation is asynchronous
+}
+```
+
+## Parsing Dictionaries
+
+A dictionary is an object that maps keys to schemas. The keys are used as the path to the data. For example:
+
+```ts
+const schemas = {
+  foo: stringSchema,
+  bar: numberSchema,
+};
+
+const data = {
+  foo: "hello",
+  bar: 123,
+};
+
+safeParseDictionary(schemas, data);
+```
+
+### `parseDictionary`
+
+Use a dictionary of schemas to parse asynchronously. Resolves to the parsed data, or rejects with a `SchemaError` if the data is invalid.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { parseDictionary, SchemaError } from "@standard-schema/utils";
+
+try {
+  const parsed = await parseDictionary(schemas, data);
+} catch (error) {
+  if (error instanceof SchemaError) {
+    // handle error
+  }
+}
+```
+
+### `parseDictionarySync`
+
+Use a dictionary of schemas to parse synchronously. Returns the parsed data, or throws a `SchemaError` if the data is invalid.
+Throws a `TypeError` if the schema validation is asynchronous.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { parseDictionarySync, SchemaError } from "@standard-schema/utils";
+
+try {
+  const parsed = parseDictionarySync(schemas, data);
+} catch (error) {
+  if (error instanceof SchemaError) {
+    // handle error
+  }
+  // schema validation is asynchronous
+}
+```
+
+### `safeParseDictionary`
+
+Use a dictionary of schemas to parse asynchronously. Resolves to a result object containing the parsed data or issues.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { safeParseDictionary } from "@standard-schema/utils";
+
+const result = await safeParseDictionary(schemas, data);
+if (result.issues) {
+  // handle error
+} else {
+  const parsed = result.value;
+}
+```
+
+### `safeParseDictionarySync`
+
+Use a dictionary of schemas to parse synchronously. Returns a result object containing the parsed data or issues.
+Throws a `TypeError` if the schema validation is asynchronous.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { safeParseDictionarySync } from "@standard-schema/utils";
+
+const result = safeParseDictionarySync(schemas, data);
+if (result.issues) {
+  // handle error
+} else {
+  const parsed = result.value;
+}
+```
+
+## Parsing Tuples
+
+A tuple is an array that maps indexes to schemas. The indexes are used as the path to the data. For example:
+
+```ts
+const schemas = [stringSchema, numberSchema];
+
+const data = ["hello", 123];
+
+safeParseTuple(schemas, data);
+```
+
+### `parseTuple`
+
+Use a tuple of schemas to parse asynchronously. Resolves to the parsed data, or rejects with a `SchemaError` if the data is invalid.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { parseTuple, SchemaError } from "@standard-schema/utils";
+
+try {
+  const parsed = await parseTuple(schemas, data);
+} catch (error) {
+  if (error instanceof SchemaError) {
+    // handle error
+  }
+}
+```
+
+### `parseTupleSync`
+
+Use a tuple of schemas to parse synchronously. Returns the parsed data, or throws a `SchemaError` if the data is invalid.
+Throws a `TypeError` if the schema validation is asynchronous.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { parseTupleSync, SchemaError } from "@standard-schema/utils";
+
+try {
+  const parsed = parseTupleSync(schemas, data);
+} catch (error) {
+  if (error instanceof SchemaError) {
+    // handle error
+  }
+  // schema validation is asynchronous
+}
+```
+
+### `safeParseTuple`
+
+Use a tuple of schemas to parse asynchronously. Resolves to a result object containing the parsed data or issues.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { safeParseTuple } from "@standard-schema/utils";
+
+const result = await safeParseTuple(schemas, data);
+if (result.issues) {
+  // handle error
+} else {
+  const parsed = result.value;
+}
+```
+
+### `safeParseTupleSync`
+
+Use a tuple of schemas to parse synchronously. Returns a result object containing the parsed data or issues.
+Throws a `TypeError` if the schema validation is asynchronous.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { safeParseTupleSync } from "@standard-schema/utils";
+
+const result = safeParseTupleSync(schemas, data);
+if (result.issues) {
+  // handle error
+} else {
+  const parsed = result.value;
 }
 ```
 
