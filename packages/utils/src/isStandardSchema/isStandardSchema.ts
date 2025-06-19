@@ -7,7 +7,7 @@ export const isStandardSchema: {
   v1(schema: unknown): schema is StandardSchemaV1;
 } = Object.assign(
   function isStandardSchema(schema: unknown): schema is StandardSchemaV1 {
-    // biome-ignore lint/suspicious/noExplicitAny: <explanation>
+    // biome-ignore lint/suspicious/noExplicitAny: avoids many unnecessary checks
     return typeof (schema as any)?.["~standard"] === "object";
   },
   {
