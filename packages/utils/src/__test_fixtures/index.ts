@@ -9,9 +9,7 @@ export const stringSchema: StandardSchemaV1<string> = {
       return pass
         ? { value }
         : {
-            issues: [
-              { message: `Expected string, got ${typeof value}`, path: [] },
-            ],
+            issues: [{ message: `Expected string, got ${typeof value}` }],
           };
     },
   },
@@ -26,9 +24,7 @@ export const asyncStringSchema: StandardSchemaV1<string> = {
       return pass
         ? { value }
         : {
-            issues: [
-              { message: `Expected string, got ${typeof value}`, path: [] },
-            ],
+            issues: [{ message: `Expected string, got ${typeof value}` }],
           };
     },
   },

@@ -14,11 +14,11 @@ describe("safeParse", () => {
   });
   test("should return a result object with issues", async () => {
     await expect(safeParse(stringSchema, 123)).resolves.toEqual({
-      issues: [{ message: "Expected string, got number", path: [] }],
+      issues: [{ message: "Expected string, got number" }],
     });
 
     await expect(safeParse(asyncStringSchema, 123)).resolves.toEqual({
-      issues: [{ message: "Expected string, got number", path: [] }],
+      issues: [{ message: "Expected string, got number" }],
     });
   });
 });
@@ -31,7 +31,7 @@ describe("safeParseSync", () => {
   });
   test("should return a result object with issues", () => {
     expect(safeParseSync(stringSchema, 123)).toEqual({
-      issues: [{ message: "Expected string, got number", path: [] }],
+      issues: [{ message: "Expected string, got number" }],
     });
   });
   test("should throw an error if the schema validation is asynchronous", () => {
