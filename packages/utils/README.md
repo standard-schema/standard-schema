@@ -113,7 +113,6 @@ async function tryParse<TSchema extends StandardSchemaV1>(
 Use a schema to parse asynchronously. Resolves to the parsed data, or rejects with a `SchemaError` if the data is invalid.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { parse, SchemaError } from "@standard-schema/utils";
 
 try {
@@ -131,7 +130,6 @@ Use a schema to parse synchronously. Returns the parsed data, or throws a `Schem
 Throws a `TypeError` if the schema validation is asynchronous.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { parseSync, SchemaError } from "@standard-schema/utils";
 
 try {
@@ -149,7 +147,6 @@ try {
 Use a schema to parse asynchronously. Resolves to a result object containing the parsed data or issues.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { safeParse } from "@standard-schema/utils";
 
 const result = await safeParse(schema, data);
@@ -166,7 +163,6 @@ Use a schema to parse synchronously. Returns a result object containing the pars
 Throws a `TypeError` if the schema validation is asynchronous.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { safeParseSync } from "@standard-schema/utils";
 try {
   const result = safeParseSync(schema, data);
@@ -203,7 +199,6 @@ safeParseDictionary(schemas, data);
 Use a dictionary of schemas to parse asynchronously. Resolves to the parsed data, or rejects with a `SchemaError` if the data is invalid.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { parseDictionary, SchemaError } from "@standard-schema/utils";
 
 try {
@@ -221,7 +216,6 @@ Use a dictionary of schemas to parse synchronously. Returns the parsed data, or 
 Throws a `TypeError` if the schema validation is asynchronous.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { parseDictionarySync, SchemaError } from "@standard-schema/utils";
 
 try {
@@ -239,7 +233,6 @@ try {
 Use a dictionary of schemas to parse asynchronously. Resolves to a result object containing the parsed data or issues.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { safeParseDictionary } from "@standard-schema/utils";
 
 const result = await safeParseDictionary(schemas, data);
@@ -256,7 +249,6 @@ Use a dictionary of schemas to parse synchronously. Returns a result object cont
 Throws a `TypeError` if the schema validation is asynchronous.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { safeParseDictionarySync } from "@standard-schema/utils";
 
 const result = safeParseDictionarySync(schemas, data);
@@ -284,7 +276,6 @@ safeParseTuple(schemas, data);
 Use a tuple of schemas to parse asynchronously. Resolves to the parsed data, or rejects with a `SchemaError` if the data is invalid.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { parseTuple, SchemaError } from "@standard-schema/utils";
 
 try {
@@ -302,7 +293,6 @@ Use a tuple of schemas to parse synchronously. Returns the parsed data, or throw
 Throws a `TypeError` if the schema validation is asynchronous.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { parseTupleSync, SchemaError } from "@standard-schema/utils";
 
 try {
@@ -320,7 +310,6 @@ try {
 Use a tuple of schemas to parse asynchronously. Resolves to a result object containing the parsed data or issues.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { safeParseTuple } from "@standard-schema/utils";
 
 const result = await safeParseTuple(schemas, data);
@@ -337,7 +326,6 @@ Use a tuple of schemas to parse synchronously. Returns a result object containin
 Throws a `TypeError` if the schema validation is asynchronous.
 
 ```ts
-import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { safeParseTupleSync } from "@standard-schema/utils";
 
 const result = safeParseTupleSync(schemas, data);
