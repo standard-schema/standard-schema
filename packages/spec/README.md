@@ -169,6 +169,8 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [FastMCP](https://github.com/punkpeye/fastmcp)                            | A TypeScript framework for building MCP servers capable of handling client sessions.                                                                                                            | [PR](https://github.com/punkpeye/fastmcp/pull/27)                                                     |
 | [Nuxt Safe Runtime Config](https://github.com/onmax/nuxt-safe-runtime-config) | Validate Nuxt runtime config at build time using Zod, Valibot, ArkType, or any Standard Schema compatible library                                                                         | [Docs](https://github.com/onmax/nuxt-safe-runtime-config)                                               |
 | [Content Collections](https://www.content-collections.dev/)               | A library for converting content into type-safe data collections.                                                                                                                               | [PR](https://github.com/sdorra/content-collections/pull/570)                                          |
+| [zod-jsonrpc](https://github.com/danscan/zod-jsonrpc)                      | Type-safe JSON-RPC 2.0 clients and servers.                                                                                                                                                    | [Docs](https://github.com/danscan/zod-jsonrpc)                           |
+
 
 ## How can my schema library implement the spec?
 
