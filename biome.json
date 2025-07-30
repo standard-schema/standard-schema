@@ -1,5 +1,5 @@
 {
-  "root": false,
+  "root": true,
   "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
   "formatter": {
