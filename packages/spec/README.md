@@ -128,6 +128,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [ts.data.json](https://github.com/joanllenas/ts.data.json)                     | v2.3.0+    | [PR](https://github.com/joanllenas/ts.data.json/pull/35)                                                   |
 | [unhoax](https://sacdenoeuds.github.io/unhoax/)                                | v0.7.0+    | [Commit](https://github.com/SacDeNoeuds/unhoax/commit/4e7f2d71c98ba9e3e73f029e0af2e46f9980dcbe)            |
 | [yup](https://github.com/jquense/yup)                                          | v1.7.0+    | [PR](https://github.com/jquense/yup/pull/2258)                                                             |
+| [joi](https://github.com/hapijs/joi)                                           | v18.0.0+   | [PR](https://github.com/hapijs/joi/pull/3080)                                                              |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
