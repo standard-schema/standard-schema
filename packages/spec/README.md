@@ -308,3 +308,13 @@ function validateInput(schema: StandardSchemaV1, data: unknown) {
   // ...
 }
 ```
+
+## Standard Community
+
+Unofficial Standard Schema libraries, examples, and repositories by the community for the community 🧡.
+
+### Get Involved
+
+Explore more at [Standard Schema Community](https://github.com/standard-community) and join us in building a robust ecosystem for TypeScript and JavaScript schema validation.
+
+🧡 Together, we can achieve more!
