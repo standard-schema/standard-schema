@@ -71,3 +71,28 @@ export declare namespace StandardSchemaV1 {
   // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
   export {};
 }
+
+/**
+ * The Standard JSON Schema Source interface. A standard interface to be implemented by any object/instance that can be converted to JSON Schema.
+ */
+export interface StandardJSONSchemaSourceV1<Input = unknown, Output = Input> {
+  "~toJSONSchema"(params: {
+    /** Required. Specifies whether the generated JSON Schema should reflect the expected input or output values. */
+    readonly io: "input" | "output";
+    /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw an error. When unspecified, implementers should target "draft-2020-12". */
+    readonly target?:
+      | "draft-04"
+      | "draft-07"
+      | "draft-2019-09"
+      | "draft-2020-12";
+  }): Record<string, unknown>;
+}
+
+/**
+ * A Standard Schema that implements the Standard JSON Schema Source interface.
+ * */
+export interface StandardSchemaWithJSONSchemaSourceV1<
+  Input = unknown,
+  Output = Input,
+> extends StandardSchemaV1<Input, Output>,
+    StandardJSONSchemaSourceV1<Input, Output> {}
