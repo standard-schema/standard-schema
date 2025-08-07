@@ -79,9 +79,10 @@ export interface StandardJSONSchemaSourceV1<Input = unknown, Output = Input> {
   "~toJSONSchema"(params: {
     /** Required. Specifies whether the generated JSON Schema should reflect the expected input or output values. */
     readonly io: "input" | "output";
-    /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw an error. When unspecified, implementers should target "draft-2020-12". */
+    /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. When unspecified, implementers should target "draft-2020-12". */
     readonly target?:
       | "draft-04"
+      | "draft-06"
       | "draft-07"
       | "draft-2019-09"
       | "draft-2020-12";
