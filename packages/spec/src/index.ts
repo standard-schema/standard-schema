@@ -79,24 +79,29 @@ export declare namespace StandardSchemaV1 {
   export {};
 }
 
-/** The target version of the JSON Schema spec. */
-export type JsonSchemaTarget =
-  | "draft-04"
-  | "draft-06"
-  | "draft-07"
-  | "draft-2019-09"
-  | "draft-2020-12";
-
-/** The options for the ~toJSONSchema method. */
-export interface ToJSONSchemaOptions {
-  /** Required. Specifies whether the generated JSON Schema should reflect the expected input or output values. */
-  readonly io: "input" | "output";
-  /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. When unspecified, implementers should target "draft-2020-12". */
-  readonly target?: JsonSchemaTarget;
-}
 /**
  * The Standard JSON Schema Source interface. A standard interface to be implemented by any object/instance that can be converted to JSON Schema.
  */
 export interface StandardJSONSchemaSourceV1<Input = unknown, Output = Input> {
-  "~toJSONSchema"(params: ToJSONSchemaOptions): Record<string, unknown>;
+  "~toJSONSchema"(
+    params: StandardJSONSchemaSourceV1.Options,
+  ): Record<string, unknown>;
+}
+
+export declare namespace StandardJSONSchemaSourceV1 {
+  /** The target version of the JSON Schema spec. */
+  export type Target =
+    | "draft-04"
+    | "draft-06"
+    | "draft-07"
+    | "draft-2019-09"
+    | "draft-2020-12";
+
+  /** The options for the ~toJSONSchema method. */
+  export interface Options {
+    /** Required. Specifies whether the generated JSON Schema should reflect the expected input or output values. */
+    readonly io: "input" | "output";
+    /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. When unspecified, implementers should target "draft-2020-12". */
+    readonly target?: Target;
+  }
 }
