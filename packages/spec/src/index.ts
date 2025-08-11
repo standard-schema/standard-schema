@@ -85,7 +85,7 @@ export declare namespace StandardSchemaV1 {
 /**
  * The Standard JSON Schema Source interface. A standard interface to be implemented by any object/instance that can be converted to JSON Schema.
  */
-export interface StandardJSONSchemaSourceV1<Input = unknown, Output = Input> {
+export interface StandardJSONSchemaSourceV1 {
   "~standard": StandardJSONSchemaSourceV1.Props;
 }
 
