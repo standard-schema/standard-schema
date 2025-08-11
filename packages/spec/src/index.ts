@@ -71,9 +71,12 @@ export declare namespace StandardSchemaV1 {
   /**
    * A Standard Schema that implements the Standard JSON Schema Source interface.
    * */
-  export interface WithJSONSchemaSource<Input = unknown, Output = Input>
-    extends StandardSchemaV1<Input, Output>,
-      StandardJSONSchemaSourceV1<Input, Output> {}
+  export interface WithJSONSchemaSource<Input = unknown, Output = Input> {
+    "~standard": StandardJSONSchemaSourceV1.PropsWithStandardSchema<
+      Input,
+      Output
+    >;
+  }
 
   // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
   export {};
@@ -83,12 +86,26 @@ export declare namespace StandardSchemaV1 {
  * The Standard JSON Schema Source interface. A standard interface to be implemented by any object/instance that can be converted to JSON Schema.
  */
 export interface StandardJSONSchemaSourceV1<Input = unknown, Output = Input> {
-  "~toJSONSchema"(
-    params: StandardJSONSchemaSourceV1.Options,
-  ): Record<string, unknown>;
+  "~standard": StandardJSONSchemaSourceV1.Props;
 }
 
 export declare namespace StandardJSONSchemaSourceV1 {
+  export interface Props {
+    /**
+     * Converts the Standard Schema to a JSON Schema.
+     * @param params - The options for the toJSONSchema method.
+     *
+     * @returns The JSON Schema.
+     */
+    readonly toJSONSchema: (
+      params: StandardJSONSchemaSourceV1.Options,
+    ) => Record<string, unknown>;
+  }
+
+  export interface PropsWithStandardSchema<Input = unknown, Output = Input>
+    extends Props,
+      StandardSchemaV1.Props<Input, Output> {}
+
   /** The target version of the JSON Schema spec. */
   export type Target =
     | "draft-04"
@@ -97,10 +114,12 @@ export declare namespace StandardJSONSchemaSourceV1 {
     | "draft-2019-09"
     | "draft-2020-12";
 
+  export type IO = "input" | "output";
+
   /** The options for the ~toJSONSchema method. */
   export interface Options {
-    /** Required. Specifies whether the generated JSON Schema should reflect the expected input or output values. */
-    readonly io: "input" | "output";
+    /** @ Specifies whether the generated JSON Schema should reflect the expected input or output values. */
+    readonly io: IO;
     /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. When unspecified, implementers should target "draft-2020-12". */
     readonly target?: Target;
   }
