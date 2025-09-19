@@ -1,7 +1,7 @@
 {
-  "root": false,
   "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
   "assist": { "actions": { "source": { "organizeImports": "on" } } },
+  "root": false,
   "formatter": {
     "indentStyle": "space",
     "indentWidth": 2
@@ -11,7 +11,16 @@
     "rules": {
       "recommended": true,
       "style": {
-        "useSelfClosingElements": "off"
+        "noInferrableTypes": "error",
+        "noParameterAssign": "error",
+        "noUnusedTemplateLiteral": "error",
+        "noUselessElse": "error",
+        "useAsConstAssertion": "error",
+        "useDefaultParameterLast": "error",
+        "useEnumInitializers": "error",
+        "useNumberNamespace": "error",
+        "useSelfClosingElements": "off",
+        "useSingleVarDeclarator": "error"
       },
       "suspicious": {
         "noExplicitAny": "off"
