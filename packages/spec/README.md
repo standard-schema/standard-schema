@@ -126,6 +126,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [Skunkteam Types](https://github.com/skunkteam/types)                          | v9.0.0+    | [PR](https://github.com/skunkteam/types/pull/108)                                                          |
 | [DreamIt GraphQL-Std-Schema](https://github.com/dreamit-de/graphql-std-schema) | v0.1.0+    | [Commit](https://github.com/dreamit-de/graphql-std-schema/commit/c948d4f56ea72d57744976735bedcaea43d33ae1) |
 | [ts.data.json](https://github.com/joanllenas/ts.data.json)                     | v2.3.0+    | [PR](https://github.com/joanllenas/ts.data.json/pull/35)                                                   |
+| [quartet](https://github.com/whiteand/ts-quartet)                              | v11.0.3+   | [PR](https://github.com/whiteand/ts-quartet/pull/9/files)                                                  |
 | [unhoax](https://sacdenoeuds.github.io/unhoax/)                                | v0.7.0+    | [Commit](https://github.com/SacDeNoeuds/unhoax/commit/4e7f2d71c98ba9e3e73f029e0af2e46f9980dcbe)            |
 | [protovalidate-es](https://github.com/bufbuild/protovalidate-es)               | v0.5.0+    | [PR](https://github.com/bufbuild/protovalidate-es/pull/54)                                                 |
 | [remult](https://remult.dev/docs/standard-schema)                              | v3.1.1+    | [PR](https://github.com/remult/remult/pull/777)                                                            |
