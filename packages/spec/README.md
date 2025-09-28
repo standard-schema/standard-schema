@@ -133,7 +133,8 @@ These are the libraries that have already implemented the Standard Schema interf
 | [stnl](https://github.com/re-utils/stnl?tab=readme-ov-file#standard-schema)    | v1.1.9+    | [Commit](https://github.com/re-utils/stnl/commit/d748522920e6066de6cc5eefa9c93c38f5b0541a)                 |
 | [yup](https://github.com/jquense/yup)                                          | v1.7.0+    | [PR](https://github.com/jquense/yup/pull/2258)                                                             |
 | [joi](https://github.com/hapijs/joi)                                           | v18.0.0+   | [PR](https://github.com/hapijs/joi/pull/3080)                                                              |
-| [typia](https://github.com/samchon/typia)                                      | v9.2.0+    | [PR](https://github.com/samchon/typia/pull/1500)                                                           |
+| [typia](https://github.com/samchon/typia)                                      | v9.2.0+    | [PR](https://github.com/samchon/typia/pull/1500) 
+| [regle](https://github.com/victorgarciaesgi/regle)                            | v1.9.0+    | [PR](https://github.com/victorgarciaesgi/regle/pull/191)                                               |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
