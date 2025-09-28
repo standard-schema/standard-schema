@@ -134,6 +134,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [yup](https://github.com/jquense/yup)                                          | v1.7.0+    | [PR](https://github.com/jquense/yup/pull/2258)                                                             |
 | [joi](https://github.com/hapijs/joi)                                           | v18.0.0+   | [PR](https://github.com/hapijs/joi/pull/3080)                                                              |
 | [typia](https://github.com/samchon/typia)                                      | v9.2.0+    | [PR](https://github.com/samchon/typia/pull/1500)                                                           |
+| [regle](https://github.com/victorgarciaesgi/regle)                             | v1.9.0+    | [PR](https://github.com/victorgarciaesgi/regle/pull/191)                                                   |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -190,7 +191,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [xignal](https://github.com/flamrdevs/xignal)                                 | signals state management for real                                                                                                                                                               | [Repo](https://github.com/flamrdevs/xignal)                                                           |
 | [svelte-jsonschema-form](https://github.com/x0k/svelte-jsonschema-form)       | Svelte 5 library for creating forms based on JSON schema.                                                                                                                                       | [Docs](https://x0k.dev/svelte-jsonschema-form/validators/standard-schema/)                            |
 | [RTK Query](https://redux-toolkit.js.org/rtk-query/overview)                  | A powerful data fetching and caching tool, included with Redux Toolkit.                                                                                                                         | [Docs](https://redux-toolkit.js.org/rtk-query/usage-with-typescript#schema-validation)                |
-| [Inngest](https://www.inngest.com)                  | Event-driven durable workflow engine that runs on any cloud. | [Docs]([https://redux-toolkit.js.org/rtk-query/usage-with-typescript#schema-validation](https://www.inngest.com/docs/reference/client/create#defining-event-payload-types))                |
+| [Inngest](https://www.inngest.com)                                            | Event-driven durable workflow engine that runs on any cloud.                                                                                                                                    | [Docs](https://www.inngest.com/docs/reference/client/create#defining-event-payload-types)             |
 
 ## How can my schema library implement the spec?
 
