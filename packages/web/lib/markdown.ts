@@ -30,6 +30,7 @@ async function initMarkdownParser() {
 
       return slug;
     },
+    permalink: AnchorPlugin.permalink.headerLink(),
   });
   globalThis.md = md;
   return md;
