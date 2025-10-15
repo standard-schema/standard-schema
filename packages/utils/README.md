@@ -45,10 +45,10 @@ To generate a dot path, simply pass an issue to the `getDotPath` function. If th
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { getDotPath } from "@standard-schema/utils";
+import { getDotPath, safeParse } from "@standard-schema/utils";
 
 async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
-  const result = await schema["~standard"].validate(data);
+  const result = await safeParse(schema, data);
   const formErrors: string[] = [];
   const fieldErrors: Record<string, string[]> = {};
   if (result.issues) {
@@ -71,12 +71,15 @@ async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
 
 ## Schema Error
 
-To throw an error that contains all issue information, simply pass the issues of the failed schema validation to the `SchemaError` class. The `SchemaError` class extends the `Error` class with an `issues` property that contains all the issues.
+To throw an error that contains all issue information, simply pass the issues of the failed schema validation to the `SchemaError` class. The `SchemaError` class extends the `Error` class with an `issues` property that contains all the issues. The error message will be a summary of all the issues.
+
+Also see [`parse`](#parse) and [`parseSync`](#parsesync) for a convenient way to parse data and throw a `SchemaError` if the data is invalid.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 import { SchemaError } from "@standard-schema/utils";
 
+// same functionality as `parse`
 async function validateInput<TSchema extends StandardSchemaV1>(
   schema: TSchema,
   data: unknown
@@ -95,13 +98,13 @@ Summarize the error messages of issues in a pretty-printable multi-line string.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { summarize } from "@standard-schema/utils";
+import { summarize, safeParse } from "@standard-schema/utils";
 
 async function tryParse<TSchema extends StandardSchemaV1>(
   schema: TSchema,
   data: unknown
 ): Promise<StandardSchemaV1.Result<StandardSchemaV1.InferOutput<TSchema>>> {
-  const result = await schema["~standard"].validate(data);
+  const result = await safeParse(schema, data);
   if (result.issues) {
     console.error(summarize(result.issues));
   }
@@ -376,7 +379,7 @@ Check whether an object is a Standard Schema.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { isStandardSchema, SchemaError } from "@standard-schema/utils";
+import { isStandardSchema, parse } from "@standard-schema/utils";
 
 interface Parser<Output> {
   parse(value: unknown): Output;
@@ -387,11 +390,7 @@ async function parseString(
   data: unknown
 ) {
   if (isStandardSchema(schema)) {
-    const result = await schema["~standard"].validate(data);
-    if (result.issues) {
-      throw new SchemaError(result.issues);
-    }
-    return result.value;
+    return parse(schema, data);
   }
   return schema.parse(data);
 }
@@ -436,10 +435,10 @@ Flatten issues into form and field errors. Field errors are only one level deep 
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { flattenIssues } from "@standard-schema/utils";
+import { flattenIssues, safeParse } from "@standard-schema/utils";
 
 async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
-  const result = await schema["~standard"].validate(data);
+  const result = await safeParse(schema, data);
   const { formIssues, fieldIssues } = flattenIssues(result.issues);
   return { formIssues, fieldIssues };
 }
@@ -449,10 +448,10 @@ A mapper function can be passed to map issues to a different value (by default, 
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { flattenIssues } from "@standard-schema/utils";
+import { flattenIssues, safeParse } from "@standard-schema/utils";
 
 async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
-  const result = await schema["~standard"].validate(data);
+  const result = await safeParse(schema, data);
   const { formIssues, fieldIssues } = flattenIssues(
     result.issues,
     (issue) => issue.message
@@ -465,13 +464,13 @@ For better type inference, pass the schema as the first argument.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { flattenIssues } from "@standard-schema/utils";
+import { flattenIssues, safeParse } from "@standard-schema/utils";
 
 async function getFormErrors<Schema extends StandardSchemaV1>(
   schema: Schema,
   data: unknown
 ) {
-  const result = await schema["~standard"].validate(data);
+  const result = await safeParse(schema, data);
   const { formIssues, fieldIssues } = flattenIssues(schema, result.issues);
   return { formIssues, fieldIssues };
 }
@@ -483,10 +482,10 @@ Formats a set of issues into a nested object. Issues will be under an `_issues` 
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { formatIssues } from "@standard-schema/utils";
+import { formatIssues, safeParse } from "@standard-schema/utils";
 
 async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
-  const result = await schema["~standard"].validate(data);
+  const result = await safeParse(schema, data);
   const fieldIssues = formatIssues(result.issues);
   return fieldIssues;
 }
@@ -496,10 +495,10 @@ A mapper function can be passed to map issues to a different value (by default, 
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { formatIssues } from "@standard-schema/utils";
+import { formatIssues, safeParse } from "@standard-schema/utils";
 
 async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
-  const result = await schema["~standard"].validate(data);
+  const result = await safeParse(schema, data);
   const fieldIssues = formatIssues(result.issues, (issue) => issue.message);
   return fieldIssues;
 }
@@ -509,13 +508,13 @@ For better type inference, pass the schema as the first argument.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { formatIssues } from "@standard-schema/utils";
+import { formatIssues, safeParse } from "@standard-schema/utils";
 
 async function getFormErrors<Schema extends StandardSchemaV1>(
   schema: Schema,
   data: unknown
 ) {
-  const result = await schema["~standard"].validate(data);
+  const result = await safeParse(schema, data);
   const fieldIssues = formatIssues(schema, result.issues);
   return fieldIssues;
 }
