@@ -14,5 +14,5 @@ export function is<TSchema extends StandardSchemaV1>(
   schema: TSchema,
   input: unknown,
 ): input is StandardSchemaV1.InferInput<TSchema> {
-  return !safeParseSync(schema, input).issues?.length;
+  return !safeParseSync(schema, input).issues;
 }
