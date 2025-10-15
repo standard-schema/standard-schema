@@ -20,6 +20,9 @@ A utils package for common operations with Standard Schema.
   - [`parseTupleSync`](#parsetuplesync)
   - [`safeParseTuple`](#safeparsetuple)
   - [`safeParseTupleSync`](#safeparsetuplesync)
+- [Type Guards](#type-guards)
+  - [`is`](#is)
+  - [`assert`](#assert)
 - [Is Standard Schema](#is-standard-schema)
 - [Get Path Segment Key](#get-path-segment-key)
 - [Flatten Issues](#flatten-issues)
@@ -333,6 +336,37 @@ if (result.issues) {
   // handle error
 } else {
   const parsed = result.value;
+}
+```
+
+## Type Guards
+
+### `is`
+
+Check whether the input matches the schema, returning a boolean.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { is } from "@standard-schema/utils";
+
+async function handleString(schema: StandardSchemaV1<string>, data: unknown) {
+  if (is(schema, data)) {
+    // data is string
+  }
+}
+```
+
+### `assert`
+
+Assert that the input matches the schema, throwing an error if it does not.
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { assert } from "@standard-schema/utils";
+
+async function handleString(schema: StandardSchemaV1<string>, data: unknown) {
+  assert(schema, data);
+  // data is string
 }
 ```
 
