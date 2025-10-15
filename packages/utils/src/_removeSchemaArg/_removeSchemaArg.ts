@@ -16,9 +16,5 @@ export type SchemaArgs<Args extends unknown[]> =
 export function _removeSchemaArg<Args extends unknown[]>(
   args: SchemaArgs<Args>,
 ): Args {
-  const schema = args[0];
-  if (isStandardSchema(schema)) {
-    return args.slice(1) as Args;
-  }
-  return args as Args;
+  return (isStandardSchema(args[0]) ? args.slice(1) : args) as Args;
 }
