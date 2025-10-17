@@ -316,7 +316,7 @@ Thus, these symbol keys don't get sorted to the bottom of the autocomplete list,
 
 ### How to only allow synchronous validation?
 
-The `~validate` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous validation whenever possible.
+The `~standard.validate()` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous validation whenever possible.
 
 ```ts
 import type {StandardSchemaV1} from '@standard-schema/spec';
