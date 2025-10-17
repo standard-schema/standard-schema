@@ -44,6 +44,9 @@
     "check": "pnpm biome check ./src",
     "build": "tsup"
   },
+  "dependencies": {
+    "@standard-schema/spec": "^1.0.0"
+  },
   "devDependencies": {
     "@standard-schema/spec": "workspace:*",
     "@vitest/coverage-v8": "2.1.2",
