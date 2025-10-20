@@ -23,7 +23,21 @@ function stringWithJSON(message = "Invalid string"): StringSchemaWithJSON {
           ? { value }
           : { issues: [{ message, path: [] }] };
       },
-      toJSONSchema(params) {
+      inputSchema(params) {
+        const schema: Record<string, unknown> = {
+          type: "string",
+        };
+
+        // Add schema version based on target
+        if (params?.target === "draft-2020-12") {
+          schema.$schema = "https://json-schema.org/draft/2020-12/schema";
+        } else if (params?.target === "draft-07") {
+          schema.$schema = "http://json-schema.org/draft-07/schema#";
+        }
+
+        return schema;
+      },
+      outputSchema(params) {
         const schema: Record<string, unknown> = {
           type: "string",
         };
@@ -43,5 +57,5 @@ function stringWithJSON(message = "Invalid string"): StringSchemaWithJSON {
 
 // usage example
 const stringSchema = stringWithJSON();
-stringSchema["~standard"].toJSONSchema();
+stringSchema["~standard"].inputSchema();
 // => { $schema: "https://json-schema.org/draft/2020-12/schema", type: "string" }
