@@ -1,41 +1,49 @@
-# RFC: JSON Schema integration for Standard Schema
+# RFC: `StandardJSONSchema`
 
-## Summary
-
-This RFC proposes the addition of JSON Schema generation capabilities to the Standard Schema specification through a new `StandardJSONSchemaSourceV1` interface. This represents a new specification under the **Standard Spec** umbrella, alongside the existing `StandardSchemaV1` specification. This allows schema libraries to provide JSON Schema output while maintaining compatibility with the existing Standard Schema interface.
+This RFC proposes the addition of a new spec for representing JSON Schema conversion capabilities. This represents a new specification under the **Standard Spec** umbrella, alongside the existing `StandardSchemaV1` specification. This allows schema libraries to provide JSON Schema output while maintaining compatibility with the existing Standard Schema interface.
 
 ## Motivation
 
 Many libraries need JSON Schema representations of type information:
 
 - API documentation generation (e.g. OpenAPI)
-- AI structured outputs
+- Tool inputs and structures outputs for AI
 - Form generation tools
 - Code generation
 
 Currently, the Standard Schema specification only provides validation capabilities. A "schema" is a black box with an input and an output type that cannot be introspected or converted to another form.
 
-This new proposal aims to solve that with the addition of a new spec: `StandardJSONSchemaSourceV1`.
+## The spec
+
+This new proposal aims to solve that with the addition of a new spec: `StandardJSONSchemaV1`.
 
 This provides a standardized interface that can be implemented by any JavaScript object/instance/entity that can be converted into a JSON Schema representation. We expect most implementers to be schema libraries, but other libraries (ORMs, form builders, etc.) can also implement it.
 
 ```typescript
-// (simplified for readability)
-
-export interface StandardJSONSchemaSourceV1 {
+// condensed for readability
+export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
   '~standard': {
-    readonly toJSONSchema: (params: Options) => Record<string, unknown>;
+    readonly version: 1;
+    readonly vendor: string;
+    readonly types?: {
+      readonly input: Input;
+      readonly output: Output;
+    };
+    readonly inputSchema: (params?: Options) => Record<string, unknown>;
+    readonly outputSchema: (params?: Options) => Record<string, unknown>;
   };
 }
 
 export interface Options {
-  readonly io: 'input' | 'output';
   readonly target?:
     | 'draft-04'
     | 'draft-06'
     | 'draft-07'
     | 'draft-2019-09'
-    | 'draft-2020-12';
+    | 'draft-2020-12'
+    | 'openapi-3.0';
+  /** Implicit support for additional vendor-specific parameters. */
+  [k: string]: unknown;
 }
 ```
 
