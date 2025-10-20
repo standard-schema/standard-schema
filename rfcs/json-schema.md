@@ -41,7 +41,8 @@ export interface Options {
     | 'draft-07'
     | 'draft-2019-09'
     | 'draft-2020-12'
-    | 'openapi-3.0';
+    | 'openapi-3.0'
+    | ({} & string); // allow for future versions
   /** Implicit support for additional vendor-specific parameters. */
   [k: string]: unknown;
 }
@@ -53,6 +54,15 @@ This interface contains no affordance for data validation. That is an orthogonal
 
 ## FAQ
 
-- input vs output
+### Why multiple `format` values?
+
+Different tooling requires different versions of JSON Schema. Currently there is a divide in the ecosystem between `"draft-07"` and `"draft-2020-12"`. Library authors that implement this spec are encouraged to implement as many formats as is practical, which a special emphasis on `"draft-07"` and `"draft-2020-12"`. Supporting multiple formats is not required to implement the spec; it is entirely on a best-effort basis.
+
+The type signature for `"format"` was intentionally widened with `{} & string`. This allows libraries to support unspecified formats. It also allows the spec to evolve to include future versions of JSON Schema without breaking assignability down the line.
+
+### What's `"openapi-3.0"`?
+
+The OpenAPI 3.0 specification (still in wide use) implements its own JSON Schema like schema definition format. It's a superset of JSON Schema `"draft-04"` that's augmented with additional keywords like `nullable`. Despite not being an official JSON Schema draft, it's in wide use and has been included in the list of recommended drafts.
+
 - json schema versioning
 - adapter patterns: many schemas will not conform to this spec (out of the box). instead we encourage libraries to provide a standard adapter function.
