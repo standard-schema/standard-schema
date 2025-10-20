@@ -50,19 +50,32 @@ export interface Options {
 
 This interface contains no affordance for data validation. That is an orthogonal concern. The two specs are independent. Think of them as "traits". Any given object/instance/entity can implement one or both.
 
-> For convenience, the spec in `@standard-schema/spec` includes a convenience interface that combines the two "traits": `StandardSchemaV1.WithJSONSchemaSource`.
+> For convenience, the spec in `@standard-schema/spec` includes a convenience interface that combines the two "traits": `StandardSchemaV1.WithJSONSchema`.
 
 ## FAQ
 
-### Why multiple `format` values?
+### Why multiple `target` values?
 
 Different tooling requires different versions of JSON Schema. Currently there is a divide in the ecosystem between `"draft-07"` and `"draft-2020-12"`. Library authors that implement this spec are encouraged to implement as many formats as is practical, which a special emphasis on `"draft-07"` and `"draft-2020-12"`. Supporting multiple formats is not required to implement the spec; it is entirely on a best-effort basis.
 
-The type signature for `"format"` was intentionally widened with `{} & string`. This allows libraries to support unspecified formats. It also allows the spec to evolve to include future versions of JSON Schema without breaking assignability down the line.
+### Does the spec account for future versions of JSON Schema?
+
+Yes, the type signature for `"target"` was intentionally widened with `{} & string`. This allows libraries to support unspecified formats. It also allows the spec to evolve to include future versions of JSON Schema without breaking assignability down the line.
 
 ### What's `"openapi-3.0"`?
 
-The OpenAPI 3.0 specification (still in wide use) implements its own JSON Schema like schema definition format. It's a superset of JSON Schema `"draft-04"` that's augmented with additional keywords like `nullable`. Despite not being an official JSON Schema draft, it's in wide use and has been included in the list of recommended drafts.
+The OpenAPI 3.0 specification (still in wide use) implements its own schema definition format. It's a superset of JSON Schema `"draft-04"` that's augmented with additional keywords like `nullable`. Despite not being an official JSON Schema draft, it's in wide use and has been included in the list of recommended drafts.
 
-- json schema versioning
-- adapter patterns: many schemas will not conform to this spec (out of the box). instead we encourage libraries to provide a standard adapter function.
+### Why both `inputSchema` and `outputSchema`?
+
+Many schemas perform transformations during validation. For example, a schema might accept a string as input (`"123"`) but output a number (`123`). The input and output types can differ, so their JSON Schema representations need to differ as well. The `inputSchema` method generates a JSON Schema for the input type, while `outputSchema` generates one for the output type. In cases where input and output types are identical, both methods will return the same schema.
+
+### Why is this a separate spec instead of adding to `StandardSchemaV1`?
+
+The two concerns are orthogonal. `StandardSchemaV1` is about validation, while `StandardJSONSchemaV1` is about introspection and schema generation. Keeping them separate allows:
+
+- Libraries to implement one without the other (e.g., ORMs or form builders that only need to generate schemas, not validate)
+- Schemas to opt into JSON Schema support independently
+- Better separation of concerns and more flexibility for implementers
+
+For convenience, schemas that implement both can use the `StandardSchemaV1.WithJSONSchema` interface which combines both specs.

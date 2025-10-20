@@ -71,7 +71,7 @@ export declare namespace StandardSchemaV1 {
   /**
    * A Standard Schema that implements the StandardJSONSchema interface.
    * */
-  export interface WithJSONSchemaSource<Input = unknown, Output = Input> {
+  export interface WithJSONSchema<Input = unknown, Output = Input> {
     "~standard": StandardJSONSchemaV1.PropsWithStandardSchema<Input, Output>;
   }
 
@@ -96,7 +96,7 @@ export declare namespace StandardJSONSchemaV1 {
     readonly types?: StandardSchemaV1.Types<Input, Output> | undefined;
     /**
      * Converts the input type to JSON Schema. May throw.
-     * @param params - The options for the toJSONSchema method.
+     * @param params - The options for the inputSchema/outputSchema methods.
      *
      * @returns The input JSON Schema.
      */
@@ -105,7 +105,7 @@ export declare namespace StandardJSONSchemaV1 {
     ) => Record<string, unknown>;
     /**
      * Converts the output type to JSON Schema. May throw.
-     * @param params - The options for the toJSONSchema method.
+     * @param params - The options for the inputSchema/outputSchema methods.
      *
      * @returns The output JSON Schema.
      */
@@ -124,9 +124,11 @@ export declare namespace StandardJSONSchemaV1 {
     | "draft-06"
     | "draft-07"
     | "draft-2019-09"
-    | "draft-2020-12";
+    | "draft-2020-12"
+    | "openapi-3.0"
+    | ({} & string);
 
-  /** The options for the ~toJSONSchema method. */
+  /** The options for the inputSchema/outputSchema methods. */
   export interface Options {
     /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. When unspecified, implementers should prefer the latest version of the spec "draft-2020-12". */
     readonly target?: Target;

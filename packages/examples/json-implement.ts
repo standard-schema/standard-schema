@@ -5,8 +5,7 @@
 
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 
-interface StringSchemaWithJSON
-  extends StandardSchemaV1.WithJSONSchemaSource<string> {
+interface StringSchemaWithJSON extends StandardSchemaV1.WithJSONSchema<string> {
   type: "string";
   message: string;
 }
