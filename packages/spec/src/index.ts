@@ -1,3 +1,13 @@
+/** The base properties shared among all specs */
+interface StandardBaseProps<Input = unknown, Output = Input> {
+  /** The version number of the standard. */
+  readonly version: 1;
+  /** The vendor name of the schema library. */
+  readonly vendor: string;
+  /** Inferred types associated with the schema. */
+  readonly types?: StandardSchemaV1.Types<Input, Output> | undefined;
+}
+
 /** The Standard Schema interface. */
 export interface StandardSchemaV1<Input = unknown, Output = Input> {
   /** The Standard Schema properties. */
@@ -6,17 +16,12 @@ export interface StandardSchemaV1<Input = unknown, Output = Input> {
 
 export declare namespace StandardSchemaV1 {
   /** The Standard Schema properties interface. */
-  export interface Props<Input = unknown, Output = Input> {
-    /** The version number of the standard. */
-    readonly version: 1;
-    /** The vendor name of the schema library. */
-    readonly vendor: string;
+  export interface Props<Input = unknown, Output = Input>
+    extends StandardBaseProps<Input, Output> {
     /** Validates unknown input values. */
     readonly validate: (
       value: unknown,
     ) => Result<Output> | Promise<Result<Output>>;
-    /** Inferred types associated with the schema. */
-    readonly types?: Types<Input, Output> | undefined;
   }
 
   /** The result interface of the validate function. */
@@ -68,13 +73,6 @@ export declare namespace StandardSchemaV1 {
     Schema["~standard"]["types"]
   >["output"];
 
-  /**
-   * A Standard Schema that implements the StandardJSONSchema interface.
-   * */
-  export interface WithJSONSchema<Input = unknown, Output = Input> {
-    "~standard": StandardJSONSchemaV1.PropsWithStandardSchema<Input, Output>;
-  }
-
   // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
   export {};
 }
@@ -87,20 +85,25 @@ export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
 }
 
 export declare namespace StandardJSONSchemaV1 {
-  export interface Props<Input = unknown, Output = Input> {
-    /** The version number of the standard. */
-    readonly version: 1;
-    /** The vendor name of the schema library. */
-    readonly vendor: string;
-    /** Inferred types associated with the schema. */
-    readonly types?: StandardSchemaV1.Types<Input, Output> | undefined;
+  export interface Props<Input = unknown, Output = Input>
+    extends StandardBaseProps<Input, Output> {
     /**
      * Converts the input type to JSON Schema. May throw.
      * @param params - The options for the inputSchema/outputSchema methods.
      *
      * @returns The input JSON Schema.
      */
-    readonly inputSchema: (
+    readonly jsonSchema: JSONSchemaConverterProp;
+  }
+
+  interface JSONSchemaConverterProp {
+    /**
+     * Converts the input type to JSON Schema. May throw.
+     * @param params - The options for the inputSchema/outputSchema methods.
+     *
+     * @returns The input JSON Schema.
+     */
+    readonly input: (
       params?: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
     /**
@@ -109,14 +112,10 @@ export declare namespace StandardJSONSchemaV1 {
      *
      * @returns The output JSON Schema.
      */
-    readonly outputSchema: (
+    readonly output: (
       params?: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
   }
-
-  export interface PropsWithStandardSchema<Input = unknown, Output = Input>
-    extends Props<Input, Output>,
-      StandardSchemaV1.Props<Input, Output> {}
 
   /** The target version of the JSON Schema spec. */
   export type Target =
@@ -136,18 +135,35 @@ export declare namespace StandardJSONSchemaV1 {
     /** Implicit support for additional vendor-specific parameters, if needed. */
     [k: string]: unknown;
   }
+
+  export interface PropsWithStandardSchema<Input = unknown, Output = Input>
+    extends Props<Input, Output>,
+      StandardSchemaV1.Props<Input, Output> {}
+
+  /**
+   * An interface that combines StandardJSONSchema and StandardSchema.
+   * */
+  export interface WithStandardSchema<Input = unknown, Output = Input> {
+    "~standard": PropsWithStandardSchema<Input, Output>;
+  }
 }
 
 /** A specification for an introspectable function. */
-export interface StandardFunctionV1<Input = unknown, Output = Input> {
-  "~standard": StandardFunctionV1.Props<Input, Output>;
+export interface StandardToolV1<Input = unknown, Output = Input> {
+  "~standard": StandardToolV1.Props<Input, Output>;
 }
 
-export declare namespace StandardFunctionV1 {
+export declare namespace StandardToolV1 {
   export interface Props<Input = unknown, Output = Input>
     extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to the empty string (`""`) for anonymous tools. */
-    readonly name: string;
+    // readonly name: string;
+    readonly metadata: {
+      id?: string;
+      title?: string;
+      name?: string;
+      description?: string;
+    };
 
     /** A description of the function's functionality. Set to the empty string for undescribed functions. */
     readonly description: string;
