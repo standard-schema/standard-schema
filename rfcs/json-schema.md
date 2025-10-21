@@ -29,8 +29,10 @@ export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
       readonly input: Input;
       readonly output: Output;
     };
-    readonly inputSchema: (params?: Options) => Record<string, unknown>;
-    readonly outputSchema: (params?: Options) => Record<string, unknown>;
+    readonly jsonSchema: {
+      input: (params?: Options) => Record<string, unknown>;
+      output: (params?: Options) => Record<string, unknown>;
+    };
   };
 }
 
@@ -66,16 +68,36 @@ Yes, the type signature for `"target"` was intentionally widened with `{} & stri
 
 The OpenAPI 3.0 specification (still in wide use) implements its own schema definition format. It's a superset of JSON Schema `"draft-04"` that's augmented with additional keywords like `nullable`. Despite not being an official JSON Schema draft, it's in wide use and has been included in the list of recommended drafts.
 
-### Why both `inputSchema` and `outputSchema`?
+### Why both `jsonSchema.input` and `jsonSchema.output`?
 
 Many schemas perform transformations during validation. For example, a schema might accept a string as input (`"123"`) but output a number (`123`). The input and output types can differ, so their JSON Schema representations need to differ as well. The `inputSchema` method generates a JSON Schema for the input type, while `outputSchema` generates one for the output type. In cases where input and output types are identical, both methods will return the same schema.
 
+### What about error handling?
+
+If a given schema/entity cannot be converted to JSON Schema, the associated converter function may throw. Any consuming libraries should plan accordingly.
+
 ### Why is this a separate spec instead of adding to `StandardSchemaV1`?
 
-The two concerns are orthogonal. `StandardSchemaV1` is about validation, while `StandardJSONSchemaV1` is about introspection and schema generation. Keeping them separate allows:
+The two concerns are orthogonal. `StandardSchemaV1` is about validation, while `StandardJSONSchemaV1` is about introspectability and JSON Schema generation. Keeping them separate allows greater flexibility.
 
-- Libraries to implement one without the other (e.g., ORMs or form builders that only need to generate schemas, not validate)
-- Schemas to opt into JSON Schema support independently
-- Better separation of concerns and more flexibility for implementers
+- Libraries can implement one or the other, or both. For instance, ORMs or form builders may only need to generate schemas, not validate.
+- Schema libraries can opt into JSON Schema support independently.
 
-For convenience, schemas that implement both can use the `StandardSchemaV1.WithJSONSchema` interface which combines both specs.
+### What if I want to accept only schemas that implement both `StandardSchema` and `StandardJSONSchema`?
+
+<!-- For convenience, the spec provides a convenience interface `StandardJSONSchemaV1.WithStandardSchema` that merges the two interfaces. You can also do this yourself as needed. -->
+
+The two specs are implemented as plain TypeScript interfaces, so you can merge them (and any future specs) as needed for your use case.
+
+```ts
+export interface CombinedProps<Input = unknown, Output = Input>
+  extends StandardSchemaV1.Props<Input, Output>,
+    StandardJSONSchemaV1.Props<Input, Output> {}
+
+/**
+ * An interface that combines StandardJSONSchema and StandardSchema.
+ * */
+export interface CombinedSpec<Input = unknown, Output = Input> {
+  '~standard': CombinedProps<Input, Output>;
+}
+```

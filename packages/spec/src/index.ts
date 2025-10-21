@@ -135,17 +135,6 @@ export declare namespace StandardJSONSchemaV1 {
     /** Implicit support for additional vendor-specific parameters, if needed. */
     [k: string]: unknown;
   }
-
-  export interface PropsWithStandardSchema<Input = unknown, Output = Input>
-    extends Props<Input, Output>,
-      StandardSchemaV1.Props<Input, Output> {}
-
-  /**
-   * An interface that combines StandardJSONSchema and StandardSchema.
-   * */
-  export interface WithStandardSchema<Input = unknown, Output = Input> {
-    "~standard": PropsWithStandardSchema<Input, Output>;
-  }
 }
 
 /** A specification for an introspectable function. */
@@ -157,7 +146,7 @@ export declare namespace StandardToolV1 {
   export interface Props<Input = unknown, Output = Input>
     extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to the empty string (`""`) for anonymous tools. */
-    // readonly name: string;
+    readonly name: string;
     readonly metadata: {
       id?: string;
       title?: string;
