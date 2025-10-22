@@ -14,7 +14,7 @@ import * as z from "zod";
 export function standardConvertToJSONSchema(
   schema: StandardJSONSchemaV1,
 ): Record<string, unknown> | null {
-  return schema["~standard"].inputSchema({
+  return schema["~standard"].jsonSchema.input({
     target: "draft-2020-12",
   });
 }
