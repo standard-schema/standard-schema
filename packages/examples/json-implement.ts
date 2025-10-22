@@ -3,14 +3,28 @@
  * It demonstrates creating schemas that support both validation and JSON Schema generation.
  */
 
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type {
+  StandardJSONSchemaV1,
+  StandardSchemaV1,
+} from "@standard-schema/spec";
 
-interface StringSchemaWithJSON extends StandardSchemaV1.WithJSONSchema<string> {
+interface CombinedProps<Input = unknown, Output = Input>
+  extends StandardSchemaV1.Props<Input, Output>,
+    StandardJSONSchemaV1.Props<Input, Output> {}
+
+/**
+ * An interface that combines StandardJSONSchema and StandardSchema.
+ * */
+interface StandardSchemaWithJSONSchema<Input = unknown, Output = Input> {
+  "~standard": CombinedProps<Input, Output>;
+}
+
+interface MySchema extends StandardSchemaWithJSONSchema<string, string> {
   type: "string";
   message: string;
 }
 
-function stringWithJSON(message = "Invalid string"): StringSchemaWithJSON {
+function stringWithJSON(message = "Invalid string"): MySchema {
   return {
     type: "string",
     message,
@@ -22,33 +36,35 @@ function stringWithJSON(message = "Invalid string"): StringSchemaWithJSON {
           ? { value }
           : { issues: [{ message, path: [] }] };
       },
-      inputSchema(params) {
-        const schema: Record<string, unknown> = {
-          type: "string",
-        };
+      jsonSchema: {
+        input(params) {
+          const schema: Record<string, unknown> = {
+            type: "string",
+          };
 
-        // Add schema version based on target
-        if (params?.target === "draft-2020-12") {
-          schema.$schema = "https://json-schema.org/draft/2020-12/schema";
-        } else if (params?.target === "draft-07") {
-          schema.$schema = "http://json-schema.org/draft-07/schema#";
-        }
+          // Add schema version based on target
+          if (params?.target === "draft-2020-12") {
+            schema.$schema = "https://json-schema.org/draft/2020-12/schema";
+          } else if (params?.target === "draft-07") {
+            schema.$schema = "http://json-schema.org/draft-07/schema#";
+          }
 
-        return schema;
-      },
-      outputSchema(params) {
-        const schema: Record<string, unknown> = {
-          type: "string",
-        };
+          return schema;
+        },
+        output(params) {
+          const schema: Record<string, unknown> = {
+            type: "string",
+          };
 
-        // Add schema version based on target
-        if (params?.target === "draft-2020-12") {
-          schema.$schema = "https://json-schema.org/draft/2020-12/schema";
-        } else if (params?.target === "draft-07") {
-          schema.$schema = "http://json-schema.org/draft-07/schema#";
-        }
+          // Add schema version based on target
+          if (params?.target === "draft-2020-12") {
+            schema.$schema = "https://json-schema.org/draft/2020-12/schema";
+          } else if (params?.target === "draft-07") {
+            schema.$schema = "http://json-schema.org/draft-07/schema#";
+          }
 
-        return schema;
+          return schema;
+        },
       },
     },
   };
@@ -56,5 +72,11 @@ function stringWithJSON(message = "Invalid string"): StringSchemaWithJSON {
 
 // usage example
 const stringSchema = stringWithJSON();
-stringSchema["~standard"].inputSchema();
+
+stringSchema["~standard"].jsonSchema.input();
 // => { $schema: "https://json-schema.org/draft/2020-12/schema", type: "string" }
+
+stringSchema["~standard"].jsonSchema.input({
+  target: "draft-07",
+});
+// => { $schema: "http://json-schema.org/draft-07/schema#", type: "string" }
