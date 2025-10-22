@@ -89,7 +89,7 @@ export declare namespace StandardJSONSchemaV1 {
     extends StandardBaseProps<Input, Output> {
     /**
      * Converts the input type to JSON Schema. May throw.
-     * @param params - The options for the inputSchema/outputSchema methods.
+     * @param params - The options for the jsonSchema methods.
      *
      * @returns The input JSON Schema.
      */
@@ -99,8 +99,6 @@ export declare namespace StandardJSONSchemaV1 {
   interface JSONSchemaConverterProp {
     /**
      * Converts the input type to JSON Schema. May throw.
-     * @param params - The options for the inputSchema/outputSchema methods.
-     *
      * @returns The input JSON Schema.
      */
     readonly input: (
@@ -108,8 +106,6 @@ export declare namespace StandardJSONSchemaV1 {
     ) => Record<string, unknown>;
     /**
      * Converts the output type to JSON Schema. May throw.
-     * @param params - The options for the inputSchema/outputSchema methods.
-     *
      * @returns The output JSON Schema.
      */
     readonly output: (
@@ -127,37 +123,12 @@ export declare namespace StandardJSONSchemaV1 {
     | "openapi-3.0"
     | ({} & string);
 
-  /** The options for the inputSchema/outputSchema methods. */
+  /** The options for the jsonSchema input/output methods. */
   export interface Options {
     /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. When unspecified, implementers should prefer the latest version of the spec "draft-2020-12". */
     readonly target?: Target;
 
     /** Implicit support for additional vendor-specific parameters, if needed. */
     [k: string]: unknown;
-  }
-}
-
-/** A specification for an introspectable function. */
-export interface StandardToolV1<Input = unknown, Output = Input> {
-  "~standard": StandardToolV1.Props<Input, Output>;
-}
-
-export declare namespace StandardToolV1 {
-  export interface Props<Input = unknown, Output = Input>
-    extends StandardJSONSchemaV1.Props<Input, Output> {
-    /** The name of the function. Set to the empty string (`""`) for anonymous tools. */
-    readonly name: string;
-    readonly metadata: {
-      id?: string;
-      title?: string;
-      name?: string;
-      description?: string;
-    };
-
-    /** A description of the function's functionality. Set to the empty string for undescribed functions. */
-    readonly description: string;
-
-    /** The function implementation */
-    readonly execute: (input: Input) => Output | Promise<Output>;
   }
 }
