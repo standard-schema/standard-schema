@@ -1,11 +1,37 @@
-/** The base properties shared among all specs */
-interface StandardBaseProps<Input = unknown, Output = Input> {
-  /** The version number of the standard. */
-  readonly version: 1;
-  /** The vendor name of the schema library. */
-  readonly vendor: string;
-  /** Inferred types associated with the schema. */
-  readonly types?: StandardSchemaV1.Types<Input, Output> | undefined;
+/** The Standard interface. */
+export interface StandardV1<Input = unknown, Output = Input> {
+  /** The Standard properties. */
+  readonly "~standard": StandardV1.Props<Input, Output>;
+}
+
+export declare namespace StandardV1 {
+  /** The Standard properties interface. */
+  export interface Props<Input = unknown, Output = Input> {
+    /** The version number of the standard. */
+    readonly version: 1;
+    /** The vendor name of the schema library. */
+    readonly vendor: string;
+    /** Inferred types associated with the schema. */
+    readonly types?: Types<Input, Output> | undefined;
+  }
+
+  /** The Standard types interface. */
+  export interface Types<Input = unknown, Output = Input> {
+    /** The input type of the schema. */
+    readonly input: Input;
+    /** The output type of the schema. */
+    readonly output: Output;
+  }
+
+  /** Infers the input type of a Standard. */
+  export type InferInput<Schema extends StandardV1> = NonNullable<
+    Schema["~standard"]["types"]
+  >["input"];
+
+  /** Infers the output type of a Standard. */
+  export type InferOutput<Schema extends StandardV1> = NonNullable<
+    Schema["~standard"]["types"]
+  >["output"];
 }
 
 /** The Standard Schema interface. */
@@ -17,7 +43,7 @@ export interface StandardSchemaV1<Input = unknown, Output = Input> {
 export declare namespace StandardSchemaV1 {
   /** The Standard Schema properties interface. */
   export interface Props<Input = unknown, Output = Input>
-    extends StandardBaseProps<Input, Output> {
+    extends StandardV1.Props<Input, Output> {
     /** Validates unknown input values. */
     readonly validate: (
       value: unknown,
@@ -31,7 +57,7 @@ export declare namespace StandardSchemaV1 {
   export interface SuccessResult<Output> {
     /** The typed output value. */
     readonly value: Output;
-    /** The non-existent issues. */
+    /** The absence of issues indicates success. */
     readonly issues?: undefined;
   }
 
@@ -54,79 +80,46 @@ export declare namespace StandardSchemaV1 {
     /** The key representing a path segment. */
     readonly key: PropertyKey;
   }
-
-  /** The Standard Schema types interface. */
-  export interface Types<Input = unknown, Output = Input> {
-    /** The input type of the schema. */
-    readonly input: Input;
-    /** The output type of the schema. */
-    readonly output: Output;
-  }
-
-  /** Infers the input type of a Standard Schema. */
-  export type InferInput<Schema extends StandardSchemaV1> = NonNullable<
-    Schema["~standard"]["types"]
-  >["input"];
-
-  /** Infers the output type of a Standard Schema. */
-  export type InferOutput<Schema extends StandardSchemaV1> = NonNullable<
-    Schema["~standard"]["types"]
-  >["output"];
-
-  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
-  export {};
 }
 
-/**
- * The StandardJSONSchema interface. A standard interface to be implemented by any object/instance that can be converted to JSON Schema.
- */
+/** The Standard JSON Schema interface. */
 export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
-  "~standard": StandardJSONSchemaV1.Props<Input, Output>;
+  readonly "~standard": StandardJSONSchemaV1.Props<Input, Output>;
 }
 
 export declare namespace StandardJSONSchemaV1 {
+  /** The Standard JSON Schema properties interface. */
   export interface Props<Input = unknown, Output = Input>
-    extends StandardBaseProps<Input, Output> {
-    /**
-     * Converts the input type to JSON Schema. May throw.
-     * @param params - The options for the jsonSchema methods.
-     *
-     * @returns The input JSON Schema.
-     */
-    readonly jsonSchema: JSONSchemaConverterProp;
+    extends StandardV1.Props<Input, Output> {
+    /** Methods for generating the input/output JSON Schema. */
+    readonly jsonSchema: Converter;
   }
 
-  interface JSONSchemaConverterProp {
-    /**
-     * Converts the input type to JSON Schema. May throw.
-     * @returns The input JSON Schema.
-     */
+  /** The Standard JSON Schema converter interface. */
+  export interface Converter {
+    /** Converts the input type to JSON Schema. May throw if conversion is not supported. */
     readonly input: (
-      params?: StandardJSONSchemaV1.Options,
+      params?: StandardJSONSchemaV1.Options | undefined,
     ) => Record<string, unknown>;
-    /**
-     * Converts the output type to JSON Schema. May throw.
-     * @returns The output JSON Schema.
-     */
+    /** Converts the output type to JSON Schema. May throw if conversion is not supported. */
     readonly output: (
-      params?: StandardJSONSchemaV1.Options,
+      params?: StandardJSONSchemaV1.Options | undefined,
     ) => Record<string, unknown>;
   }
 
-  /** The target version of the JSON Schema spec. */
+  /** The target version of the generated JSON Schema. */
   export type Target =
     | "draft-04"
-    | "draft-06"
     | "draft-07"
-    | "draft-2019-09"
     | "draft-2020-12"
     | "openapi-3.0"
+    // Accepts any string for future targets while preserving autocomplete
     | ({} & string);
 
-  /** The options for the jsonSchema input/output methods. */
+  /** The options for the input/output methods. */
   export interface Options {
-    /** Specifies the target version of the JSON Schema spec. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. When unspecified, implementers should prefer the latest version of the spec "draft-2020-12". */
-    readonly target?: Target;
+    /** Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. */
+    readonly target: Target;
 
     /** Implicit support for additional vendor-specific parameters, if needed. */
     [k: string]: unknown;
