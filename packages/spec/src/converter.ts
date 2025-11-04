@@ -13,6 +13,14 @@ export declare namespace StandardTypedV1 {
     readonly vendor: string;
     /** Inferred types associated with the schema. */
     readonly types?: Types<Input, Output> | undefined;
+
+    /** **Optional** A JSON Schema converter for associated schema library, if supported. May be set for schemas that encapsulate their own JSON Schema conversion logic. There is no guarantee that any given schema library will support this.
+     *
+     * To support all schemas, you should accept a compliant `StandardJSONSchemaConverterV1` elsewhere in your library's API.
+     */
+    readonly jsonSchemaConverter?:
+      | StandardJSONSchemaConverterV1<Input, Output>
+      | undefined;
   }
 
   /** The Standard types interface. */
@@ -101,11 +109,14 @@ export declare namespace StandardSchemaV1 {
 }
 
 /** The Standard JSON Schema interface. */
-export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
-  readonly "~standard": StandardJSONSchemaV1.Props<Input, Output>;
+export interface StandardJSONSchemaConverterV1<
+  Input = unknown,
+  Output = Input,
+> {
+  readonly "~standard": StandardJSONSchemaConverterV1.Props<Input, Output>;
 }
 
-export declare namespace StandardJSONSchemaV1 {
+export declare namespace StandardJSONSchemaConverterV1 {
   /** The Standard JSON Schema properties interface. */
   export interface Props<Input = unknown, Output = Input>
     extends StandardTypedV1.Props<Input, Output> {
@@ -115,13 +126,20 @@ export declare namespace StandardJSONSchemaV1 {
 
   /** The Standard JSON Schema converter interface. */
   export interface Converter {
+    /** Checks if the converter can convert the input to JSON Schema.
+     *
+     * e.g. `input => input instanceof MySchema`
+     */
+    readonly match: (input: unknown) => boolean;
+
     /** Converts the input type to JSON Schema. May throw if conversion is not supported. */
     readonly input: (
-      params: StandardJSONSchemaV1.Options,
+      params: StandardJSONSchemaConverterV1.Options,
     ) => Record<string, unknown>;
     /** Converts the output type to JSON Schema. May throw if conversion is not supported. */
+
     readonly output: (
-      params: StandardJSONSchemaV1.Options,
+      params: StandardJSONSchemaConverterV1.Options,
     ) => Record<string, unknown>;
   }
 
@@ -140,7 +158,7 @@ export declare namespace StandardJSONSchemaV1 {
 
   /** The options for the input/output methods. */
   export interface Options {
-    /** Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. */
+    /** Specifies the target version of the generated JSON Schema. */
     readonly target: Target;
 
     /** Implicit support for additional vendor-specific parameters, if needed. */
