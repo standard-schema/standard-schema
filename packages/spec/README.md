@@ -135,6 +135,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [joi](https://github.com/hapijs/joi)                                           | v18.0.0+   | [PR](https://github.com/hapijs/joi/pull/3080)                                                              |
 | [typia](https://github.com/samchon/typia)                                      | v9.2.0+    | [PR](https://github.com/samchon/typia/pull/1500)                                                           |
 | [regle](https://github.com/victorgarciaesgi/regle)                             | v1.9.0+    | [PR](https://github.com/victorgarciaesgi/regle/pull/191)                                                   |
+| [jsonv-ts](https://github.com/dswbx/jsonv-ts)                                  | v0.3.0+    | [PR](https://github.com/dswbx/jsonv-ts/pull/7)                                                             |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
