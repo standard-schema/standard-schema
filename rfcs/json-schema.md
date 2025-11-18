@@ -1,6 +1,8 @@
+> This represents a new specification under the **Standard Spec** umbrella, alongside the existing _Standard Schema_ specification.
+
 # RFC: `StandardJSONSchema`
 
-This RFC proposes the addition of a new spec for representing JSON Schema conversion capabilities. This represents a new specification under the **Standard Spec** umbrella, alongside the existing `StandardSchemaV1` specification. This allows schema libraries to provide JSON Schema output while maintaining compatibility with the existing Standard Schema interface.
+This RFC proposes the addition of a new spec for representing a _standard_, _strongly-typed_ JSON Schema payload. This allows schema libraries to provide JSON Schema output while maintaining compatibility with the existing Standard Schema interface.
 
 ## Motivation
 
@@ -30,31 +32,35 @@ export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
       readonly output: Output;
     };
     readonly jsonSchema: {
-      input: (params?: Options) => Record<string, unknown>;
-      output: (params?: Options) => Record<string, unknown>;
+      input: (params: Options) => Record<string, unknown>;
+      output: (params: Options) => Record<string, unknown>;
     };
   };
 }
 
 export interface Options {
-  readonly target?:
-    | 'draft-04'
-    | 'draft-06'
-    | 'draft-07'
-    | 'draft-2019-09'
-    | 'draft-2020-12'
-    | 'openapi-3.0'
-    | ({} & string); // allow for future versions
-  /** Implicit support for additional vendor-specific parameters. */
-  [k: string]: unknown;
+  // support for `draft-07` and `draft-2020-12` is strongly recommended.
+  readonly target: 'draft-07' | 'draft-2020-12' | 'openapi-3.0' | ({} & string);
+
+  // support for any vendor-specific parameters
+  readonly libraryOptions?: Record<string, unknown> | undefined;
 }
 ```
 
-This interface contains no affordance for data validation. That is an orthogonal concern. The two specs are independent. Think of them as "traits". Any given object/instance/entity can implement one or both.
-
-> For convenience, the spec in `@standard-schema/spec` includes a convenience interface that combines the two "traits": `StandardSchemaV1.WithJSONSchema`.
-
 ## FAQ
+
+### What's the relationship between this and _Standard Schema_?
+
+This spec is _orthogonal_ to _Standard Schema_. This interface contains no affordance for data validation. Think of them as "traits" or "interfaces". Any given object/instance/entity can implement one or both.
+
+### How will this spec by used by schema libraries?
+
+The spec applies to any object that can be converted or represented as JSON Schema.
+
+- If a library directly encapsulates JSON Schema conversion logic within schemas themselves (say, as a method), it can directly implement the spec.
+  - Zod, ArkType
+- Other libraries keep this functionality independent, say, as a standalone `toJSONSchema` function. In this case, the _result_ of the function can implement this spec.
+  - Valibot, Zod Mini
 
 ### Why multiple `target` values?
 
@@ -80,8 +86,13 @@ If a given schema/entity cannot be converted to JSON Schema, the associated conv
 
 The two concerns are orthogonal. `StandardSchemaV1` is about validation, while `StandardJSONSchemaV1` is about introspectability and JSON Schema generation. Keeping them separate allows greater flexibility.
 
-- Libraries can implement one or the other, or both. For instance, ORMs or form builders may only need to generate schemas, not validate.
-- Schema libraries can opt into JSON Schema support independently.
+### I'm a schema library author. How do I implement this spec?
+
+Refer to the [implementation example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/json-implement.ts) for a worked example.
+
+### I want to accept JSON Schema from a user. How do I do that?
+
+Refer to the [implementation example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/json-integrate.ts) for a worked example.
 
 ### What if I want to accept only schemas that implement both `StandardSchema` and `StandardJSONSchema`?
 
