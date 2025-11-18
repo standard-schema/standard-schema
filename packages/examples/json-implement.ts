@@ -24,7 +24,7 @@ interface MySchema extends StandardSchemaWithJSONSchema<string, string> {
   message: string;
 }
 
-function stringWithJSON(message = "Invalid string"): MySchema {
+export function stringWithJSON(message = "Invalid string"): MySchema {
   return {
     type: "string",
     message,
