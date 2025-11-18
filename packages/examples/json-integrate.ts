@@ -19,12 +19,17 @@ export function standardConvertToJSONSchema(
   });
 }
 
+// sample schema
+const compliantSchema = stringWithJSON();
+standardConvertToJSONSchema(compliantSchema);
+
 // Zod
 standardConvertToJSONSchema(z.string());
 // => { type: "string" }
 
 // Valibot (with side-effect import)
 import "valibot/to-json-schema"; // adds JSON Schema conversion methods
+import { stringWithJSON } from "./json-implement.ts";
 standardConvertToJSONSchema(v.string());
 // => { type: "string" }
 
