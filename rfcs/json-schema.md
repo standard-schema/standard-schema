@@ -96,8 +96,6 @@ Refer to the [implementation example](https://github.com/standard-schema/standar
 
 ### What if I want to accept only schemas that implement both `StandardSchema` and `StandardJSONSchema`?
 
-<!-- For convenience, the spec provides a convenience interface `StandardJSONSchemaV1.WithStandardSchema` that merges the two interfaces. You can also do this yourself as needed. -->
-
 The two specs are implemented as plain TypeScript interfaces, so you can merge them (and any future specs) as needed for your use case.
 
 ```ts
