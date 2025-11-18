@@ -26,7 +26,7 @@ This new proposal aims to solve that with the addition of a new spec: `StandardJ
 This provides a standardized interface that can be implemented by any JavaScript object/instance/entity that can be converted into a JSON Schema representation. We expect most implementers to be schema libraries, but other libraries (ORMs, form builders, etc.) can also implement it.
 
 ```typescript
-// condensed for readability
+// ⚠️ this has been condensed for readability
 export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
   '~standard': {
     readonly version: 1;
@@ -36,8 +36,8 @@ export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
       readonly output: Output;
     };
     readonly jsonSchema: {
-      input: (params: Options) => Record<string, unknown>;
-      output: (params: Options) => Record<string, unknown>;
+      readonly input: (options: Options) => Record<string, unknown>;
+      readonly output: (options: Options) => Record<string, unknown>;
     };
   };
 }
