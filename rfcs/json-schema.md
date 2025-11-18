@@ -74,7 +74,7 @@ The spec can be implemented by any object that _represents_ or _can be converted
 2. If a library keeps this functionality independent (say, as a standalone `toJSONSchema` function) the _result_ of the function should implement this spec.
 
 - Valibot's `v.toJsonSchema()`
-- Zod Mini's `z.toJSONSChema()`
+- Zod Mini's `z.toJSONSchema()`
 
 <br/>
 
@@ -98,13 +98,13 @@ The OpenAPI 3.0 specification (still in wide use) implements its own schema defi
 
 ### Why both `jsonSchema.input` and `jsonSchema.output`?
 
-Many schemas perform transformations during validation. For example, a schema might accept a string as input (`"123"`) but output a number (`123`). The input and output types can differ, so their JSON Schema representations need to differ as well. The `inputSchema` method generates a JSON Schema for the input type, while `outputSchema` generates one for the output type. In cases where input and output types are identical, both methods will return the same schema.
+Many schemas perform transformations during validation. For example, a schema might accept a string as input (`"123"`) but output a number (`123`). The input and output types can differ, so their JSON Schema representations need to differ as well. The `jsonSchema.input` method generates a JSON Schema for the input type, while `jsonSchema.output` generates one for the output type. In cases where input and output types are identical, both methods will return the same schema.
 
 <br/>
 
 ### What about error handling?
 
-If a given schema/entity cannot be converted to JSON Schema, the associated converter function may throw. Any consuming libraries should plan accordingly.
+If a given schema/entity cannot be converted to JSON Schema, the associated converter function may throw. They may also throw if the entity is non-convertible or otherwise cannot be soundly reprsented as JSON Schema. Any integrating frameworks should account for this.
 
 <br/>
 
