@@ -4,6 +4,8 @@
 
 This RFC proposes the addition of a new spec for representing a _standard_, _strongly-typed_ JSON Schema payload. This allows schema libraries to provide JSON Schema output while maintaining compatibility with the existing Standard Schema interface.
 
+<br />
+
 ## Motivation
 
 Many libraries need JSON Schema representations of type information:
@@ -14,6 +16,8 @@ Many libraries need JSON Schema representations of type information:
 - Code generation
 
 Currently, the Standard Schema specification only provides validation capabilities. A "schema" is a black box with an input and an output type that cannot be introspected or converted to another form.
+
+<br />
 
 ## The spec
 
@@ -46,6 +50,8 @@ export interface Options {
   readonly libraryOptions?: Record<string, unknown> | undefined;
 }
 ```
+
+<br />
 
 ## FAQ
 
@@ -116,7 +122,7 @@ Refer to the [implementation example](https://github.com/standard-schema/standar
 
 ### I want to accept JSON Schema from a user. How do I do that?
 
-Refer to the [implementation example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/json-integrate.ts) for a worked example.
+Refer to the [integration example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/json-integrate.ts) for a worked example.
 
 <br/>
 
