@@ -55,6 +55,7 @@ This is the 1.0 release a new spec called _Standard JSON Schema_. The _Standard 
 
 _Standard JSON Schema_ is _orthogonal_ to _Standard Schema_. This interface contains no affordance for data validation. Think of them as "traits" or "interfaces". Any given object/instance/entity can implement one or both.
 
+<br/>
 ### How will this spec by used by schema libraries?
 
 The spec can be implemented by any object that _represents_ or _can be converted_ to JSON Schema. It's intentionally designed to support multiple use cases.
@@ -69,37 +70,55 @@ The spec can be implemented by any object that _represents_ or _can be converted
 - Valibot's `v.toJsonSchema()`
 - Zod Mini's `z.toJSONSChema()`
 
+<br/>
+
 ### Why multiple `target` values?
 
 Different tooling requires different versions of JSON Schema. Currently there is a divide in the ecosystem between `"draft-07"` and `"draft-2020-12"`. Library authors that implement this spec are encouraged to implement as many formats as is practical, which a special emphasis on `"draft-07"` and `"draft-2020-12"`. Supporting multiple formats is not required to implement the spec; it is entirely on a best-effort basis.
+
+<br/>
 
 ### Does the spec account for future versions of JSON Schema?
 
 Yes, the type signature for `"target"` was intentionally widened with `{} & string`. This allows libraries to support unspecified formats. It also allows the spec to evolve to include future versions of JSON Schema without breaking assignability down the line.
 
+<br/>
+
 ### What's `"openapi-3.0"`?
 
 The OpenAPI 3.0 specification (still in wide use) implements its own schema definition format. It's a superset of JSON Schema `"draft-04"` that's augmented with additional keywords like `nullable`. Despite not being an official JSON Schema draft, it's in wide use and has been included in the list of recommended drafts.
+
+<br/>
 
 ### Why both `jsonSchema.input` and `jsonSchema.output`?
 
 Many schemas perform transformations during validation. For example, a schema might accept a string as input (`"123"`) but output a number (`123`). The input and output types can differ, so their JSON Schema representations need to differ as well. The `inputSchema` method generates a JSON Schema for the input type, while `outputSchema` generates one for the output type. In cases where input and output types are identical, both methods will return the same schema.
 
+<br/>
+
 ### What about error handling?
 
 If a given schema/entity cannot be converted to JSON Schema, the associated converter function may throw. Any consuming libraries should plan accordingly.
+
+<br/>
 
 ### Why is this a separate spec instead of adding to `StandardSchemaV1`?
 
 The two concerns are orthogonal. `StandardSchemaV1` is about validation, while `StandardJSONSchemaV1` is about introspectability and JSON Schema generation. Keeping them separate allows greater flexibility.
 
+<br/>
+
 ### I'm a schema library author. How do I implement this spec?
 
 Refer to the [implementation example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/json-implement.ts) for a worked example.
 
+<br/>
+
 ### I want to accept JSON Schema from a user. How do I do that?
 
 Refer to the [implementation example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/json-integrate.ts) for a worked example.
+
+<br/>
 
 ### What if I want to accept only schemas that implement both `StandardSchema` and `StandardJSONSchema`?
 
