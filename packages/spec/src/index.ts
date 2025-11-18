@@ -117,17 +117,19 @@ export declare namespace StandardJSONSchemaV1 {
   export interface Converter {
     /** Converts the input type to JSON Schema. May throw if conversion is not supported. */
     readonly input: (
-      params: StandardJSONSchemaV1.Options,
+      options: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
     /** Converts the output type to JSON Schema. May throw if conversion is not supported. */
     readonly output: (
-      params: StandardJSONSchemaV1.Options,
+      options: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
   }
 
   /** The target version of the generated JSON Schema.
    *
    * It is *strongly recommended* that implementers support `"draft-2020-12"` and `"draft-07"`, as they are both in wide use.
+   *
+   * The `"openapi-3.0"` target is intended as a standardized specifier for OpenAPI 3.0 which is a superset of JSON Schema `"draft-04"`.
    *
    * All other targets can be implemented on a best-effort basis. Libraries should throw if they don't support a specified target.
    */
