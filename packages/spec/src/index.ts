@@ -102,6 +102,7 @@ export declare namespace StandardSchemaV1 {
 
 /** The Standard JSON Schema interface. */
 export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
+  /** The Standard JSON Schema properties. */
   readonly "~standard": StandardJSONSchemaV1.Props<Input, Output>;
 }
 
