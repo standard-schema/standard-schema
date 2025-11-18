@@ -51,16 +51,23 @@ export interface Options {
 
 ### What's the relationship between this and _Standard Schema_?
 
-This spec is _orthogonal_ to _Standard Schema_. This interface contains no affordance for data validation. Think of them as "traits" or "interfaces". Any given object/instance/entity can implement one or both.
+This is the 1.0 release a new spec called _Standard JSON Schema_. The _Standard Schema_ spec remains unchanged.
+
+_Standard JSON Schema_ is _orthogonal_ to _Standard Schema_. This interface contains no affordance for data validation. Think of them as "traits" or "interfaces". Any given object/instance/entity can implement one or both.
 
 ### How will this spec by used by schema libraries?
 
-The spec applies to any object that can be converted or represented as JSON Schema.
+The spec can be implemented by any object that _represents_ or _can be converted_ to JSON Schema. It's intentionally designed to support multiple use cases.
 
-- If a library directly encapsulates JSON Schema conversion logic within schemas themselves (say, as a method), it can directly implement the spec.
-  - Zod, ArkType
-- Other libraries keep this functionality independent, say, as a standalone `toJSONSchema` function. In this case, the _result_ of the function can implement this spec.
-  - Valibot, Zod Mini
+1. If a library directly encapsulates JSON Schema conversion logic within schemas themselves (say, as a method), it can directly implement the spec.
+
+- Zod's `.toJSONSchema()` method
+- ArkType's `.toJsonSchema()` method
+
+2. If a library keeps this functionality independent (say, as a standalone `toJSONSchema` function) the _result_ of the function should implement this spec.
+
+- Valibot's `v.toJsonSchema()`
+- Zod Mini's `z.toJSONSChema()`
 
 ### Why multiple `target` values?
 
