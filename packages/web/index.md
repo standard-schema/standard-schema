@@ -262,7 +262,7 @@ By contrast, declaring the symbol externally makes it "nominally typed". This me
 
 ### What should I do if I only accept synchronous validation?
 
-The `~validate` function does not necessarily have to return a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of the `Promise` class.
+The `~standard.validate()` function does not necessarily have to return a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of the `Promise` class.
 
 ```ts
 import type { StandardSchemaV1 } from "@standard-schema/spec";
