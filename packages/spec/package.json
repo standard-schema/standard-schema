@@ -9,7 +9,13 @@
     "type": "git",
     "url": "https://github.com/standard-schema/standard-schema"
   },
-  "keywords": ["typescript", "schema", "validation", "standard", "interface"],
+  "keywords": [
+    "typescript",
+    "schema",
+    "validation",
+    "standard",
+    "interface"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -26,7 +32,9 @@
     }
   },
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },

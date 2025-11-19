@@ -3,10 +3,9 @@
  */
 
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-
-import * as z from "zod";
-import * as v from "valibot";
 import { type } from "arktype";
+import * as v from "valibot";
+import * as z from "zod";
 
 export async function standardValidate<T extends StandardSchemaV1>(
   schema: T,
