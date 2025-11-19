@@ -8,7 +8,11 @@
     "type": "git",
     "url": "https://github.com/standard-schema/standard-schema"
   },
-  "keywords": ["standard", "schema", "utils"],
+  "keywords": [
+    "standard",
+    "schema",
+    "utils"
+  ],
   "type": "module",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
@@ -25,7 +29,9 @@
     }
   },
   "sideEffects": false,
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "publishConfig": {
     "access": "public"
   },
@@ -38,7 +44,7 @@
     "build": "tsup"
   },
   "devDependencies": {
-    "@standard-schema/spec": "npm:@jsr/standard-schema__spec@1.0.0-beta.4",
+    "@standard-schema/spec": "workspace:*",
     "@vitest/coverage-v8": "2.1.2",
     "tsup": "^8.3.0",
     "typescript": "^5.6.2",
