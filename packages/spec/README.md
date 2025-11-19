@@ -245,7 +245,7 @@ bun add @standard-schema/spec           # bun
 deno add jsr:@standard-schema/spec      # deno
 ```
 
-Here's is an simple example of a generic function that accepts an arbitrary spec-compliant validator and uses it to parse some data.
+Here's a simple example of a generic function that accepts an arbitrary spec-compliant validator and uses it to parse some data.
 
 ```ts
 import type {StandardSchemaV1} from '@standard-schema/spec';
