@@ -106,4 +106,8 @@ article {
     /* no line break */
     @apply whitespace-nowrap;
   }
+
+  :is(h2, h3, h4, h5, h6) a.header-anchor {
+    @apply no-underline text-inherit hover:text-gray-300 transition-colors;
+  }
 }

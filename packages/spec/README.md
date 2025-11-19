@@ -119,7 +119,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [ArkType](https://arktype.io/)                                                 | v2.0+      | [PR](https://github.com/arktypeio/arktype/pull/1194/files)                                                 |
 | [Effect Schema](https://effect.website/docs/schema/introduction/)              | v3.13.0+   | [PR](https://github.com/Effect-TS/effect/pull/4359)                                                        |
 | [Arri Schema](https://github.com/modiimedia/arri)                              | v0.71.0+   | [PR](https://github.com/modiimedia/arri/pull/130)                                                          |
-| [TypeMap](https://github.com/sinclairzx81/typemap)                             | v0.8.0+    | [PR](https://github.com/sinclairzx81/typemap/pull/9)                                                       |
+| [TypeBox](https://github.com/sinclairzx81/typebox)                             | v1.0.0+    | [PR](https://github.com/sinclairzx81/typebox/issues/1355)                                                       |
 | [Formgator](https://github.com/GauBen/formgator)                               | v0.1.0+    | [PR](https://github.com/GauBen/formgator/commit/12c8a90)                                                   |
 | [decoders](https://github.com/nvie/decoders)                                   | v2.6.0+    | [PR](https://github.com/nvie/decoders/pull/1213)                                                           |
 | [Sury](https://github.com/DZakh/sury)                                          | v9.2.0+    | [PR](https://github.com/DZakh/sury/pull/105)                                                               |
@@ -136,6 +136,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [typia](https://github.com/samchon/typia)                                      | v9.2.0+    | [PR](https://github.com/samchon/typia/pull/1500)                                                           |
 | [regle](https://github.com/victorgarciaesgi/regle)                             | v1.9.0+    | [PR](https://github.com/victorgarciaesgi/regle/pull/191)                                                   |
 | [Evolu](https://github.com/evoluhq/evolu)                                      | v6.0.1+    | [PR](https://github.com/evoluhq/evolu/pull/605)                                                            |
+| [zeed](https://github.com/holtwick/zeed)                                       | v1.1.0+    | [Commit](https://github.com/holtwick/zeed/commit/05fb980df7ed0722f45a417bad8f1560195c7e1b)                                                   |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -193,6 +194,9 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [svelte-jsonschema-form](https://github.com/x0k/svelte-jsonschema-form)       | Svelte 5 library for creating forms based on JSON schema.                                                                                                                                       | [Docs](https://x0k.dev/svelte-jsonschema-form/validators/standard-schema/)                            |
 | [RTK Query](https://redux-toolkit.js.org/rtk-query/overview)                  | A powerful data fetching and caching tool, included with Redux Toolkit.                                                                                                                         | [Docs](https://redux-toolkit.js.org/rtk-query/usage-with-typescript#schema-validation)                |
 | [Inngest](https://www.inngest.com)                                            | Event-driven durable workflow engine that runs on any cloud.                                                                                                                                    | [Docs](https://www.inngest.com/docs/reference/client/create#defining-event-payload-types)             |
+| [BUPKIS](https://github.com/boneskull/bupkis)                                 | Uncommonly extensible assertions for the beautiful people.                                                                                                                                      | [Docs](https://bupkis.zip)                                                          |
+| [Fragno](https://fragno.dev)                                                  | For building framework-agnostic TypeScript libraries that embed backend and frontend logic in the users' applications                                                                           | [Docs](https://fragno.dev/docs/for-library-authors/features/route-definition#input-schema)            |
+
 
 ## How can my schema library implement the spec?
 
@@ -245,7 +249,7 @@ bun add @standard-schema/spec           # bun
 deno add jsr:@standard-schema/spec      # deno
 ```
 
-Here's is an simple example of a generic function that accepts an arbitrary spec-compliant validator and uses it to parse some data.
+Here's a simple example of a generic function that accepts an arbitrary spec-compliant validator and uses it to parse some data.
 
 ```ts
 import type {StandardSchemaV1} from '@standard-schema/spec';
@@ -317,7 +321,7 @@ Thus, these symbol keys don't get sorted to the bottom of the autocomplete list,
 
 ### How to only allow synchronous validation?
 
-The `~validate` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous validation whenever possible.
+The `~standard.validate()` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous validation whenever possible.
 
 ```ts
 import type {StandardSchemaV1} from '@standard-schema/spec';
