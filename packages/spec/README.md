@@ -119,7 +119,6 @@ These are the libraries that have already implemented the Standard Schema interf
 | [ArkType](https://arktype.io/)                                                 | v2.0+      | [PR](https://github.com/arktypeio/arktype/pull/1194/files)                                                 |
 | [Effect Schema](https://effect.website/docs/schema/introduction/)              | v3.13.0+   | [PR](https://github.com/Effect-TS/effect/pull/4359)                                                        |
 | [Arri Schema](https://github.com/modiimedia/arri)                              | v0.71.0+   | [PR](https://github.com/modiimedia/arri/pull/130)                                                          |
-| [TypeBox](https://github.com/sinclairzx81/typebox)                             | v1.0.0+    | [Issue](https://github.com/sinclairzx81/typebox/issues/1355)                                               |
 | [Formgator](https://github.com/GauBen/formgator)                               | v0.1.0+    | [Commit](https://github.com/GauBen/formgator/commit/12c8a90)                                               |
 | [decoders](https://github.com/nvie/decoders)                                   | v2.6.0+    | [PR](https://github.com/nvie/decoders/pull/1213)                                                           |
 | [Sury](https://github.com/DZakh/sury)                                          | v9.2.0+    | [PR](https://github.com/DZakh/sury/pull/105)                                                               |
