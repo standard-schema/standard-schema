@@ -1,11 +1,11 @@
-/** The Standard interface. */
+/** The Standard Typed interface. */
 export interface StandardTypedV1<Input = unknown, Output = Input> {
   /** The Standard properties. */
   readonly "~standard": StandardTypedV1.Props<Input, Output>;
 }
 
 export declare namespace StandardTypedV1 {
-  /** The Standard properties interface. */
+  /** The Standard Typed properties interface. */
   export interface Props<Input = unknown, Output = Input> {
     /** The version number of the standard. */
     readonly version: 1;
@@ -15,7 +15,7 @@ export declare namespace StandardTypedV1 {
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The Standard types interface. */
+  /** The Standard Typed types interface. */
   export interface Types<Input = unknown, Output = Input> {
     /** The input type of the schema. */
     readonly input: Input;
@@ -23,7 +23,7 @@ export declare namespace StandardTypedV1 {
     readonly output: Output;
   }
 
-  /** Infers the input type of a Standard. */
+  /** Infers the input type of a Standard Typed. */
   export type InferInput<Schema extends StandardTypedV1> = NonNullable<
     Schema["~standard"]["types"]
   >["input"];
