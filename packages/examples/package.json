@@ -5,7 +5,8 @@
   "scripts": {
     "lint": "pnpm biome lint .",
     "format": "pnpm biome format --write .",
-    "check": "pnpm biome check ."
+    "check": "pnpm biome check .",
+    "build": "tsup"
   },
   "devDependencies": {
     "@standard-schema/spec": "workspace:*",
