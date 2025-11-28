@@ -28,7 +28,7 @@ export declare namespace StandardTypedV1 {
     Schema["~standard"]["types"]
   >["input"];
 
-  /** Infers the output type of a Standard. */
+  /** Infers the output type of a Standard Typed. */
   export type InferOutput<Schema extends StandardTypedV1> = NonNullable<
     Schema["~standard"]["types"]
   >["output"];
