@@ -132,7 +132,8 @@ export declare namespace StandardJSONSchemaV1 {
 		) => Record<string, unknown>;
 	}
 
-	/** The target version of the generated JSON Schema.
+	/**
+	 * The target version of the generated JSON Schema.
 	 *
 	 * It is *strongly recommended* that implementers support `"draft-2020-12"` and `"draft-07"`, as they are both in wide use.
 	 *
