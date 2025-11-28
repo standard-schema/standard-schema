@@ -1,5 +1,8 @@
 {
   "name": "@standard-schema/utils",
   "version": "0.3.0",
-  "exports": "./src/index.ts"
+  "exports": "./src/index.ts",
+  "imports": {
+    "@standard-schema/spec": "jsr:@standard-schema/spec@^1.0.0"
+  }
 }
