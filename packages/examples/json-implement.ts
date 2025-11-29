@@ -43,10 +43,12 @@ export function stringWithJSON(message = "Invalid string"): MySchema {
           };
 
           // Add schema version based on target
-          if (params?.target === "draft-2020-12") {
+          if (params.target === "draft-2020-12") {
             schema.$schema = "https://json-schema.org/draft/2020-12/schema";
-          } else if (params?.target === "draft-07") {
+          } else if (params.target === "draft-07") {
             schema.$schema = "http://json-schema.org/draft-07/schema#";
+          } else {
+            throw new Error(`Unsupported target: ${params.target}`);
           }
 
           return schema;
@@ -57,10 +59,12 @@ export function stringWithJSON(message = "Invalid string"): MySchema {
           };
 
           // Add schema version based on target
-          if (params?.target === "draft-2020-12") {
+          if (params.target === "draft-2020-12") {
             schema.$schema = "https://json-schema.org/draft/2020-12/schema";
-          } else if (params?.target === "draft-07") {
+          } else if (params.target === "draft-07") {
             schema.$schema = "http://json-schema.org/draft-07/schema#";
+          } else {
+            throw new Error(`Unsupported target: ${params.target}`);
           }
 
           return schema;
@@ -73,7 +77,9 @@ export function stringWithJSON(message = "Invalid string"): MySchema {
 // usage example
 const stringSchema = stringWithJSON();
 
-stringSchema["~standard"].jsonSchema.input();
+stringSchema["~standard"].jsonSchema.input({
+  target: "draft-2020-12",
+});
 // => { $schema: "https://json-schema.org/draft/2020-12/schema", type: "string" }
 
 stringSchema["~standard"].jsonSchema.input({
