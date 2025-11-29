@@ -13,13 +13,14 @@ import * as z from "zod";
 // and converts it to a JSON Schema.
 export function standardConvertToJSONSchema(
   schema: StandardJSONSchemaV1,
-): Record<string, unknown> | null {
+): Record<string, unknown> {
   return schema["~standard"].jsonSchema.input({
     target: "draft-2020-12",
   });
 }
 
 // sample schema
+import { stringWithJSON } from "./json-implement.ts";
 const compliantSchema = stringWithJSON();
 standardConvertToJSONSchema(compliantSchema);
 
@@ -27,10 +28,9 @@ standardConvertToJSONSchema(compliantSchema);
 standardConvertToJSONSchema(z.string());
 // => { type: "string" }
 
-// Valibot (with side-effect import)
-import "valibot/to-json-schema"; // adds JSON Schema conversion methods
-import { stringWithJSON } from "./json-implement.ts";
-standardConvertToJSONSchema(v.string());
+// Valibot
+import { toJsonSchema } from "@valibot/to-json-schema"; // adds JSON Schema conversion methods
+standardConvertToJSONSchema(toJsonSchema(v.string()));
 // => { type: "string" }
 
 // ArkType
