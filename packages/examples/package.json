@@ -3,9 +3,10 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "lint": "pnpm biome lint ./src",
-    "format": "pnpm biome format --write ./src",
-    "check": "pnpm biome check ./src"
+    "lint": "pnpm biome lint .",
+    "format": "pnpm biome format --write .",
+    "check": "pnpm biome check .",
+    "build": "tsup"
   },
   "devDependencies": {
     "@standard-schema/spec": "workspace:*",
