@@ -9,7 +9,7 @@ import { parseMarkdown } from "@/lib/markdown";
 import { getUrl } from "@/lib/utils";
 
 export async function generateMetadata() {
-  const title = "Standard";
+  const title = "Standard Schema";
   const description = "Common interfaces for interoperability in TypeScript";
   const url = getUrl();
   return {
@@ -18,7 +18,7 @@ export async function generateMetadata() {
     openGraph: {
       title,
       description,
-      siteName: "Standard",
+      siteName: "Standard Schema",
       url,
       locale: "en_US",
       images: [
@@ -26,7 +26,7 @@ export async function generateMetadata() {
           url: `${url}/og.png`,
           width: 1200,
           height: 630,
-          alt: "Introducing Standard",
+          alt: "Introducing Standard Schema",
         },
       ],
     },
@@ -55,7 +55,7 @@ export default async function Home() {
             src="/favicon.svg"
             width="50"
             height="50"
-            alt="Standard fire logo"
+            alt="Standard Schema fire logo"
             unoptimized
           />
           <div className="h-4" />
@@ -68,7 +68,9 @@ export default async function Home() {
             Introducing
           </p>
           <div className="h-4" />
-          <h1 className="flex text-center text-3xl sm:text-4xl">Standard</h1>
+          <h1 className="flex text-center text-3xl sm:text-4xl">
+            Standard Schema
+          </h1>
           <div className="h-4 text-center" />
           <h2 className="text-gray-200 text-center">
             Common interfaces for interoperability in TypeScript
@@ -84,7 +86,7 @@ export default async function Home() {
         </div>
 
         <div className="h-[3vw]" />
-        <hr className="border-t-2 border-gray-500 w-full" />
+        <hr className="border-t border-gray-700 w-full" />
         <div className="h-[3vw]" />
         <div className="flex flex-col gap-4 w-full">
           <Link
@@ -121,7 +123,7 @@ export default async function Home() {
           </Link>
         </div>
         <div className="h-[3vw]" />
-        <hr className="border-t-2 border-gray-500 w-full" />
+        <hr className="border-t border-gray-700 w-full" />
         <div className="h-[3vw]" />
         <article
           className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm prose-blockquote:quote- "

@@ -1,12 +1,12 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { buttonVariants } from "@/components/ui/button";
-import { parseMarkdown } from "@/lib/markdown";
-import { getUrl } from "@/lib/utils";
 import { Github } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { parseMarkdown } from "@/lib/markdown";
+import { getUrl } from "@/lib/utils";
 
 export async function generateMetadata() {
   const title = "Standard JSON Schema";
@@ -87,7 +87,7 @@ export default async function JsonSchemaPage() {
         </div>
 
         <div className="h-[3vw]" />
-        <hr className="border-t-2 border-gray-500 w-full" />
+        <hr className="border-t border-gray-700 w-full" />
         <div className="h-[3vw]" />
         <article
           className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm prose-blockquote:quote- "
@@ -133,4 +133,3 @@ export default async function JsonSchemaPage() {
     </div>
   );
 }
-

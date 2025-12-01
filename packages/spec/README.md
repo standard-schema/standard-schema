@@ -11,26 +11,9 @@
 
 <!-- start -->
 
-Standard provides common interfaces designed to be implemented by JavaScript and TypeScript libraries for interoperability.
+The Standard Schema project aims to provide common interfaces designed to be implemented by JavaScript and TypeScript libraries for interoperability.
 
-The goal is to make it easier for ecosystem tools to accept user-defined types, without needing to write custom logic or adapters for each supported library. And since Standard is a specification, they can do so with no additional runtime dependencies.
-
-<div style="display: flex; flex-direction: column; gap: 1rem; margin: 2rem 0;">
-  <a href="/schema" style="border: 1px solid white; border-radius: 0.5rem; padding: 1.5rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; text-decoration: none; color: inherit;">
-    <div style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
-      <h3 style="margin: 0; font-size: 1.25rem; font-weight: 600;">Standard Schema</h3>
-      <p style="margin: 0; color: #d1d5db; font-size: 0.875rem;">For entities that perform data validation</p>
-    </div>
-    <span style="flex-shrink: 0; margin-top: 0.25rem;">→</span>
-  </a>
-  <a href="/json-schema" style="border: 1px solid white; border-radius: 0.5rem; padding: 1.5rem; display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; text-decoration: none; color: inherit;">
-    <div style="display: flex; flex-direction: column; gap: 0.5rem; flex: 1;">
-      <h3 style="margin: 0; font-size: 1.25rem; font-weight: 600;">Standard JSON Schema</h3>
-      <p style="margin: 0; color: #d1d5db; font-size: 0.875rem;">For entities that are or can be converted to JSON Schema</p>
-    </div>
-    <span style="flex-shrink: 0; margin-top: 0.25rem;">→</span>
-  </a>
-</div>
+The goal is to make it easier for ecosystem tools to accept user-defined types, without needing to write custom logic or adapters for each supported library. And since Standard Schema is a specification, they can do so with no additional runtime dependencies.
 
 ## The specifications
 
