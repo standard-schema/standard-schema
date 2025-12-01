@@ -1,4 +1,4 @@
-/** The Standard Typed interface. */
+/** The Standard Typed interface. This is a base type extended by other specs. */
 export interface StandardTypedV1<Input = unknown, Output = Input> {
   /** The Standard properties. */
   readonly "~standard": StandardTypedV1.Props<Input, Output>;
@@ -135,17 +135,15 @@ export declare namespace StandardJSONSchemaV1 {
   /**
    * The target version of the generated JSON Schema.
    *
-   * It is *strongly recommended* that implementers support `"draft-2020-12"` and `"draft-07"`, as they are both in wide use.
+   * It is *strongly recommended* that implementers support `"draft-2020-12"` and `"draft-07"`, as they are both in wide use. All other targets can be implemented on a best-effort basis. Libraries should throw if they don't support a specified target.
    *
    * The `"openapi-3.0"` target is intended as a standardized specifier for OpenAPI 3.0 which is a superset of JSON Schema `"draft-04"`.
-   *
-   * All other targets can be implemented on a best-effort basis. Libraries should throw if they don't support a specified target.
    */
   export type Target =
     | "draft-2020-12"
     | "draft-07"
     | "openapi-3.0"
-    // Accepts any string for future targets while preserving autocomplete
+    // Accepts any string: allows future targets while preserving autocomplete
     | ({} & string);
 
   /** The options for the input/output methods. */
