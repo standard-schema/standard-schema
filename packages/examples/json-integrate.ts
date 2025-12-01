@@ -5,10 +5,6 @@
 
 import type { StandardJSONSchemaV1 } from "@standard-schema/spec";
 
-import { type } from "arktype";
-import * as v from "valibot";
-import * as z from "zod";
-
 // Function that accepts any compliant `StandardJSONSchemaSourceV1`
 // and converts it to a JSON Schema.
 export function acceptStandardJSONSchema(
@@ -19,25 +15,33 @@ export function acceptStandardJSONSchema(
   });
 }
 
-// sample schema
+/**
+ * Example using sample schema from `json-implement.ts`
+ * */
 import { stringWithJSON } from "./json-implement.ts";
 
 const compliantSchema = stringWithJSON();
 acceptStandardJSONSchema(compliantSchema);
 
-// Zod
+/**
+ * Zod & Zod Mini examples
+ */
 import * as z from "zod";
-
-acceptStandardJSONSchema(z.string());
-
 import * as zm from "zod/mini";
 
+acceptStandardJSONSchema(z.string());
 acceptStandardJSONSchema(zm.toJSONSchema(zm.string()));
 
-// Valibot
+/**
+ * Valibot example
+ */
 import { toJsonSchema } from "@valibot/to-json-schema"; // adds JSON Schema conversion methods
 
 acceptStandardJSONSchema(toJsonSchema(v.string()));
 
-// ArkType
+/**
+ * ArkType example
+ */
+import { type } from "arktype";
+
 acceptStandardJSONSchema(type("string"));
