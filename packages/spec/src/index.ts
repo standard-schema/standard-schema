@@ -61,7 +61,7 @@ export declare namespace StandardSchemaV1 {
   export interface SuccessResult<Output> {
     /** The typed output value. */
     readonly value: Output;
-    /** The absence of issues indicates success. */
+    /** A falsy value for `issues` indicates success. */
     readonly issues?: undefined;
   }
 
@@ -117,7 +117,7 @@ export declare namespace StandardJSONSchemaV1 {
   export interface Props<Input = unknown, Output = Input>
     extends StandardTypedV1.Props<Input, Output> {
     /** Methods for generating the input/output JSON Schema. */
-    readonly jsonSchema: Converter;
+    readonly jsonSchema: StandardJSONSchemaV1.Converter;
   }
 
   /** The Standard JSON Schema converter interface. */
