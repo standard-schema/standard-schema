@@ -21,20 +21,18 @@ interface StandardSchemaWithJSONSchema<Input = unknown, Output = Input> {
 
 interface MySchema extends StandardSchemaWithJSONSchema<string, string> {
   type: "string";
-  message: string;
 }
 
-export function stringWithJSON(message = "Invalid string"): MySchema {
+export function stringWithJSON(): MySchema {
   return {
     type: "string",
-    message,
     "~standard": {
       version: 1,
       vendor: "example-lib",
       validate(value) {
         return typeof value === "string"
           ? { value }
-          : { issues: [{ message, path: [] }] };
+          : { issues: [{ message: "Invalid string", path: [] }] };
       },
       jsonSchema: {
         input(params) {
@@ -54,20 +52,8 @@ export function stringWithJSON(message = "Invalid string"): MySchema {
           return schema;
         },
         output(params) {
-          const schema: Record<string, unknown> = {
-            type: "string",
-          };
-
-          // Add schema version based on target
-          if (params.target === "draft-2020-12") {
-            schema.$schema = "https://json-schema.org/draft/2020-12/schema";
-          } else if (params.target === "draft-07") {
-            schema.$schema = "http://json-schema.org/draft-07/schema#";
-          } else {
-            throw new Error(`Unsupported target: ${params.target}`);
-          }
-
-          return schema;
+          // input and output are the same in this example
+          return this.input(params);
         },
       },
     },
