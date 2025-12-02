@@ -23,13 +23,13 @@ The spec was designed by the creators of Zod, Valibot, and ArkType. Recent versi
 
 The specification consists of a single TypeScript interface `StandardSchemaV1` to be implemented by any schema library wishing to be spec-compliant.
 
-This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec). There will be zero changes without a major version bump.
+This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
 
 ```ts
 /** The Standard Schema interface. */
 export interface StandardSchemaV1<Input = unknown, Output = Input> {
   /** The Standard Schema properties. */
-  readonly '~standard': StandardSchemaV1.Props<Input, Output>;
+  readonly "~standard": StandardSchemaV1.Props<Input, Output>;
 }
 
 export declare namespace StandardSchemaV1 {
@@ -88,13 +88,13 @@ export declare namespace StandardSchemaV1 {
 
   /** Infers the input type of a Standard Schema. */
   export type InferInput<Schema extends StandardSchemaV1> = NonNullable<
-    Schema['~standard']['types']
-  >['input'];
+    Schema["~standard"]["types"]
+  >["input"];
 
   /** Infers the output type of a Standard Schema. */
   export type InferOutput<Schema extends StandardSchemaV1> = NonNullable<
-    Schema['~standard']['types']
-  >['output'];
+    Schema["~standard"]["types"]
+  >["output"];
 }
 ```
 
@@ -208,24 +208,26 @@ Then implement the spec by adding the `~standard` property to your validator obj
 Here's a simple worked example of a string validator that implements the spec.
 
 ```ts
-import type {StandardSchemaV1} from '@standard-schema/spec';
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 // Step 1: Define the schema interface
 interface StringSchema extends StandardSchemaV1<string> {
-  type: 'string';
+  type: "string";
   message: string;
 }
 
 // Step 2: Implement the schema interface
-function string(message: string = 'Invalid type'): StringSchema {
+function string(message: string = "Invalid type"): StringSchema {
   return {
-    type: 'string',
+    type: "string",
     message,
-    '~standard': {
+    "~standard": {
       version: 1,
-      vendor: 'valizod',
+      vendor: "valizod",
       validate(value) {
-        return typeof value === 'string' ? {value} : {issues: [{message}]};
+        return typeof value === "string"
+          ? { value }
+          : { issues: [{ message }] };
       },
     },
   };
@@ -253,13 +255,13 @@ deno add jsr:@standard-schema/spec      # deno
 Here's a simple example of a generic function that accepts an arbitrary spec-compliant validator and uses it to parse some data.
 
 ```ts
-import type {StandardSchemaV1} from '@standard-schema/spec';
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 export async function standardValidate<T extends StandardSchemaV1>(
   schema: T,
   input: StandardSchemaV1.InferInput<T>
 ): Promise<StandardSchemaV1.InferOutput<T>> {
-  let result = schema['~standard'].validate(input);
+  let result = schema["~standard"].validate(input);
   if (result instanceof Promise) result = await result;
 
   // if the `issues` field exists, the validation failed
@@ -274,13 +276,13 @@ export async function standardValidate<T extends StandardSchemaV1>(
 This concise function can accept inputs from any spec-compliant schema library.
 
 ```ts
-import * as z from 'zod';
-import * as v from 'valibot';
-import {type} from 'arktype';
+import * as z from "zod";
+import * as v from "valibot";
+import { type } from "arktype";
 
-const zodResult = await standardValidate(z.string(), 'hello');
-const valibotResult = await standardValidate(v.string(), 'hello');
-const arktypeResult = await standardValidate(type('string'), 'hello');
+const zodResult = await standardValidate(z.string(), "hello");
+const valibotResult = await standardValidate(v.string(), "hello");
+const arktypeResult = await standardValidate(type("string"), "hello");
 ```
 
 ## FAQ
@@ -309,7 +311,7 @@ In TypeScript, using a plain `Symbol` inline as a key always collapses to a simp
 
 ```ts
 const object = {
-  [Symbol.for('~output')]: 'some data',
+  [Symbol.for("~output")]: "some data",
 };
 // { [k: symbol]: string }
 ```
@@ -325,12 +327,12 @@ Thus, these symbol keys don't get sorted to the bottom of the autocomplete list,
 The `~standard.validate()` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous validation whenever possible.
 
 ```ts
-import type {StandardSchemaV1} from '@standard-schema/spec';
+import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 function validateInput(schema: StandardSchemaV1, data: unknown) {
-  const result = schema['~standard'].validate(data);
+  const result = schema["~standard"].validate(data);
   if (result instanceof Promise) {
-    throw new TypeError('Schema validation must be synchronous');
+    throw new TypeError("Schema validation must be synchronous");
   }
   // ...
 }

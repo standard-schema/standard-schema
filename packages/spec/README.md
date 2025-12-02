@@ -17,7 +17,7 @@ The goal is to make it easier for ecosystem tools to accept user-defined types, 
 
 ## The specifications
 
-The specifications can be found below in their entirety. Libraries wishing to implement a spec can copy/paste the code block below into their codebase. They're also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec). There will be zero changes without a major version bump.
+The specifications can be found below in their entirety. Libraries wishing to implement a spec can copy/paste the code block below into their codebase. They're also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
 
 ```ts
 /** The Standard Typed interface. This is a base type extended by other specs. */

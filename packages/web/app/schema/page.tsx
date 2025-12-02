@@ -58,15 +58,6 @@ export default async function ValidatorPage() {
             alt="Standard Schema fire logo"
           />
           <div className="h-4" />
-          <p
-            className="flex text-center text-sm font-small uppercase text-gray-900 px-12 bg-[hsl(var(--foreground))] rounded"
-            style={{
-              fontVariant: "small-caps",
-            }}
-          >
-            Introducing
-          </p>
-          <div className="h-4" />
           <h1 className="flex text-center text-3xl sm:text-4xl">
             Standard Schema
           </h1>

@@ -26,7 +26,7 @@ export async function generateMetadata() {
           url: `${url}/og.png`,
           width: 1200,
           height: 630,
-          alt: "Introducing Standard Schema",
+          alt: "Standard Schema logo",
         },
       ],
     },
@@ -58,15 +58,6 @@ export default async function Home() {
             alt="Standard Schema fire logo"
             unoptimized
           />
-          <div className="h-4" />
-          <p
-            className="flex text-center text-sm font-small uppercase text-gray-900 px-12 bg-[hsl(var(--foreground))] rounded"
-            style={{
-              fontVariant: "small-caps",
-            }}
-          >
-            Introducing
-          </p>
           <div className="h-4" />
           <h1 className="flex text-center text-3xl sm:text-4xl">
             Standard Schema

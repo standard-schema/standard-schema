@@ -34,13 +34,13 @@ The spec was designed by the creators of Zod, Valibot, and ArkType. Recent versi
 
 The specification consists of a single TypeScript interface `StandardJSONSchemaV1` to be implemented by any library wishing to be spec-compliant.
 
-This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec). There will be zero changes without a major version bump.
+This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
 
 ```typescript
 /* The Standard JSON Schema interface. */
 export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
   /* The Standard JSON Schema properties. */
-  readonly '~standard': StandardJSONSchemaV1.Props<Input, Output>;
+  readonly "~standard": StandardJSONSchemaV1.Props<Input, Output>;
 }
 
 export declare namespace StandardJSONSchemaV1 {
@@ -78,9 +78,9 @@ export declare namespace StandardJSONSchemaV1 {
    * All other targets can be implemented on a best-effort basis. Libraries should throw if they don't support a specified target.
    */
   export type Target =
-    | 'draft-2020-12'
-    | 'draft-07'
-    | 'openapi-3.0'
+    | "draft-2020-12"
+    | "draft-07"
+    | "openapi-3.0"
     // Accepts any string: allows future targets while preserving autocomplete
     | ({} & string);
 
@@ -103,13 +103,13 @@ export declare namespace StandardJSONSchemaV1 {
 
   /* Infers the input type of a Standard JSON Schema. */
   export type InferInput<Schema extends StandardJSONSchemaV1> = NonNullable<
-    Schema['~standard']['types']
-  >['input'];
+    Schema["~standard"]["types"]
+  >["input"];
 
   /* Infers the output type of a Standard JSON Schema. */
   export type InferOutput<Schema extends StandardJSONSchemaV1> = NonNullable<
-    Schema['~standard']['types']
-  >['output'];
+    Schema["~standard"]["types"]
+  >["output"];
 
   // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
   export {};
@@ -155,26 +155,26 @@ Then implement the spec by adding the `~standard` property to your schema object
 Here's a simple worked example of a string schema that implements the spec.
 
 ```ts
-import type {StandardJSONSchemaV1} from '@standard-schema/spec';
+import type { StandardJSONSchemaV1 } from "@standard-schema/spec";
 
 // Step 1: Define the schema interface
 interface StringSchema extends StandardJSONSchemaV1<string> {
-  type: 'string';
+  type: "string";
 }
 
 // Step 2: Implement the schema interface
 function string(): StringSchema {
   return {
-    type: 'string',
-    '~standard': {
+    type: "string",
+    "~standard": {
       version: 1,
-      vendor: 'valizod',
+      vendor: "valizod",
       jsonSchema: {
         input(options) {
-          return {type: 'string'};
+          return { type: "string" };
         },
         output(options) {
-          return {type: 'string'};
+          return { type: "string" };
         },
       },
     },
@@ -201,25 +201,25 @@ deno add jsr:@standard-schema/spec      # deno
 Here's a simple example of a generic function that accepts an arbitrary spec-compliant schema and uses it to generate JSON Schema.
 
 ```ts
-import type {StandardJSONSchemaV1} from '@standard-schema/spec';
+import type { StandardJSONSchemaV1 } from "@standard-schema/spec";
 
 export function generateJSONSchema<T extends StandardJSONSchemaV1>(
   schema: T,
   options: StandardJSONSchemaV1.Options
 ): Record<string, unknown> {
-  return schema['~standard'].jsonSchema.output(options);
+  return schema["~standard"].jsonSchema.output(options);
 }
 ```
 
 This concise function can accept inputs from any spec-compliant schema library.
 
 ```ts
-import * as z from 'zod';
-import {type} from 'arktype';
+import * as z from "zod";
+import { type } from "arktype";
 
-const zodSchema = generateJSONSchema(z.string(), {target: 'draft-2020-12'});
-const arktypeSchema = generateJSONSchema(type('string'), {
-  target: 'draft-2020-12',
+const zodSchema = generateJSONSchema(z.string(), { target: "draft-2020-12" });
+const arktypeSchema = generateJSONSchema(type("string"), {
+  target: "draft-2020-12",
 });
 ```
 
@@ -278,6 +278,6 @@ export interface CombinedProps<Input = unknown, Output = Input>
  * An interface that combines StandardJSONSchema and StandardSchema.
  * */
 export interface CombinedSpec<Input = unknown, Output = Input> {
-  '~standard': CombinedProps<Input, Output>;
+  "~standard": CombinedProps<Input, Output>;
 }
 ```
