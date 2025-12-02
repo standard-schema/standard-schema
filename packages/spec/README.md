@@ -20,6 +20,10 @@ The goal is to make it easier for ecosystem tools to accept user-defined types, 
 The specifications can be found below in their entirety. Libraries wishing to implement a spec can copy/paste the code block below into their codebase. They're also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
 
 ```ts
+// #########################
+// ###   Standard Typed  ###
+// #########################
+
 /** The Standard Typed interface. This is a base type extended by other specs. */
 export interface StandardTypedV1<Input = unknown, Output = Input> {
   /** The Standard properties. */
