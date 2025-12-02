@@ -66,7 +66,7 @@ export declare namespace StandardSchemaV1 {
   }
 
   export interface Options {
-    /** Implicit support for additional vendor-specific parameters, if needed. */
+    /** Explicit support for additional vendor-specific parameters, if needed. */
     readonly libraryOptions?: Record<string, unknown> | undefined;
   }
 
@@ -151,7 +151,7 @@ export declare namespace StandardJSONSchemaV1 {
     /** Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. */
     readonly target: Target;
 
-    /** Implicit support for additional vendor-specific parameters, if needed. */
+    /** Explicit support for additional vendor-specific parameters, if needed. */
     readonly libraryOptions?: Record<string, unknown> | undefined;
   }
 
