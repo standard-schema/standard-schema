@@ -133,7 +133,7 @@ If a library directly encapsulates JSON Schema conversion logic within schemas t
 | ------------------------------ | ---------- | ---------------------------------------------------- | ---------------------- |
 | [Zod](https://zod.dev)         | 4.2        | [PR](https://github.com/colinhacks/zod/pull/5477)    |                        |
 | [Zod Mini](https://zod.dev)    | 4.2        | [PR](https://github.com/colinhacks/zod/pull/5477)    | via `z.toJSONSchema()` |
-| [ArkType](https://arktype.io/) | 2.1.27     | [PR](https://github.com/arktypeio/arktype/pull/1493) |                        |
+| [ArkType](https://arktype.io/) | 2.1.28     | [PR](https://github.com/arktypeio/arktype/pull/1558) |                        |
 | `@valibot/to-json-schema`      | 1.4        |                                                      |                        |
 
 ## What tools / frameworks accept spec-compliant schemas?
