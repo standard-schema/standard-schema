@@ -1,6 +1,6 @@
 {
   "name": "standard-schema",
-  "description": "A standard interface for TypeScript schema validation libraries",
+  "description": "A family of specs for interoperable TypeScript",
   "version": "0.0.0",
   "license": "MIT",
   "author": "Colin McDonnell",
