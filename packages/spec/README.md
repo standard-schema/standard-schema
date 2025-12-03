@@ -3,7 +3,7 @@
   </br>
   Standard Schema</h1>
 <p align="center">
-  A common interface for TypeScript validation libraries
+  A family of specs for interoperable TypeScript
   <br/>
   <a href="https://standardschema.dev">standardschema.dev</a>
 </p>
@@ -11,9 +11,9 @@
 
 <!-- start -->
 
-The Standard Schema project aims to provide common interfaces designed to be implemented by JavaScript and TypeScript libraries for interoperability.
+The Standard Schema project is a set of interfaces that standardize the provision and consumption of shared functionality in the TypeScript ecosystem.
 
-The goal is to make it easier for ecosystem tools to accept user-defined types, without needing to write custom logic or adapters for each supported library. And since Standard Schema is a specification, they can do so with no additional runtime dependencies.
+Its goal is to allow tools to accept a single input that includes all the types and capabilities they need— no library-specific adapters, no extra dependencies. The result is an ecosystem that's fair for implementers, friendly for consumers, and open for end users.
 
 ## The specifications
 
@@ -27,7 +27,7 @@ The specifications can be found below in their entirety. Libraries wishing to im
 /** The Standard Typed interface. This is a base type extended by other specs. */
 export interface StandardTypedV1<Input = unknown, Output = Input> {
   /** The Standard properties. */
-  readonly '~standard': StandardTypedV1.Props<Input, Output>;
+  readonly "~standard": StandardTypedV1.Props<Input, Output>;
 }
 
 export declare namespace StandardTypedV1 {
@@ -51,16 +51,13 @@ export declare namespace StandardTypedV1 {
 
   /** Infers the input type of a Standard Typed. */
   export type InferInput<Schema extends StandardTypedV1> = NonNullable<
-    Schema['~standard']['types']
-  >['input'];
+    Schema["~standard"]["types"]
+  >["input"];
 
   /** Infers the output type of a Standard Typed. */
   export type InferOutput<Schema extends StandardTypedV1> = NonNullable<
-    Schema['~standard']['types']
-  >['output'];
-
-  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
-  export {};
+    Schema["~standard"]["types"]
+  >["output"];
 }
 
 // ##########################
@@ -70,7 +67,7 @@ export declare namespace StandardTypedV1 {
 /** The Standard Schema interface. */
 export interface StandardSchemaV1<Input = unknown, Output = Input> {
   /** The Standard Schema properties. */
-  readonly '~standard': StandardSchemaV1.Props<Input, Output>;
+  readonly "~standard": StandardSchemaV1.Props<Input, Output>;
 }
 
 export declare namespace StandardSchemaV1 {
@@ -131,9 +128,6 @@ export declare namespace StandardSchemaV1 {
   /** Infers the output type of a Standard. */
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
-
-  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
-  export {};
 }
 
 // ###############################
@@ -143,7 +137,7 @@ export declare namespace StandardSchemaV1 {
 /** The Standard JSON Schema interface. */
 export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
   /** The Standard JSON Schema properties. */
-  readonly '~standard': StandardJSONSchemaV1.Props<Input, Output>;
+  readonly "~standard": StandardJSONSchemaV1.Props<Input, Output>;
 }
 
 export declare namespace StandardJSONSchemaV1 {
@@ -174,9 +168,9 @@ export declare namespace StandardJSONSchemaV1 {
    * The `"openapi-3.0"` target is intended as a standardized specifier for OpenAPI 3.0 which is a superset of JSON Schema `"draft-04"`.
    */
   export type Target =
-    | 'draft-2020-12'
-    | 'draft-07'
-    | 'openapi-3.0'
+    | "draft-2020-12"
+    | "draft-07"
+    | "openapi-3.0"
     // Accepts any string for future targets while preserving autocomplete
     | ({} & string);
 
@@ -200,8 +194,5 @@ export declare namespace StandardJSONSchemaV1 {
   /** Infers the output type of a Standard. */
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
-
-  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
-  export {};
 }
 ```

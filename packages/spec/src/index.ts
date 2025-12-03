@@ -32,9 +32,6 @@ export declare namespace StandardTypedV1 {
   export type InferOutput<Schema extends StandardTypedV1> = NonNullable<
     Schema["~standard"]["types"]
   >["output"];
-
-  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
-  export {};
 }
 
 /** The Standard Schema interface. */
@@ -101,9 +98,6 @@ export declare namespace StandardSchemaV1 {
   /** Infers the output type of a Standard. */
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
-
-  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
-  export {};
 }
 
 /** The Standard JSON Schema interface. */
@@ -166,7 +160,4 @@ export declare namespace StandardJSONSchemaV1 {
   /** Infers the output type of a Standard. */
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
-
-  // biome-ignore lint/complexity/noUselessEmptyExport: needed for granular visibility control of TS namespace
-  export {};
 }

@@ -8,9 +8,10 @@ import { buttonVariants } from "@/components/ui/button";
 import { parseMarkdown } from "@/lib/markdown";
 import { getUrl } from "@/lib/utils";
 
+const title = "Standard Schema";
+const description = "A family of specs for interoperable TypeScript";
+
 export async function generateMetadata() {
-  const title = "Standard Schema";
-  const description = "Common interfaces for interoperability in TypeScript";
   const url = getUrl();
   return {
     title,
@@ -59,13 +60,9 @@ export default async function Home() {
             unoptimized
           />
           <div className="h-4" />
-          <h1 className="flex text-center text-3xl sm:text-4xl">
-            Standard Schema
-          </h1>
+          <h1 className="flex text-center text-3xl sm:text-4xl">{title}</h1>
           <div className="h-4 text-center" />
-          <h2 className="text-gray-200 text-center">
-            Common interfaces for interoperability in TypeScript
-          </h2>
+          <h2 className="text-gray-200 text-center">{description}</h2>
           <div className="h-8" />
           <Link
             href="https://github.com/standard-schema/standard-schema"
@@ -90,7 +87,7 @@ export default async function Home() {
                   Standard Schema
                 </h3>
                 <p className="text-gray-300 text-sm">
-                  For entities that perform data validation
+                  For entities that validate and transform data
                 </p>
               </div>
               <ArrowRight className="text-white shrink-0 w-5 h-5 mt-1 group-hover:translate-x-1 transition-transform" />
@@ -106,7 +103,7 @@ export default async function Home() {
                   Standard JSON Schema
                 </h3>
                 <p className="text-gray-300 text-sm">
-                  For entities that are or can be converted to JSON Schema
+                  For JSON Schema and entities that convert to it
                 </p>
               </div>
               <ArrowRight className="text-white shrink-0 w-5 h-5 mt-1 group-hover:translate-x-1 transition-transform" />
