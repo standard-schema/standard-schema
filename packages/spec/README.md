@@ -197,6 +197,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [Inngest](https://www.inngest.com)                                            | Event-driven durable workflow engine that runs on any cloud                                                                           | [Docs](https://www.inngest.com/docs/reference/client/create#defining-event-payload-types)             |
 | [BUPKIS](https://github.com/boneskull/bupkis)                                 | Uncommonly extensible assertions for the beautiful people                                                                             | [Docs](https://bupkis.zip)                                                                            |
 | [Fragno](https://fragno.dev)                                                  | Build framework-agnostic TypeScript libraries that embed backend and frontend logic in user applications                              | [Docs](https://fragno.dev/docs/for-library-authors/features/route-definition#input-schema)            |
+| [@zap-studio/fetch](https://github.com/zap-studio/monorepo)                   | A type-safe fetch wrapper with Standard Schema validation                                                                             | [Docs](https://www.zapstudio.dev/packages/fetch)                                                      |
 
 ## How can my schema library implement the spec?
 
