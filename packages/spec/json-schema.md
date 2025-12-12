@@ -129,12 +129,12 @@ The answer to this question is a little more nuanced than with regular _Standard
 
 If a library directly encapsulates JSON Schema conversion logic within schemas themselves (say, as a method), it can directly implement the spec. If not, the library may provide a `toJSONSchema` function that returns a value that implements this spec.
 
-| Implementer                    | Version(s) | Link                                                 | Notes                  |
-| ------------------------------ | ---------- | ---------------------------------------------------- | ---------------------- |
-| [Zod](https://zod.dev)         | 4.2        | [PR](https://github.com/colinhacks/zod/pull/5477)    |                        |
-| [Zod Mini](https://zod.dev)    | 4.2        | [PR](https://github.com/colinhacks/zod/pull/5477)    | via `z.toJSONSchema()` |
-| [ArkType](https://arktype.io/) | 2.1.28     | [PR](https://github.com/arktypeio/arktype/pull/1558) |                        |
-| `@valibot/to-json-schema`      | 1.4        |                                                      |                        |
+| Implementer                    | Version(s) | Link                                                   | Notes                                                                         |
+| ------------------------------ | ---------- | ------------------------------------------------------ | ----------------------------------------------------------------------------- |
+| [Zod](https://zod.dev)         | 4.2        | [PR](https://github.com/colinhacks/zod/pull/5477)      |                                                                               |
+| [Zod Mini](https://zod.dev)    | 4.2        | [PR](https://github.com/colinhacks/zod/pull/5477)      | via `z.toJSONSchema()`                                                        |
+| [ArkType](https://arktype.io/) | 2.1.28     | [PR](https://github.com/arktypeio/arktype/pull/1558)   |                                                                               |
+| [Valibot](https://valibot.dev) | 1.2        | [PR](https://github.com/open-circle/valibot/pull/1372) | via `toStandardJsonSchema()` of the `@valibot/to-json-schema` package (v1.5+) |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
