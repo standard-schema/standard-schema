@@ -1,6 +1,6 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { ArrowRight, Github } from "lucide-react";
+import { Github } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
@@ -8,10 +8,9 @@ import { buttonVariants } from "@/components/ui/button";
 import { parseMarkdown } from "@/lib/markdown";
 import { getUrl } from "@/lib/utils";
 
-const title = "Standard Schema";
-const description = "A family of specs for interoperable TypeScript";
-
 export async function generateMetadata() {
+  const title = "Standard Schema";
+  const description = "A common interface for TypeScript validation libraries";
   const url = getUrl();
   return {
     title,
@@ -20,14 +19,14 @@ export async function generateMetadata() {
       title,
       description,
       siteName: "Standard Schema",
-      url,
+      url: `${url}/schema`,
       locale: "en_US",
       images: [
         {
           url: `${url}/og.png`,
           width: 1200,
           height: 630,
-          alt: "Standard Schema logo",
+          alt: "Standard Schema",
         },
       ],
     },
@@ -41,8 +40,8 @@ export async function generateMetadata() {
   } satisfies Metadata;
 }
 
-export default async function Home() {
-  const mdPath = join(process.cwd(), "..", "..", "README.md");
+export default async function ValidatorPage() {
+  const mdPath = join(process.cwd(), "..", "spec", "schema.md");
   const md = readFileSync(mdPath, "utf-8").split("<!-- start -->")[1];
 
   const html = await parseMarkdown(md);
@@ -57,12 +56,15 @@ export default async function Home() {
             width="50"
             height="50"
             alt="Standard Schema fire logo"
-            unoptimized
           />
           <div className="h-4" />
-          <h1 className="flex text-center text-3xl sm:text-4xl">{title}</h1>
+          <h1 className="flex text-center text-3xl sm:text-4xl">
+            Standard Schema
+          </h1>
           <div className="h-4 text-center" />
-          <h2 className="text-gray-200 text-center">{description}</h2>
+          <h2 className="text-gray-200 text-center">
+            A common interface for TypeScript validation libraries
+          </h2>
           <div className="h-8" />
           <Link
             href="https://github.com/standard-schema/standard-schema"
@@ -73,43 +75,6 @@ export default async function Home() {
           </Link>
         </div>
 
-        <div className="h-[3vw]" />
-        <hr className="border-t border-gray-700 w-full" />
-        <div className="h-[3vw]" />
-        <div className="flex flex-col gap-4 w-full">
-          <Link
-            href="/schema"
-            className="border border-white rounded-lg p-6 hover:bg-white/5 transition-colors group"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-2 flex-1">
-                <h3 className="text-xl font-semibold text-white">
-                  Standard Schema
-                </h3>
-                <p className="text-gray-300 text-sm">
-                  For entities that validate and transform data
-                </p>
-              </div>
-              <ArrowRight className="text-white shrink-0 w-5 h-5 mt-1 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-          <Link
-            href="/json-schema"
-            className="border border-white rounded-lg p-6 hover:bg-white/5 transition-colors group"
-          >
-            <div className="flex items-start justify-between gap-4">
-              <div className="flex flex-col gap-2 flex-1">
-                <h3 className="text-xl font-semibold text-white">
-                  Standard JSON Schema
-                </h3>
-                <p className="text-gray-300 text-sm">
-                  For JSON Schema and entities that convert to it
-                </p>
-              </div>
-              <ArrowRight className="text-white shrink-0 w-5 h-5 mt-1 group-hover:translate-x-1 transition-transform" />
-            </div>
-          </Link>
-        </div>
         <div className="h-[3vw]" />
         <hr className="border-t border-gray-700 w-full" />
         <div className="h-[3vw]" />
@@ -153,39 +118,6 @@ export default async function Home() {
           <div className="h-2" />
           <p>© {new Date().getFullYear()}</p>
         </div>
-
-        {/* <Github color="white" size={50} /> */}
-
-        {/* <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a> */}
-        {/* <a
-          className="flex items-center gap-2 hover:underline hover:underline-offset-4"
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to repo →
-        </a> */}
       </footer>
     </div>
   );

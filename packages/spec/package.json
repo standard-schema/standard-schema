@@ -1,7 +1,7 @@
 {
   "name": "@standard-schema/spec",
-  "description": "A standard interface for TypeScript schema validation libraries",
-  "version": "1.0.0",
+  "description": "A family of specs for interoperable TypeScript",
+  "version": "1.1.0",
   "license": "MIT",
   "author": "Colin McDonnell",
   "homepage": "https://standardschema.dev",
@@ -21,6 +21,7 @@
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
+      "standard-schema-spec": "./src/index.ts",
       "import": {
         "types": "./dist/index.d.ts",
         "default": "./dist/index.js"
