@@ -60,7 +60,7 @@ export declare namespace StandardSchemaV1 {
   }
 
   export interface Options {
-    /** Implicit support for additional vendor-specific parameters, if needed. */
+    /** Explicit support for additional vendor-specific parameters, if needed. */
     readonly libraryOptions?: Record<string, unknown> | undefined;
   }
 
@@ -205,7 +205,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [BUPKIS](https://github.com/boneskull/bupkis)                                 | Uncommonly extensible assertions for the beautiful people                                                                             | [Docs](https://bupkis.zip)                                                                            |
 | [Fragno](https://fragno.dev)                                                  | Build framework-agnostic TypeScript libraries that embed backend and frontend logic in user applications                              | [Docs](https://fragno.dev/docs/for-library-authors/features/route-definition#input-schema)            |
 
-## How can my schema library implement the spec?
+<!-- ## How can my schema library implement the spec?
 
 Schema libraries that want to support Standard Schema must implement the `StandardSchemaV1` interface. Start by copying the specification file above into your library. It consists of types only.
 
@@ -240,9 +240,9 @@ function string(message: string = 'Invalid type'): StringSchema {
 
 We recommend defining the `~standard.validate()` function in terms of your library's existing validation functions/methods. Ideally implementing the spec only requires a handful of lines of code.
 
-Avoid returning `Promise` from `~standard.validate()` unless absolutely necessary. Some third-party libraries may not support async validation.
+Avoid returning `Promise` from `~standard.validate()` unless absolutely necessary. Some third-party libraries may not support async validation. -->
 
-## How do I accept Standard Schemas in my library?
+<!-- ## How do I accept Standard Schemas in my library?
 
 Third-party libraries and frameworks can leverage the Standard Schema spec to accept user-defined schemas in a type-safe way.
 
@@ -287,7 +287,7 @@ import {type} from 'arktype';
 const zodResult = await standardValidate(z.string(), 'hello');
 const valibotResult = await standardValidate(v.string(), 'hello');
 const arktypeResult = await standardValidate(type('string'), 'hello');
-```
+``` -->
 
 ## FAQ
 

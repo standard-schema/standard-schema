@@ -11,16 +11,16 @@
 
 <!-- start -->
 
-Standard JSON Schema is a common interface designed to be implemented by JavaScript and TypeScript libraries that can be converted to JSON Schema.
+Standard JSON Schema is a common interface designed to be implemented by JavaScript and TypeScript entities that _are_ or _can be converted to_ JSON Schema.
 
-The goal is to make it easier for ecosystem tools to accept user-defined types that can be converted to JSON Schema, without needing to write custom logic or adapters for each supported library. And since Standard JSON Schema is a specification, they can do so with no additional runtime dependencies.
+The goal is to make it easier for ecosystem tools to accept user-defined types (typically defined using schema/validation libraries) without needing to write custom logic or adapters for each supported library. And since Standard JSON Schema is a specification, they can do so with no additional runtime dependencies.
 
 ## Motivation
 
 Many libraries need JSON Schema representations of type information:
 
 - API documentation generation (e.g. OpenAPI)
-- Tool inputs and structures outputs for AI
+- Tool inputs and structured outputs for AI
 - Form generation tools
 - Code generation
 
@@ -40,7 +40,7 @@ This interface can be found below in its entirety. Libraries wishing to implemen
 /* The Standard JSON Schema interface. */
 export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
   /* The Standard JSON Schema properties. */
-  readonly "~standard": StandardJSONSchemaV1.Props<Input, Output>;
+  readonly '~standard': StandardJSONSchemaV1.Props<Input, Output>;
 }
 
 export declare namespace StandardJSONSchemaV1 {
@@ -76,9 +76,9 @@ export declare namespace StandardJSONSchemaV1 {
    * The `"openapi-3.0"` target is intended as a standardized specifier for OpenAPI 3.0 which is a superset of JSON Schema `"draft-04"`.
    */
   export type Target =
-    | "draft-2020-12"
-    | "draft-07"
-    | "openapi-3.0"
+    | 'draft-2020-12'
+    | 'draft-07'
+    | 'openapi-3.0'
     // Accepts any string: allows future targets while preserving autocomplete
     | ({} & string);
 
@@ -87,7 +87,7 @@ export declare namespace StandardJSONSchemaV1 {
     /* Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. */
     readonly target: Target;
 
-    /* Implicit support for additional vendor-specific parameters, if needed. */
+    /* Explicit support for additional vendor-specific parameters, if needed. */
     readonly libraryOptions?: Record<string, unknown> | undefined;
   }
 
@@ -101,13 +101,13 @@ export declare namespace StandardJSONSchemaV1 {
 
   /* Infers the input type of a Standard JSON Schema. */
   export type InferInput<Schema extends StandardJSONSchemaV1> = NonNullable<
-    Schema["~standard"]["types"]
-  >["input"];
+    Schema['~standard']['types']
+  >['input'];
 
   /* Infers the output type of a Standard JSON Schema. */
   export type InferOutput<Schema extends StandardJSONSchemaV1> = NonNullable<
-    Schema["~standard"]["types"]
-  >["output"];
+    Schema['~standard']['types']
+  >['output'];
 }
 ```
 
@@ -115,7 +115,7 @@ export declare namespace StandardJSONSchemaV1 {
 
 The specification meets a few primary design objectives:
 
-- **Support JSON Schema generation.** Given a Standard JSON Schema compatible entity, you should be able to generate JSON Schema from it. The spec supports multiple JSON Schema draft versions and formats.
+- **Support JSON Schema conversion.** Given a Standard JSON Schema compatible entity, you should be able to generate JSON Schema from it. The spec supports multiple JSON Schema draft versions and formats.
 - **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" their inferred type, so it can be extracted and used by external tools.
 - **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing functions/methods.
 - **Avoid API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
@@ -138,12 +138,12 @@ If a library directly encapsulates JSON Schema conversion logic within schemas t
 
 ## What tools / frameworks accept spec-compliant schemas?
 
-The following tools accept user-defined schemas conforming to the Standard JSON Schema spec. (If you maintain a tool that supports Standard JSON Schemas, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
+The following tools accept user-defined schemas conforming to the Standard JSON Schema spec. If you maintain a tool that supports Standard JSON Schemas, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!
 
 | Integrator | Description | Link |
 | ---------- | ----------- | ---- |
 
-## How can my schema library implement the spec?
+<!-- ## How can my schema library implement the spec?
 
 Schema libraries that want to support Standard JSON Schema must implement the `StandardJSONSchemaV1` interface. Start by copying the specification file above into your library. It consists of types only.
 
@@ -179,9 +179,9 @@ function string(): StringSchema {
 }
 ```
 
-We recommend defining the `~standard.jsonSchema` methods in terms of your library's existing JSON Schema conversion functions/methods. Ideally implementing the spec only requires a handful of lines of code.
+We recommend defining the `~standard.jsonSchema` methods in terms of your library's existing JSON Schema conversion functions/methods. Ideally implementing the spec only requires a handful of lines of code. -->
 
-## How do I accept Standard JSON Schemas in my library?
+<!-- ## How do I accept Standard JSON Schemas in my library?
 
 Third-party libraries and frameworks can leverage the Standard JSON Schema spec to accept user-defined schemas in a type-safe way.
 
@@ -218,7 +218,7 @@ const zodSchema = generateJSONSchema(z.string(), { target: "draft-2020-12" });
 const arktypeSchema = generateJSONSchema(type("string"), {
   target: "draft-2020-12",
 });
-```
+``` -->
 
 ## FAQ
 
@@ -252,7 +252,7 @@ If a given schema/entity cannot be converted to JSON Schema, the conversion meth
 
 ### Why is this a separate spec instead of adding to `StandardSchemaV1`?
 
-The two concerns are orthogonal. `StandardSchemaV1` is about validation, while `StandardJSONSchemaV1` is about introspectability and JSON Schema generation. Keeping them separate allows greater flexibility.
+The two concerns are orthogonal. `StandardSchemaV1` is about validation, while `StandardJSONSchemaV1` is about conversion to a JSON Schema representation. Keeping them separate allows greater flexibility for use cases where only one or the other may be required.
 
 ### I'm a schema library author. How do I implement this spec?
 
@@ -275,6 +275,6 @@ export interface CombinedProps<Input = unknown, Output = Input>
  * An interface that combines StandardJSONSchema and StandardSchema.
  * */
 export interface CombinedSpec<Input = unknown, Output = Input> {
-  "~standard": CombinedProps<Input, Output>;
+  '~standard': CombinedProps<Input, Output>;
 }
 ```

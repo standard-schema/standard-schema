@@ -1,5 +1,5 @@
 /**
- * This example shows how to implement the Standard JSON Schema Source interface.
+ * This example shows how to implement the Standard JSON Schema interface.
  * It demonstrates creating schemas that support both validation and JSON Schema generation.
  */
 

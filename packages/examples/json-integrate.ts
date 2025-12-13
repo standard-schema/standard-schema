@@ -5,7 +5,7 @@
 
 import type { StandardJSONSchemaV1 } from "@standard-schema/spec";
 
-// Function that accepts any compliant `StandardJSONSchemaSourceV1`
+// Function that accepts any compliant `StandardJSONSchemaV1`
 // and converts it to a JSON Schema.
 export function acceptStandardJSONSchema(
   schema: StandardJSONSchemaV1,
