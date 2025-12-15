@@ -1,6 +1,7 @@
 {
   "compilerOptions": {
     "allowImportingTsExtensions": true,
+    "customConditions": ["standard-schema-spec"],
     "declaration": true,
     "exactOptionalPropertyTypes": true,
     "isolatedDeclarations": true,

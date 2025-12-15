@@ -1,16 +1,17 @@
 import { readFileSync } from "node:fs";
 import { join } from "node:path";
-import { buttonVariants } from "@/components/ui/button";
-import { parseMarkdown } from "@/lib/markdown";
-import { getUrl } from "@/lib/utils";
-import { Github } from "lucide-react";
+import { ArrowRight, Github } from "lucide-react";
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { parseMarkdown } from "@/lib/markdown";
+import { getUrl } from "@/lib/utils";
+
+const title = "Standard Schema";
+const description = "A family of specs for interoperable TypeScript";
 
 export async function generateMetadata() {
-  const title = "Standard Schema";
-  const description = "A common interface for TypeScript validation libraries";
   const url = getUrl();
   return {
     title,
@@ -26,7 +27,7 @@ export async function generateMetadata() {
           url: `${url}/og.png`,
           width: 1200,
           height: 630,
-          alt: "Introducing Standard Schema",
+          alt: "Standard Schema logo",
         },
       ],
     },
@@ -56,24 +57,12 @@ export default async function Home() {
             width="50"
             height="50"
             alt="Standard Schema fire logo"
+            unoptimized
           />
           <div className="h-4" />
-          <p
-            className="flex text-center text-sm font-small uppercase text-gray-900 px-12 bg-[hsl(var(--foreground))] rounded"
-            style={{
-              fontVariant: "small-caps",
-            }}
-          >
-            Introducing
-          </p>
-          <div className="h-4" />
-          <h1 className="flex text-center text-3xl sm:text-4xl">
-            Standard Schema
-          </h1>
+          <h1 className="flex text-center text-3xl sm:text-4xl">{title}</h1>
           <div className="h-4 text-center" />
-          <h2 className="text-gray-200 text-center">
-            A common interface for TypeScript validation libraries
-          </h2>
+          <h2 className="text-gray-200 text-center">{description}</h2>
           <div className="h-8" />
           <Link
             href="https://github.com/standard-schema/standard-schema"
@@ -85,10 +74,47 @@ export default async function Home() {
         </div>
 
         <div className="h-[3vw]" />
-        <hr className="border-t-2 border-gray-500 w-full" />
+        <hr className="border-t border-gray-700 w-full" />
+        <div className="h-[3vw]" />
+        <div className="flex flex-col gap-4 w-full">
+          <Link
+            href="/schema"
+            className="border border-white rounded-lg p-6 hover:bg-white/5 transition-colors group"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-2 flex-1">
+                <h3 className="text-xl font-semibold text-white">
+                  Standard Schema
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  For entities that validate and transform data
+                </p>
+              </div>
+              <ArrowRight className="text-white shrink-0 w-5 h-5 mt-1 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+          <Link
+            href="/json-schema"
+            className="border border-white rounded-lg p-6 hover:bg-white/5 transition-colors group"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-2 flex-1">
+                <h3 className="text-xl font-semibold text-white">
+                  Standard JSON Schema
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  For JSON Schema and entities that convert to it
+                </p>
+              </div>
+              <ArrowRight className="text-white shrink-0 w-5 h-5 mt-1 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+        </div>
+        <div className="h-[3vw]" />
+        <hr className="border-t border-gray-700 w-full" />
         <div className="h-[3vw]" />
         <article
-          className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm prose-blockquote:quote- "
+          className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm prose-blockquote:quote-none"
           dangerouslySetInnerHTML={{
             __html: html,
           }}
