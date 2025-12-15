@@ -130,119 +130,62 @@ The answer to this question is a little more nuanced than with regular _Standard
 - Some schemas may directly encapsulate JSON Schema conversion as a method. These schemas can directly implement the spec.
 - For bundle size, reasons, other libraries provide external functions for JSON Schema conversion. In these cases, the _result_ of that function will implement the spec.
 
-| Implementer                    | Version(s) | Link                                                   | Notes                                                                     |
-| ------------------------------ | ---------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
-| [Zod](https://zod.dev)         | v4.2+      | [PR](https://github.com/colinhacks/zod/pull/5477)      |                                                                           |
-| [Zod Mini](https://zod.dev)    | v4.2+      | [PR](https://github.com/colinhacks/zod/pull/5477)      | via `z.toJSONSchema()`                                                    |
-| [ArkType](https://arktype.io/) | v2.1.28    | [PR](https://github.com/arktypeio/arktype/pull/1558)   |                                                                           |
-| [Valibot](https://valibot.dev) | v1.2       | [PR](https://github.com/open-circle/valibot/pull/1372) | via `toStandardJsonSchema()` in `@valibot/to-json-schema` package (v1.5+) |
+| Implementer                    | Version(s) | Link                                                   | Notes                                                                     | Usage          |
+| ------------------------------ | ---------- | ------------------------------------------------------ | ------------------------------------------------------------------------- | -------------- |
+| [Zod](https://zod.dev)         | v4.2+      | [PR](https://github.com/colinhacks/zod/pull/5477)      |                                                                           | [#](#zod)      |
+| [ArkType](https://arktype.io/) | v2.1.28    | [PR](https://github.com/arktypeio/arktype/pull/1558)   |                                                                           | [#](#arktype)  |
+| [Valibot](https://valibot.dev) | v1.2       | [PR](https://github.com/open-circle/valibot/pull/1372) | via `toStandardJsonSchema()` in `@valibot/to-json-schema` package (v1.5+) | [#](#valibot)  |
+| [Zod Mini](https://zod.dev)    | v4.2+      | [PR](https://github.com/colinhacks/zod/pull/5477)      | via `z.toJSONSchema()`                                                    | [#](#zod-mini) |
 
-### Examples
+## Usage
 
-The examples below assume the existence of an `acceptSchema` function that accepts `StandardJSONSchemaV1`.
+Usage examples for each implementing library.
+
+### Zod
 
 ```ts
-// Zod
 import * as z from 'zod';
+
 z.string() satisfies StandardJSONSchemaV1; // ✅
+```
 
-// Zod Mini
-import * as z from 'zod/mini';
-z.toJSONSchema(z.string()) satisfies StandardJSONSchemaV1; // ✅
+### ArkType
 
-// ArkType
+```ts
 import {type} from 'arktype';
-type('string') satisfies StandardJSONSchemaV1; // ✅
 
-// Valibot
+type('string') satisfies StandardJSONSchemaV1; // ✅
+```
+
+### Valibot
+
+```ts
 import * as v from 'valibot';
 import {toStandardJsonSchema} from '@valibot/to-json-schema';
+
 toStandardJsonSchema(v.string()) satisfies StandardJSONSchemaV1; // ✅
+```
+
+### Zod Mini
+
+```ts
+import * as z from 'zod/mini';
+
+z.toJSONSchema(z.string()) satisfies StandardJSONSchemaV1; // ✅
 ```
 
 ## What tools / frameworks accept spec-compliant schemas?
 
 The following tools accept user-defined schemas conforming to the Standard JSON Schema spec. If you maintain a tool that supports Standard JSON Schemas, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!
 
+When creating a PR to add your tool, please add a new row to the table below with:
+
+- **Integrator**: The name of your tool/framework (as a link to your project)
+- **Description**: A brief description of your tool. Should be a sentence fragment with no period at the end, e.g. ("Type-safe OpenAPI framework for Express")
+- **Link**: A link to PR/commit where support was merged.
+
 | Integrator | Description | Link |
 | ---------- | ----------- | ---- |
-
-<!-- ## How can my schema library implement the spec?
-
-Schema libraries that want to support Standard JSON Schema must implement the `StandardJSONSchemaV1` interface. Start by copying the specification file above into your library. It consists of types only.
-
-Then implement the spec by adding the `~standard` property to your schema objects/instances. We recommend using `extends` / `implements` to ensure static agreement with the interface. It doesn't matter whether your schema library returns plain objects, functions, or class instances. The only thing that matters is that the `~standard` property is defined somehow.
-
-Here's a simple worked example of a string schema that implements the spec.
-
-```ts
-import type { StandardJSONSchemaV1 } from "@standard-schema/spec";
-
-// Step 1: Define the schema interface
-interface StringSchema extends StandardJSONSchemaV1<string> {
-  type: "string";
-}
-
-// Step 2: Implement the schema interface
-function string(): StringSchema {
-  return {
-    type: "string",
-    "~standard": {
-      version: 1,
-      vendor: "valizod",
-      jsonSchema: {
-        input(options) {
-          return { type: "string" };
-        },
-        output(options) {
-          return { type: "string" };
-        },
-      },
-    },
-  };
-}
-````
-
-We recommend defining the `~standard.jsonSchema` methods in terms of your library's existing JSON Schema conversion functions/methods. Ideally implementing the spec only requires a handful of lines of code. -->
-
-<!-- ## How do I accept Standard JSON Schemas in my library?
-
-Third-party libraries and frameworks can leverage the Standard JSON Schema spec to accept user-defined schemas in a type-safe way.
-
-To get started, copy and paste the specification file into your project. Alternatively (if you are okay with the extra dependency), you can install the `@standard-schema/spec` package from [npm](https://www.npmjs.com/package/@standard-schema/spec) or [JSR](https://jsr.io/@standard-schema/spec) as a dependency. _It is not recommended to install as a dev dependency, see the [associated FAQ](#can-i-add-it-as-a-dev-dependency) for details_.
-
-```sh
-npm install @standard-schema/spec       # npm
-yarn add @standard-schema/spec          # yarn
-pnpm add @standard-schema/spec          # pnpm
-bun add @standard-schema/spec           # bun
-deno add jsr:@standard-schema/spec      # deno
-```
-
-Here's a simple example of a generic function that accepts an arbitrary spec-compliant schema and uses it to generate JSON Schema.
-
-```ts
-import type { StandardJSONSchemaV1 } from "@standard-schema/spec";
-
-export function generateJSONSchema<T extends StandardJSONSchemaV1>(
-  schema: T,
-  options: StandardJSONSchemaV1.Options
-): Record<string, unknown> {
-  return schema["~standard"].jsonSchema.output(options);
-}
-```
-
-This concise function can accept inputs from any spec-compliant schema library.
-
-```ts
-import * as z from "zod";
-import { type } from "arktype";
-
-const zodSchema = generateJSONSchema(z.string(), { target: "draft-2020-12" });
-const arktypeSchema = generateJSONSchema(type("string"), {
-  target: "draft-2020-12",
-});
-``` -->
 
 ## FAQ
 
