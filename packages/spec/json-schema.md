@@ -272,9 +272,11 @@ To infer generic type information from the user-defined schema:
 ```ts
 export function parseData<T extends StandardJSONSchemaV1>(
   schema: T,
-  data: StandardJSONSchemaV1.InferInput<T> // knp
-): StandardJSONSchemaV1.InferOutput<T> {
-  // do stuff, e.g. validate with AJV
+  data: StandardJSONSchemaV1.InferInput<T> // extract input type
+) {
+  return {
+    /* ... */
+  } as StandardJSONSchemaV1.InferOutput<T>; // extract output type
 }
 ```
 
