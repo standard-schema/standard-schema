@@ -125,16 +125,40 @@ The specification meets a few primary design objectives:
 
 These are the libraries that have already implemented the Standard JSON Schema interface. (If you maintain a library that implements the spec, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
-The answer to this question is a little more nuanced than with regular _Standard Schema_. The spec can be implemented by any object that _represents_ or _can be converted_ to JSON Schema. It's intentionally designed to support multiple use cases.
+The answer to this question is a little more nuanced than with regular _Standard Schema_. The spec can be implemented by any object that _is_ or _can be converted_ to JSON Schema. It's intentionally designed to support multiple use cases.
 
-If a library directly encapsulates JSON Schema conversion logic within schemas themselves (say, as a method), it can directly implement the spec. If not, the library may provide a `toJSONSchema` function that returns a value that implements this spec.
+- Some schemas may directly encapsulate JSON Schema conversion as a method. These schemas can directly implement the spec.
+- For bundle size, reasons, other libraries provide external functions for JSON Schema conversion. In these cases, the _result_ of that function will implement the spec.
 
-| Implementer                    | Version(s) | Link                                                   | Notes                                                                         |
-| ------------------------------ | ---------- | ------------------------------------------------------ | ----------------------------------------------------------------------------- |
-| [Zod](https://zod.dev)         | 4.2        | [PR](https://github.com/colinhacks/zod/pull/5477)      |                                                                               |
-| [Zod Mini](https://zod.dev)    | 4.2        | [PR](https://github.com/colinhacks/zod/pull/5477)      | via `z.toJSONSchema()`                                                        |
-| [ArkType](https://arktype.io/) | 2.1.28     | [PR](https://github.com/arktypeio/arktype/pull/1558)   |                                                                               |
-| [Valibot](https://valibot.dev) | 1.2        | [PR](https://github.com/open-circle/valibot/pull/1372) | via `toStandardJsonSchema()` of the `@valibot/to-json-schema` package (v1.5+) |
+| Implementer                    | Version(s) | Link                                                   | Notes                                                                     |
+| ------------------------------ | ---------- | ------------------------------------------------------ | ------------------------------------------------------------------------- |
+| [Zod](https://zod.dev)         | v4.2+      | [PR](https://github.com/colinhacks/zod/pull/5477)      |                                                                           |
+| [Zod Mini](https://zod.dev)    | v4.2+      | [PR](https://github.com/colinhacks/zod/pull/5477)      | via `z.toJSONSchema()`                                                    |
+| [ArkType](https://arktype.io/) | v2.1.28    | [PR](https://github.com/arktypeio/arktype/pull/1558)   |                                                                           |
+| [Valibot](https://valibot.dev) | v1.2       | [PR](https://github.com/open-circle/valibot/pull/1372) | via `toStandardJsonSchema()` in `@valibot/to-json-schema` package (v1.5+) |
+
+### Examples
+
+The examples below assume the existence of an `acceptSchema` function that accepts `StandardJSONSchemaV1`.
+
+```ts
+// Zod
+import * as z from 'zod';
+z.string() satisfies StandardJSONSchemaV1; // ✅
+
+// Zod Mini
+import * as z from 'zod/mini';
+z.toJSONSchema(z.string()) satisfies StandardJSONSchemaV1; // ✅
+
+// ArkType
+import {type} from 'arktype';
+type('string') satisfies StandardJSONSchemaV1; // ✅
+
+// Valibot
+import * as v from 'valibot';
+import {toStandardJsonSchema} from '@valibot/to-json-schema';
+toStandardJsonSchema(v.string()) satisfies StandardJSONSchemaV1; // ✅
+```
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -177,7 +201,7 @@ function string(): StringSchema {
     },
   };
 }
-```
+````
 
 We recommend defining the `~standard.jsonSchema` methods in terms of your library's existing JSON Schema conversion functions/methods. Ideally implementing the spec only requires a handful of lines of code. -->
 

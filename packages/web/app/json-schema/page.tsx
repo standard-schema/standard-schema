@@ -90,7 +90,7 @@ export default async function JsonSchemaPage() {
         <hr className="border-t border-gray-700 w-full" />
         <div className="h-[3vw]" />
         <article
-          className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500 prose-blockquote:border-l-2 prose-blockquote:border-gray-500 prose-blockquote:text-sm prose-blockquote:quote-none"
+          className="flex flex-col gap-4 prose prose-sm md:prose-base prose-gray dark:prose-invert !max-w-none text-gray-300 prose-th:border-b-2 prose-th:border-gray-500"
           dangerouslySetInnerHTML={{
             __html: html,
           }}
