@@ -37,32 +37,63 @@ The specification consists of a single TypeScript interface `StandardJSONSchemaV
 This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
 
 ```typescript
-/* The Standard JSON Schema interface. */
+/** The Standard Typed interface. This is a base type extended by other specs. */
+export interface StandardTypedV1<Input = unknown, Output = Input> {
+  /** The Standard properties. */
+  readonly '~standard': StandardTypedV1.Props<Input, Output>;
+}
+
+export declare namespace StandardTypedV1 {
+  /** The Standard Typed properties interface. */
+  export interface Props<Input = unknown, Output = Input> {
+    /** The version number of the standard. */
+    readonly version: 1;
+    /** The vendor name of the schema library. */
+    readonly vendor: string;
+    /** Inferred types associated with the schema. */
+    readonly types?: Types<Input, Output> | undefined;
+  }
+
+  /** The Standard Typed types interface. */
+  export interface Types<Input = unknown, Output = Input> {
+    /** The input type of the schema. */
+    readonly input: Input;
+    /** The output type of the schema. */
+    readonly output: Output;
+  }
+
+  /** Infers the input type of a Standard Typed. */
+  export type InferInput<Schema extends StandardTypedV1> = NonNullable<
+    Schema['~standard']['types']
+  >['input'];
+
+  /** Infers the output type of a Standard Typed. */
+  export type InferOutput<Schema extends StandardTypedV1> = NonNullable<
+    Schema['~standard']['types']
+  >['output'];
+}
+
+/** The Standard JSON Schema interface. */
 export interface StandardJSONSchemaV1<Input = unknown, Output = Input> {
-  /* The Standard JSON Schema properties. */
+  /** The Standard JSON Schema properties. */
   readonly '~standard': StandardJSONSchemaV1.Props<Input, Output>;
 }
 
 export declare namespace StandardJSONSchemaV1 {
-  /* The Standard JSON Schema properties interface. */
-  export interface Props<Input = unknown, Output = Input> {
-    /* The version number of the standard. */
-    readonly version: 1;
-    /* The vendor name of the schema library. */
-    readonly vendor: string;
-    /* Inferred types associated with the schema. */
-    readonly types?: Types<Input, Output> | undefined;
-    /* Methods for generating the input/output JSON Schema. */
+  /** The Standard JSON Schema properties interface. */
+  export interface Props<Input = unknown, Output = Input>
+    extends StandardTypedV1.Props<Input, Output> {
+    /** Methods for generating the input/output JSON Schema. */
     readonly jsonSchema: StandardJSONSchemaV1.Converter;
   }
 
-  /* The Standard JSON Schema converter interface. */
+  /** The Standard JSON Schema converter interface. */
   export interface Converter {
-    /* Converts the input type to JSON Schema. May throw if conversion is not supported. */
+    /** Converts the input type to JSON Schema. May throw if conversion is not supported. */
     readonly input: (
       options: StandardJSONSchemaV1.Options
     ) => Record<string, unknown>;
-    /* Converts the output type to JSON Schema. May throw if conversion is not supported. */
+    /** Converts the output type to JSON Schema. May throw if conversion is not supported. */
     readonly output: (
       options: StandardJSONSchemaV1.Options
     ) => Record<string, unknown>;
@@ -82,32 +113,26 @@ export declare namespace StandardJSONSchemaV1 {
     // Accepts any string: allows future targets while preserving autocomplete
     | ({} & string);
 
-  /* The options for the input/output methods. */
+  /** The options for the input/output methods. */
   export interface Options {
-    /* Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. */
+    /** Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. */
     readonly target: Target;
 
-    /* Explicit support for additional vendor-specific parameters, if needed. */
+    /** Explicit support for additional vendor-specific parameters, if needed. */
     readonly libraryOptions?: Record<string, unknown> | undefined;
   }
 
-  /* The Standard types interface. */
-  export interface Types<Input = unknown, Output = Input> {
-    /* The input type of the schema. */
-    readonly input: Input;
-    /* The output type of the schema. */
-    readonly output: Output;
-  }
+  /** The Standard types interface. */
+  export interface Types<Input = unknown, Output = Input>
+    extends StandardTypedV1.Types<Input, Output> {}
 
-  /* Infers the input type of a Standard JSON Schema. */
-  export type InferInput<Schema extends StandardJSONSchemaV1> = NonNullable<
-    Schema['~standard']['types']
-  >['input'];
+  /** Infers the input type of a Standard. */
+  export type InferInput<Schema extends StandardTypedV1> =
+    StandardTypedV1.InferInput<Schema>;
 
-  /* Infers the output type of a Standard JSON Schema. */
-  export type InferOutput<Schema extends StandardJSONSchemaV1> = NonNullable<
-    Schema['~standard']['types']
-  >['output'];
+  /** Infers the output type of a Standard. */
+  export type InferOutput<Schema extends StandardTypedV1> =
+    StandardTypedV1.InferOutput<Schema>;
 }
 ```
 
@@ -227,7 +252,31 @@ Refer to the [implementation example](https://github.com/standard-schema/standar
 
 ### I want to accept JSON Schema from a user. How do I do that?
 
-Refer to the [integration example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/json-integrate.ts) for a worked example.
+Use the interface to accept values from the user.
+
+```ts
+// Function that accepts any compliant `StandardJSONSchemaV1`
+// and converts it to a JSON Schema.
+export function acceptSchema(schema: StandardJSONSchemaV1) {
+  // do stuff, e.g.
+  return schema['~standard'].jsonSchema.input({
+    target: 'draft-2020-12',
+  });
+}
+
+acceptSchema(z.string());
+```
+
+To infer generic type information from the user-defined schema:
+
+```ts
+export function parseData<T extends StandardJSONSchemaV1>(
+  schema: T,
+  data: StandardJSONSchemaV1.InferInput<T> // knp
+): StandardJSONSchemaV1.InferOutput<T> {
+  // do stuff, e.g. validate with AJV
+}
+```
 
 ### What if I want to accept only schemas that implement both `StandardSchema` and `StandardJSONSchema`?
 
