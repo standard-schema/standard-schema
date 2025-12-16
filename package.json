@@ -15,6 +15,7 @@
     "prettier": "^3.4.2"
   },
   "scripts": {
-    "build": "pnpm run --filter=@standard-schema/spec --filter=@standard-schema/utils build"
+    "build": "pnpm run --filter=@standard-schema/spec --filter=@standard-schema/utils build",
+    "web": "pnpm run --filter=onepager-nextjs dev"
   }
 }
