@@ -161,6 +161,7 @@ The answer to this question is a little more nuanced than with regular _Standard
 | [ArkType](https://arktype.io/) | v2.1.28    | [PR](https://github.com/arktypeio/arktype/pull/1558)   |                                                                           | [#](#arktype)  |
 | [Valibot](https://valibot.dev) | v1.2       | [PR](https://github.com/open-circle/valibot/pull/1372) | via `toStandardJsonSchema()` in `@valibot/to-json-schema` package (v1.5+) | [#](#valibot)  |
 | [Zod Mini](https://zod.dev)    | v4.2+      | [PR](https://github.com/colinhacks/zod/pull/5477)      | via `z.toJSONSchema()`                                                    | [#](#zod-mini) |
+| [GraphQL Standard Schema](https://github.com/apollographql/graphql-standard-schema) | v0.2.0+    | [PR](https://github.com/apollographql/graphql-standard-schema/pull/8) | | [#](#graphql-standard-schema) |
 
 ## Usage
 
@@ -197,6 +198,20 @@ toStandardJsonSchema(v.string()) satisfies StandardJSONSchemaV1; // ✅
 import * as z from 'zod/mini';
 
 z.toJSONSchema(z.string()) satisfies StandardJSONSchemaV1; // ✅
+```
+
+### GraphQL Standard Schema
+
+```ts
+import { GraphQLStandardSchemaGenerator } from "@apollo/graphql-standard-schema";
+
+const generator = new GraphQLStandardSchemaGenerator({ schema, scalarTypes });
+const fragmentSchema = generator.getFragmentSchema(
+  gql`fragment UserDetails on User { id name }`
+);
+fragmentSchema satisfies StandardJSONSchemaV1; // ✅
+fragmentSchema.serialize satisfies StandardJSONSchemaV1; // ✅
+fragmentSchema.deserialize satisfies StandardJSONSchemaV1; // ✅
 ```
 
 ## What tools / frameworks accept spec-compliant schemas?

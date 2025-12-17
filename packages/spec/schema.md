@@ -144,6 +144,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [jsonv-ts](https://github.com/dswbx/jsonv-ts)                                      | v0.3.0+    | [PR](https://github.com/dswbx/jsonv-ts/pull/7)                                                             |
 | [Evolu](https://github.com/evoluhq/evolu)                                          | v6.0.1+    | [PR](https://github.com/evoluhq/evolu/pull/605)                                                            |
 | [zeed](https://github.com/holtwick/zeed)                                           | v1.1.0+    | [Commit](https://github.com/holtwick/zeed/commit/05fb980df7ed0722f45a417bad8f1560195c7e1b)                 |
+| [GraphQL Standard Schema](https://github.com/apollographql/graphql-standard-schema)| v0.1.0+    | from the start | 
 
 ## What tools / frameworks accept spec-compliant schemas?
 
