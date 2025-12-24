@@ -1,18 +1,24 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 
-export const isStandardSchema: {
-  // check for any version
-  (schema: unknown): schema is StandardSchemaV1;
-  // specific version checks
-  v1(schema: unknown): schema is StandardSchemaV1;
-} = Object.assign(
-  function isStandardSchema(schema: unknown): schema is StandardSchemaV1 {
-    // biome-ignore lint/suspicious/noExplicitAny: avoids many unnecessary checks
-    return typeof (schema as any)?.["~standard"] === "object";
-  },
-  {
-    v1(schema: unknown): schema is StandardSchemaV1 {
-      return isStandardSchema(schema) && schema["~standard"].version === 1;
-    },
-  },
-);
+// check for any version
+export function isStandardSchema(schema: unknown): schema is StandardSchemaV1;
+// check for specific version
+export function isStandardSchema(
+  schema: unknown,
+  version: 1,
+): schema is StandardSchemaV1;
+export function isStandardSchema(
+  // biome-ignore lint/suspicious/noExplicitAny: we don't want to typeof check the schema itself - only the ~standard property (schemas can be objects or functions, for example)
+  schema: any,
+  version?: number,
+): schema is StandardSchemaV1 {
+  if (schema == null) return false;
+  const standardProps = schema["~standard"];
+  const baseConditions =
+    typeof standardProps === "object" &&
+    typeof standardProps.validate === "function" &&
+    typeof standardProps.version === "number" &&
+    typeof standardProps.vendor === "string";
+  if (version == null) return baseConditions;
+  return baseConditions && standardProps.version === version;
+}

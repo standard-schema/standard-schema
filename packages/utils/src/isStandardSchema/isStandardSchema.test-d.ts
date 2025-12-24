@@ -10,11 +10,25 @@ describe("isStandardSchema", () => {
       expectTypeOf(maybeSchema).toEqualTypeOf<StandardSchemaV1>();
     }
   });
+  test("should narrow types from unknown with version", () => {
+    const maybeSchema: unknown = stringSchema;
+    if (isStandardSchema(maybeSchema, 1)) {
+      expectTypeOf(maybeSchema).toEqualTypeOf<StandardSchemaV1>();
+    }
+  });
   test("should narrow types from known", () => {
     const maybeSchema = stringSchema as
       | StandardSchemaV1<string>
       | { parse(value: unknown): string };
     if (isStandardSchema(maybeSchema)) {
+      expectTypeOf(maybeSchema).toEqualTypeOf<StandardSchemaV1<string>>();
+    }
+  });
+  test("should narrow types from known with version", () => {
+    const maybeSchema = stringSchema as
+      | StandardSchemaV1<string>
+      | { parse(value: unknown): string };
+    if (isStandardSchema(maybeSchema, 1)) {
       expectTypeOf(maybeSchema).toEqualTypeOf<StandardSchemaV1<string>>();
     }
   });
