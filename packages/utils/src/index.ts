@@ -4,6 +4,7 @@ export * from "./formatIssues/index.ts";
 export * from "./getDotPath/index.ts";
 export * from "./getPathSegmentKey/index.ts";
 export * from "./is/index.ts";
+export * from "./isStandardJsonSchema/index.ts";
 export * from "./isStandardSchema/index.ts";
 export * from "./parse/index.ts";
 export * from "./parseDictionary/index.ts";

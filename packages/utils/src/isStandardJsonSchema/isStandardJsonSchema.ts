@@ -1,22 +1,26 @@
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type { StandardJSONSchemaV1 } from "@standard-schema/spec";
 
 // check for any version
-export function isStandardSchema(schema: unknown): schema is StandardSchemaV1;
+export function isStandardJsonSchema(
+  schema: unknown,
+): schema is StandardJSONSchemaV1;
 // check for specific version
-export function isStandardSchema(
+export function isStandardJsonSchema(
   schema: unknown,
   version: 1,
-): schema is StandardSchemaV1;
-export function isStandardSchema(
+): schema is StandardJSONSchemaV1;
+export function isStandardJsonSchema(
   // biome-ignore lint/suspicious/noExplicitAny: we don't want to typeof check the schema itself - only the ~standard property (schemas can be objects or functions, for example)
   schema: any,
   version?: number,
-): schema is StandardSchemaV1 {
+): schema is StandardJSONSchemaV1 {
   if (schema == null) return false;
   const standardProps = schema["~standard"];
   const baseConditions =
     typeof standardProps === "object" &&
-    typeof standardProps.validate === "function" &&
+    typeof standardProps.jsonSchema === "object" &&
+    typeof standardProps.jsonSchema.input === "function" &&
+    typeof standardProps.jsonSchema.output === "function" &&
     typeof standardProps.version === "number" &&
     typeof standardProps.vendor === "string";
   return version == null

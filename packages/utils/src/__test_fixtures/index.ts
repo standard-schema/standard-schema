@@ -1,4 +1,7 @@
-import type { StandardSchemaV1 } from "@standard-schema/spec";
+import type {
+  StandardJSONSchemaV1,
+  StandardSchemaV1,
+} from "@standard-schema/spec";
 
 export const stringSchema: StandardSchemaV1<string> = {
   "~standard": {
@@ -15,6 +18,17 @@ export const stringSchema: StandardSchemaV1<string> = {
   },
 };
 
+export const stringJsonSchema: StandardJSONSchemaV1<string> = {
+  "~standard": {
+    version: 1,
+    vendor: "custom",
+    jsonSchema: {
+      input: () => ({ type: "string" }),
+      output: () => ({ type: "string" }),
+    },
+  },
+};
+
 export const stringToNumberSchema: StandardSchemaV1<string, number> = {
   "~standard": {
     version: 1,
@@ -26,6 +40,17 @@ export const stringToNumberSchema: StandardSchemaV1<string, number> = {
         : {
             issues: [{ message: `Expected string, got ${typeof value}` }],
           };
+    },
+  },
+};
+
+export const stringToNumberJsonSchema: StandardJSONSchemaV1<string, number> = {
+  "~standard": {
+    version: 1,
+    vendor: "custom",
+    jsonSchema: {
+      input: () => ({ type: "string" }),
+      output: () => ({ type: "number" }),
     },
   },
 };
@@ -55,5 +80,25 @@ export const fieldsSchema: StandardSchemaV1<Fields> = {
     version: 1,
     vendor: "custom",
     validate: () => ({ issues: [{ message: "Not implemented" }] }),
+  },
+};
+
+const _fieldsJsonSchema = {
+  type: "object",
+  properties: {
+    foo: { type: "string" },
+    bar: { type: "number" },
+  },
+  required: ["foo", "bar"],
+};
+
+export const fieldsJsonSchema: StandardJSONSchemaV1<Fields> = {
+  "~standard": {
+    version: 1,
+    vendor: "custom",
+    jsonSchema: {
+      input: () => _fieldsJsonSchema,
+      output: () => _fieldsJsonSchema,
+    },
   },
 };
