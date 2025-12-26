@@ -14,10 +14,10 @@ import { safeParse, safeParseSync } from "../safeParse/safeParse.ts";
  *
  * @throws {SchemaError} If the data is invalid.
  */
-export async function parse<Schema extends StandardSchemaV1>(
-  schema: Schema,
-  data: LooseAutocomplete<StandardSchemaV1.InferInput<Schema>>,
-): Promise<StandardSchemaV1.InferOutput<Schema>> {
+export async function parse<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
+  data: LooseAutocomplete<StandardSchemaV1.InferInput<TSchema>>,
+): Promise<StandardSchemaV1.InferOutput<TSchema>> {
   const result = await safeParse(schema, data);
   if (result.issues) throw new SchemaError(result.issues);
   return result.value;
@@ -35,10 +35,10 @@ export async function parse<Schema extends StandardSchemaV1>(
  * @throws {SchemaError} If the data is invalid.
  * @throws {TypeError} If the schema validation is asynchronous.
  */
-export function parseSync<Schema extends StandardSchemaV1>(
-  schema: Schema,
-  data: LooseAutocomplete<StandardSchemaV1.InferInput<Schema>>,
-): StandardSchemaV1.InferOutput<Schema> {
+export function parseSync<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
+  data: LooseAutocomplete<StandardSchemaV1.InferInput<TSchema>>,
+): StandardSchemaV1.InferOutput<TSchema> {
   const result = safeParseSync(schema, data);
   if (result.issues) throw new SchemaError(result.issues);
   return result.value;

@@ -4,24 +4,24 @@ import { _removeSchemaArg } from "../_removeSchemaArg/_removeSchemaArg.ts";
 import type { IssueMapper } from "../flattenIssues/flattenIssues.ts";
 import { getPathSegmentKey } from "../getPathSegmentKey/getPathSegmentKey.ts";
 
-type RecursiveFormattedIssues<T, MappedIssue> = T extends readonly [
+type RecursiveFormattedIssues<T, TMapped> = T extends readonly [
   unknown,
   ...unknown[],
 ]
-  ? { [K in keyof T]?: FormattedIssues<T[K], MappedIssue> }
+  ? { [TKey in keyof T]?: FormattedIssues<T[TKey], TMapped> }
   : T extends readonly unknown[]
-    ? { [k: number]: FormattedIssues<T[number], MappedIssue> }
+    ? { [k: number]: FormattedIssues<T[number], TMapped> }
     : T extends object
-      ? { [K in keyof T]?: FormattedIssues<T[K], MappedIssue> }
+      ? { [TKey in keyof T]?: FormattedIssues<T[TKey], TMapped> }
       : unknown;
 
 export type InferFormattedIssues<
-  Schema extends StandardSchemaV1,
-  MappedIssue = string,
-> = FormattedIssues<StandardSchemaV1.InferOutput<Schema>, MappedIssue>;
-export type FormattedIssues<T, MappedIssue = string> = {
-  _issues: readonly MappedIssue[];
-} & RecursiveFormattedIssues<NonNullable<T>, MappedIssue>;
+  TSchema extends StandardSchemaV1,
+  TMapped = string,
+> = FormattedIssues<StandardSchemaV1.InferOutput<TSchema>, TMapped>;
+export type FormattedIssues<T, TMapped = string> = {
+  _issues: readonly TMapped[];
+} & RecursiveFormattedIssues<NonNullable<T>, TMapped>;
 
 /**
  * Formats a set of issues into a nested object.
@@ -38,10 +38,10 @@ export function formatIssues(
  *
  * @param mapIssue A function that maps an issue to a value.
  */
-export function formatIssues<MappedIssue>(
+export function formatIssues<TMapped>(
   issues: readonly StandardSchemaV1.Issue[],
-  mapIssue: IssueMapper<MappedIssue>,
-): FormattedIssues<unknown, MappedIssue>;
+  mapIssue: IssueMapper<TMapped>,
+): FormattedIssues<unknown, TMapped>;
 /**
  * Formats a set of issues into a nested object.
  *
@@ -49,10 +49,10 @@ export function formatIssues<MappedIssue>(
  *
  * @param issues The issues to format.
  */
-export function formatIssues<Schema extends StandardSchemaV1>(
-  schema: Schema,
+export function formatIssues<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
   issues: readonly StandardSchemaV1.Issue[],
-): InferFormattedIssues<Schema>;
+): InferFormattedIssues<TSchema>;
 /**
  * Formats a set of issues into a nested object.
  *
@@ -62,11 +62,11 @@ export function formatIssues<Schema extends StandardSchemaV1>(
  *
  * @param mapIssue A function that maps an issue to a value.
  */
-export function formatIssues<Schema extends StandardSchemaV1, MappedIssue>(
-  schema: Schema,
+export function formatIssues<TSchema extends StandardSchemaV1, TMapped>(
+  schema: TSchema,
   issues: readonly StandardSchemaV1.Issue[],
-  mapIssue: IssueMapper<MappedIssue>,
-): InferFormattedIssues<Schema, MappedIssue>;
+  mapIssue: IssueMapper<TMapped>,
+): InferFormattedIssues<TSchema, TMapped>;
 export function formatIssues(
   ...args: SchemaArgs<
     [issues: readonly StandardSchemaV1.Issue[], mapIssue?: IssueMapper<unknown>]

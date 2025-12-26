@@ -10,10 +10,10 @@ import type { LooseAutocomplete } from "../_types/index.ts";
  *
  * @returns A promise that resolves to a result object.
  */
-export async function safeParse<Schema extends StandardSchemaV1>(
-  schema: Schema,
-  data: LooseAutocomplete<StandardSchemaV1.InferInput<Schema>>,
-): Promise<StandardSchemaV1.Result<StandardSchemaV1.InferOutput<Schema>>> {
+export async function safeParse<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
+  data: LooseAutocomplete<StandardSchemaV1.InferInput<TSchema>>,
+): Promise<StandardSchemaV1.Result<StandardSchemaV1.InferOutput<TSchema>>> {
   return schema["~standard"].validate(data);
 }
 
@@ -29,10 +29,10 @@ export async function safeParse<Schema extends StandardSchemaV1>(
  *
  * @throws {TypeError} If the schema validation is asynchronous.
  */
-export function safeParseSync<Schema extends StandardSchemaV1>(
-  schema: Schema,
-  data: LooseAutocomplete<StandardSchemaV1.InferInput<Schema>>,
-): StandardSchemaV1.Result<StandardSchemaV1.InferOutput<Schema>> {
+export function safeParseSync<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
+  data: LooseAutocomplete<StandardSchemaV1.InferInput<TSchema>>,
+): StandardSchemaV1.Result<StandardSchemaV1.InferOutput<TSchema>> {
   const result = schema["~standard"].validate(data);
   if (result instanceof Promise) {
     throw new TypeError("Schema validation must be synchronous");

@@ -18,14 +18,14 @@ import type { StandardSchemaV1Dictionary } from "../types/StandardSchemaDictiona
  * @throws {SchemaError} If the data is invalid.
  */
 export async function parseDictionary<
-  Schemas extends StandardSchemaV1Dictionary,
+  TSchema extends StandardSchemaV1Dictionary,
 >(
-  schemas: Schemas,
+  schemas: TSchema,
   data: LooseAutocomplete<
-    StandardSchemaV1Dictionary.InferInput<Schemas>,
+    StandardSchemaV1Dictionary.InferInput<TSchema>,
     Record<string, unknown>
   >,
-): Promise<StandardSchemaV1Dictionary.InferOutput<Schemas>> {
+): Promise<StandardSchemaV1Dictionary.InferOutput<TSchema>> {
   const result = await safeParseDictionary(schemas, data);
   if (result.issues) throw new SchemaError(result.issues);
   return result.value;
@@ -43,13 +43,15 @@ export async function parseDictionary<
  * @throws {SchemaError} If the data is invalid.
  * @throws {TypeError} If the schema validation is asynchronous.
  */
-export function parseDictionarySync<Schemas extends StandardSchemaV1Dictionary>(
-  schemas: Schemas,
+export function parseDictionarySync<
+  TSchemas extends StandardSchemaV1Dictionary,
+>(
+  schemas: TSchemas,
   data: LooseAutocomplete<
-    StandardSchemaV1Dictionary.InferInput<Schemas>,
+    StandardSchemaV1Dictionary.InferInput<TSchemas>,
     Record<string, unknown>
   >,
-): StandardSchemaV1Dictionary.InferOutput<Schemas> {
+): StandardSchemaV1Dictionary.InferOutput<TSchemas> {
   const result = safeParseDictionarySync(schemas, data);
   if (result.issues) throw new SchemaError(result.issues);
   return result.value;

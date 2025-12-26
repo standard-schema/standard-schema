@@ -10,9 +10,9 @@ import { safeParseSync } from "../safeParse/safeParse.ts";
  *
  * @returns Whether the input matches the schema.
  */
-export function is<Schema extends StandardSchemaV1>(
-  schema: Schema,
+export function is<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
   input: unknown,
-): input is StandardSchemaV1.InferInput<Schema> {
+): input is StandardSchemaV1.InferInput<TSchema> {
   return !safeParseSync(schema, input).issues;
 }

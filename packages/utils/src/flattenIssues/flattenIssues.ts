@@ -5,18 +5,16 @@ import type { KeyofUnion } from "../_types/index.ts";
 import { getPathSegmentKey } from "../getPathSegmentKey/getPathSegmentKey.ts";
 
 export type InferFlattenedIssues<
-  Schema extends StandardSchemaV1,
-  MappedIssue = string,
-> = FlattenedIssues<StandardSchemaV1.InferOutput<Schema>, MappedIssue>;
+  TSchema extends StandardSchemaV1,
+  TMapped = string,
+> = FlattenedIssues<StandardSchemaV1.InferOutput<TSchema>, TMapped>;
 
-export interface FlattenedIssues<Fields, MappedIssue = string> {
-  formIssues: readonly MappedIssue[];
-  fieldIssues: Partial<Record<KeyofUnion<Fields>, readonly MappedIssue[]>>;
+export interface FlattenedIssues<TFields, TMapped = string> {
+  formIssues: readonly TMapped[];
+  fieldIssues: Partial<Record<KeyofUnion<TFields>, readonly TMapped[]>>;
 }
 
-export type IssueMapper<MappedIssue> = (
-  issue: StandardSchemaV1.Issue,
-) => MappedIssue;
+export type IssueMapper<TMapped> = (issue: StandardSchemaV1.Issue) => TMapped;
 
 /**
  * Flatten issues into form and field errors. Useful for schemas that are one level deep.
@@ -33,10 +31,10 @@ export function flattenIssues(
  *
  * @param mapIssue A function that maps an issue to a value.
  */
-export function flattenIssues<MappedIssue>(
+export function flattenIssues<TMapped>(
   issues: readonly StandardSchemaV1.Issue[],
-  mapIssue: IssueMapper<MappedIssue>,
-): FlattenedIssues<unknown, MappedIssue>;
+  mapIssue: IssueMapper<TMapped>,
+): FlattenedIssues<unknown, TMapped>;
 /**
  * Flatten issues into form and field errors. Useful for schemas that are one level deep.
  *
@@ -44,10 +42,10 @@ export function flattenIssues<MappedIssue>(
  *
  * @param issues The issues to flatten.
  */
-export function flattenIssues<Schema extends StandardSchemaV1>(
-  schema: Schema,
+export function flattenIssues<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
   issues: readonly StandardSchemaV1.Issue[],
-): InferFlattenedIssues<Schema>;
+): InferFlattenedIssues<TSchema>;
 /**
  * Flatten issues into form and field errors. Useful for schemas that are one level deep.
  *
@@ -57,11 +55,11 @@ export function flattenIssues<Schema extends StandardSchemaV1>(
  *
  * @param mapIssue A function that maps an issue to a value.
  */
-export function flattenIssues<Schema extends StandardSchemaV1, MappedIssue>(
-  schema: Schema,
+export function flattenIssues<TSchema extends StandardSchemaV1, TMapped>(
+  schema: TSchema,
   issues: readonly StandardSchemaV1.Issue[],
-  mapIssue: IssueMapper<MappedIssue>,
-): InferFlattenedIssues<Schema, MappedIssue>;
+  mapIssue: IssueMapper<TMapped>,
+): InferFlattenedIssues<TSchema, TMapped>;
 export function flattenIssues(
   ...args: SchemaArgs<
     [issues: readonly StandardSchemaV1.Issue[], mapIssue?: IssueMapper<unknown>]

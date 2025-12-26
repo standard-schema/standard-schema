@@ -1,3 +1,4 @@
+/** biome-ignore-all lint/style/useNamingConvention: consistent with spec */
 import type { StandardSchemaV1 } from "@standard-schema/spec";
 
 export type StandardSchemaV1Dictionary<

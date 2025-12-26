@@ -12,11 +12,14 @@ import type { StandardSchemaV1Tuple } from "../types/StandardSchemaDictionary.ts
  *
  * @returns A promise that resolves to a result object.
  */
-export async function safeParseTuple<Schemas extends StandardSchemaV1Tuple>(
-  schemas: Schemas,
-  data: LooseAutocomplete<StandardSchemaV1Tuple.InferInput<Schemas>, unknown[]>,
+export async function safeParseTuple<TSchemas extends StandardSchemaV1Tuple>(
+  schemas: TSchemas,
+  data: LooseAutocomplete<
+    StandardSchemaV1Tuple.InferInput<TSchemas>,
+    unknown[]
+  >,
 ): Promise<
-  StandardSchemaV1.Result<StandardSchemaV1Tuple.InferOutput<Schemas>>
+  StandardSchemaV1.Result<StandardSchemaV1Tuple.InferOutput<TSchemas>>
 > {
   const results = await Promise.all(
     schemas.map(async (schema, index) => {
@@ -36,7 +39,7 @@ export async function safeParseTuple<Schemas extends StandardSchemaV1Tuple>(
   return {
     value: results.map(
       (result) => (result as StandardSchemaV1.SuccessResult<unknown>).value,
-    ) as StandardSchemaV1Tuple.InferOutput<Schemas>,
+    ) as StandardSchemaV1Tuple.InferOutput<TSchemas>,
   };
 }
 
@@ -52,10 +55,13 @@ export async function safeParseTuple<Schemas extends StandardSchemaV1Tuple>(
  *
  * @throws {TypeError} If the schema validation is asynchronous.
  */
-export function safeParseTupleSync<Schemas extends StandardSchemaV1Tuple>(
-  schemas: Schemas,
-  data: LooseAutocomplete<StandardSchemaV1Tuple.InferInput<Schemas>, unknown[]>,
-): StandardSchemaV1.Result<StandardSchemaV1Tuple.InferOutput<Schemas>> {
+export function safeParseTupleSync<TSchemas extends StandardSchemaV1Tuple>(
+  schemas: TSchemas,
+  data: LooseAutocomplete<
+    StandardSchemaV1Tuple.InferInput<TSchemas>,
+    unknown[]
+  >,
+): StandardSchemaV1.Result<StandardSchemaV1Tuple.InferOutput<TSchemas>> {
   const results = schemas.map((schema, index) => {
     const result = safeParseSync(schema, data[index]);
     if (result.issues) {
@@ -72,6 +78,6 @@ export function safeParseTupleSync<Schemas extends StandardSchemaV1Tuple>(
   return {
     value: results.map(
       (result) => (result as StandardSchemaV1.SuccessResult<unknown>).value,
-    ) as StandardSchemaV1Tuple.InferOutput<Schemas>,
+    ) as StandardSchemaV1Tuple.InferOutput<TSchemas>,
   };
 }

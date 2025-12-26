@@ -10,9 +10,9 @@ import { parseSync } from "../parse/parse.ts";
  *
  * @throws {SchemaError} If the data does not match the schema.
  */
-export function assert<Schema extends StandardSchemaV1>(
-  schema: Schema,
+export function assert<TSchema extends StandardSchemaV1>(
+  schema: TSchema,
   data: unknown,
-): asserts data is StandardSchemaV1.InferInput<Schema> {
+): asserts data is StandardSchemaV1.InferInput<TSchema> {
   parseSync(schema, data);
 }

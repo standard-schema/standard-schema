@@ -13,15 +13,15 @@ import type { StandardSchemaV1Dictionary } from "../types/StandardSchemaDictiona
  * @returns A promise that resolves to a result object.
  */
 export async function safeParseDictionary<
-  Schemas extends StandardSchemaV1Dictionary,
+  TSchemas extends StandardSchemaV1Dictionary,
 >(
-  schemas: Schemas,
+  schemas: TSchemas,
   data: LooseAutocomplete<
-    StandardSchemaV1Dictionary.InferInput<Schemas>,
+    StandardSchemaV1Dictionary.InferInput<TSchemas>,
     Record<string, unknown>
   >,
 ): Promise<
-  StandardSchemaV1.Result<StandardSchemaV1Dictionary.InferOutput<Schemas>>
+  StandardSchemaV1.Result<StandardSchemaV1Dictionary.InferOutput<TSchemas>>
 > {
   const results = await Promise.all(
     Object.entries(schemas).map(async ([key, schema]) => {
@@ -44,7 +44,7 @@ export async function safeParseDictionary<
         key,
         (result as StandardSchemaV1.SuccessResult<unknown>).value,
       ]),
-    ) as StandardSchemaV1Dictionary.InferOutput<Schemas>,
+    ) as StandardSchemaV1Dictionary.InferOutput<TSchemas>,
   };
 }
 
@@ -61,14 +61,14 @@ export async function safeParseDictionary<
  * @throws {TypeError} If the schema validation is asynchronous.
  */
 export function safeParseDictionarySync<
-  Schemas extends StandardSchemaV1Dictionary,
+  TSchemas extends StandardSchemaV1Dictionary,
 >(
-  schemas: Schemas,
+  schemas: TSchemas,
   data: LooseAutocomplete<
-    StandardSchemaV1Dictionary.InferInput<Schemas>,
+    StandardSchemaV1Dictionary.InferInput<TSchemas>,
     Record<string, unknown>
   >,
-): StandardSchemaV1.Result<StandardSchemaV1Dictionary.InferOutput<Schemas>> {
+): StandardSchemaV1.Result<StandardSchemaV1Dictionary.InferOutput<TSchemas>> {
   const results = Object.entries(schemas).map(([key, schema]) => {
     const result = safeParseSync(schema, data[key]);
     if (result.issues) {
@@ -88,6 +88,6 @@ export function safeParseDictionarySync<
         key,
         (result as StandardSchemaV1.SuccessResult<unknown>).value,
       ]),
-    ) as StandardSchemaV1Dictionary.InferOutput<Schemas>,
+    ) as StandardSchemaV1Dictionary.InferOutput<TSchemas>,
   };
 }

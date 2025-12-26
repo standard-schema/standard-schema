@@ -17,10 +17,13 @@ import type { StandardSchemaV1Tuple } from "../types/StandardSchemaDictionary.ts
  *
  * @throws {SchemaError} If the data is invalid.
  */
-export async function parseTuple<Schemas extends StandardSchemaV1Tuple>(
-  schemas: Schemas,
-  data: LooseAutocomplete<StandardSchemaV1Tuple.InferInput<Schemas>, unknown[]>,
-): Promise<StandardSchemaV1Tuple.InferOutput<Schemas>> {
+export async function parseTuple<TSchemas extends StandardSchemaV1Tuple>(
+  schemas: TSchemas,
+  data: LooseAutocomplete<
+    StandardSchemaV1Tuple.InferInput<TSchemas>,
+    unknown[]
+  >,
+): Promise<StandardSchemaV1Tuple.InferOutput<TSchemas>> {
   const result = await safeParseTuple(schemas, data);
   if (result.issues) throw new SchemaError(result.issues);
   return result.value;
@@ -38,10 +41,13 @@ export async function parseTuple<Schemas extends StandardSchemaV1Tuple>(
  * @throws {SchemaError} If the data is invalid.
  * @throws {TypeError} If the schema validation is asynchronous.
  */
-export function parseTupleSync<Schemas extends StandardSchemaV1Tuple>(
-  schemas: Schemas,
-  data: LooseAutocomplete<StandardSchemaV1Tuple.InferInput<Schemas>, unknown[]>,
-): StandardSchemaV1Tuple.InferOutput<Schemas> {
+export function parseTupleSync<TSchemas extends StandardSchemaV1Tuple>(
+  schemas: TSchemas,
+  data: LooseAutocomplete<
+    StandardSchemaV1Tuple.InferInput<TSchemas>,
+    unknown[]
+  >,
+): StandardSchemaV1Tuple.InferOutput<TSchemas> {
   const result = safeParseTupleSync(schemas, data);
   if (result.issues) throw new SchemaError(result.issues);
   return result.value;
