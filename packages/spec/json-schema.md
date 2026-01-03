@@ -226,6 +226,7 @@ When creating a PR to add your tool, please add a new row to the table below wit
 
 | Integrator | Description | Link |
 | ---------- | ----------- | ---- |
+| [xsAI](https://github.com/moeru-ai/xsai) | Extra-small AI SDK | [PR](https://github.com/moeru-ai/xsai/pull/238) |
 | [GQLoom](https://gqloom.dev/) | Weave GraphQL schema and resolvers using Standard Schema | [PR](https://github.com/modevol-com/gqloom/pull/242) |
 
 ## FAQ
