@@ -13,39 +13,39 @@ import type { StandardSchemaV1Dictionary } from "../types/StandardSchemaDictiona
  * @returns A promise that resolves to a result object.
  */
 export async function safeParseDictionary<
-  TSchemas extends StandardSchemaV1Dictionary,
+	TSchemas extends StandardSchemaV1Dictionary,
 >(
-  schemas: TSchemas,
-  data: LooseAutocomplete<
-    StandardSchemaV1Dictionary.InferInput<TSchemas>,
-    Record<string, unknown>
-  >,
+	schemas: TSchemas,
+	data: LooseAutocomplete<
+		StandardSchemaV1Dictionary.InferInput<TSchemas>,
+		Record<string, unknown>
+	>,
 ): Promise<
-  StandardSchemaV1.Result<StandardSchemaV1Dictionary.InferOutput<TSchemas>>
+	StandardSchemaV1.Result<StandardSchemaV1Dictionary.InferOutput<TSchemas>>
 > {
-  const results = await Promise.all(
-    Object.entries(schemas).map(async ([key, schema]) => {
-      const result = await safeParse(schema, data[key]);
-      if (result.issues) {
-        // @ts-expect-error ignoring readonly for performance
-        // biome-ignore lint/suspicious/noAssignInExpressions: ignoring for performance
-        for (const issue of result.issues) (issue.path ??= [])?.unshift(key);
-      }
-      return [key, result] as const;
-    }),
-  );
-  const issues = results.flatMap(([, result]) => result.issues ?? []);
-  if (issues.length) {
-    return { issues };
-  }
-  return {
-    value: Object.fromEntries(
-      results.map(([key, result]) => [
-        key,
-        (result as StandardSchemaV1.SuccessResult<unknown>).value,
-      ]),
-    ) as StandardSchemaV1Dictionary.InferOutput<TSchemas>,
-  };
+	const results = await Promise.all(
+		Object.entries(schemas).map(async ([key, schema]) => {
+			const result = await safeParse(schema, data[key]);
+			if (result.issues) {
+				// @ts-expect-error ignoring readonly for performance
+				// biome-ignore lint/suspicious/noAssignInExpressions: ignoring for performance
+				for (const issue of result.issues) (issue.path ??= []).unshift(key);
+			}
+			return [key, result] as const;
+		}),
+	);
+	const issues = results.flatMap(([, result]) => result.issues ?? []);
+	if (issues.length) {
+		return { issues };
+	}
+	return {
+		value: Object.fromEntries(
+			results.map(([key, result]) => [
+				key,
+				(result as StandardSchemaV1.SuccessResult<unknown>).value,
+			]),
+		) as StandardSchemaV1Dictionary.InferOutput<TSchemas>,
+	};
 }
 
 /**
@@ -61,33 +61,33 @@ export async function safeParseDictionary<
  * @throws {TypeError} If the schema validation is asynchronous.
  */
 export function safeParseDictionarySync<
-  TSchemas extends StandardSchemaV1Dictionary,
+	TSchemas extends StandardSchemaV1Dictionary,
 >(
-  schemas: TSchemas,
-  data: LooseAutocomplete<
-    StandardSchemaV1Dictionary.InferInput<TSchemas>,
-    Record<string, unknown>
-  >,
+	schemas: TSchemas,
+	data: LooseAutocomplete<
+		StandardSchemaV1Dictionary.InferInput<TSchemas>,
+		Record<string, unknown>
+	>,
 ): StandardSchemaV1.Result<StandardSchemaV1Dictionary.InferOutput<TSchemas>> {
-  const results = Object.entries(schemas).map(([key, schema]) => {
-    const result = safeParseSync(schema, data[key]);
-    if (result.issues) {
-      // @ts-expect-error ignoring readonly for performance
-      // biome-ignore lint/suspicious/noAssignInExpressions: ignoring for performance
-      for (const issue of result.issues) (issue.path ??= [])?.unshift(key);
-    }
-    return [key, result] as const;
-  });
-  const issues = results.flatMap(([, result]) => result.issues ?? []);
-  if (issues.length) {
-    return { issues };
-  }
-  return {
-    value: Object.fromEntries(
-      results.map(([key, result]) => [
-        key,
-        (result as StandardSchemaV1.SuccessResult<unknown>).value,
-      ]),
-    ) as StandardSchemaV1Dictionary.InferOutput<TSchemas>,
-  };
+	const results = Object.entries(schemas).map(([key, schema]) => {
+		const result = safeParseSync(schema, data[key]);
+		if (result.issues) {
+			// @ts-expect-error ignoring readonly for performance
+			// biome-ignore lint/suspicious/noAssignInExpressions: ignoring for performance
+			for (const issue of result.issues) (issue.path ??= []).unshift(key);
+		}
+		return [key, result] as const;
+	});
+	const issues = results.flatMap(([, result]) => result.issues ?? []);
+	if (issues.length) {
+		return { issues };
+	}
+	return {
+		value: Object.fromEntries(
+			results.map(([key, result]) => [
+				key,
+				(result as StandardSchemaV1.SuccessResult<unknown>).value,
+			]),
+		) as StandardSchemaV1Dictionary.InferOutput<TSchemas>,
+	};
 }
