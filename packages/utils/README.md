@@ -396,7 +396,7 @@ async function parseString(
 }
 ```
 
-Also includes attached methods for checking specific versions.
+Optionally a version number can be passed, to check for a specific version.
 
 ```ts
 // some point in future...
@@ -407,7 +407,7 @@ async function parseString(
   schema: StandardSchemaV1<string> | StandardSchemaV2<string>,
   data: unknown
 ) {
-  if (isStandardSchema.v1(schema)) {
+  if (isStandardSchema(schema, 1)) {
     // handle v1
   } else {
     // handle v2
