@@ -135,7 +135,6 @@ These are the libraries that have already implemented the Standard Schema interf
 | [unhoax](https://sacdenoeuds.github.io/unhoax/)                                    | v0.7.0+    | [Commit](https://github.com/SacDeNoeuds/unhoax/commit/4e7f2d71c98ba9e3e73f029e0af2e46f9980dcbe)            |
 | [protovalidate-es](https://github.com/bufbuild/protovalidate-es)                   | v0.5.0+    | [PR](https://github.com/bufbuild/protovalidate-es/pull/54)                                                 |
 | [remult](https://remult.dev/docs/standard-schema)                                  | v3.1.1+    | [PR](https://github.com/remult/remult/pull/777)                                                            |
-| [stnl](https://github.com/re-utils/stnl?tab=readme-ov-file#standard-schema)        | v1.1.9+    | [Commit](https://github.com/re-utils/stnl/commit/d748522920e6066de6cc5eefa9c93c38f5b0541a)                 |
 | [yup](https://github.com/jquense/yup)                                              | v1.7.0+    | [PR](https://github.com/jquense/yup/pull/2258)                                                             |
 | [joi](https://github.com/hapijs/joi)                                               | v18.0.0+   | [PR](https://github.com/hapijs/joi/pull/3080)                                                              |
 | [typia](https://github.com/samchon/typia)                                          | v9.2.0+    | [PR](https://github.com/samchon/typia/pull/1500)                                                           |
@@ -143,7 +142,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [jsonv-ts](https://github.com/dswbx/jsonv-ts)                                      | v0.3.0+    | [PR](https://github.com/dswbx/jsonv-ts/pull/7)                                                             |
 | [Evolu](https://github.com/evoluhq/evolu)                                          | v6.0.1+    | [PR](https://github.com/evoluhq/evolu/pull/605)                                                            |
 | [zeed](https://github.com/holtwick/zeed)                                           | v1.1.0+    | [Commit](https://github.com/holtwick/zeed/commit/05fb980df7ed0722f45a417bad8f1560195c7e1b)                 |
-| [GraphQL Standard Schema](https://github.com/apollographql/graphql-standard-schema)| v0.1.0+    | from the start | 
+| [GraphQL Standard Schema](https://github.com/apollographql/graphql-standard-schema)| v0.1.0+    | from the start |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
