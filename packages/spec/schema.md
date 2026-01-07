@@ -125,7 +125,6 @@ These are the libraries that have already implemented the Standard Schema interf
 | [ArkType](https://arktype.io/)                                                     | v2.0+      | [PR](https://github.com/arktypeio/arktype/pull/1194/files)                                                 |
 | [Effect Schema](https://effect.website/docs/schema/introduction/) (⚠️ via adapter) | v3.13.0+   | [PR](https://github.com/Effect-TS/effect/pull/4359)                                                        |
 | [Arri Schema](https://github.com/modiimedia/arri)                                  | v0.71.0+   | [PR](https://github.com/modiimedia/arri/pull/130)                                                          |
-| [TypeBox](https://github.com/sinclairzx81/typebox) (⚠️ via adapter)                | v1.0.0+    | [Issue](https://github.com/sinclairzx81/typebox/issues/1365#issuecomment-3369342504)                       |
 | [Formgator](https://github.com/GauBen/formgator)                                   | v0.1.0+    | [Commit](https://github.com/GauBen/formgator/commit/12c8a90)                                               |
 | [decoders](https://github.com/nvie/decoders)                                       | v2.6.0+    | [PR](https://github.com/nvie/decoders/pull/1213)                                                           |
 | [Sury](https://github.com/DZakh/sury)                                              | v9.2.0+    | [PR](https://github.com/DZakh/sury/pull/105)                                                               |
@@ -207,6 +206,8 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [Reatom](https://reatom.dev/)                                                 | Powerful framework agnostic state-manager with signals, routing, forms out-of-the-box                                                 | [Docs](https://v1000.reatom.dev/handbook/forms/concepts/field-atom/#standard-schema)                  |
 | [Tako](https://takojs.github.io/)                                             | A CLI framework that works on any JavaScript runtime                                                                                  | [Docs](https://github.com/takojs/tako/blob/main/README.md)                                            |
 | [@zap-studio/fetch](https://github.com/zap-studio/monorepo)                   | A type-safe fetch wrapper with Standard Schema validation                                                                             | [Docs](https://www.zapstudio.dev/packages/fetch)                                                      |
+| [@restatedev/restate-sdk](https://github.com/restatedev/sdk-typescript/)      | Durable functions and agents with typesafe interfaces & clients validation                                                            | [Docs](https://docs.restate.dev/develop/ts/serialization)                                             |
+| [WireTyped](https://github.com/kasperrt/wiretyped)                            | Universal fetch-based, typed HTTP client with error-first ergonomics, retries, caching, SSE, and Standard Schema validation           | [Docs](https://wiretyped.io/)                                                                         |
 
 <!-- ## How can my schema library implement the spec?
 
