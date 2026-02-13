@@ -17,8 +17,5 @@
   "scripts": {
     "build": "pnpm run --filter=@standard-schema/spec --filter=@standard-schema/utils build",
     "web": "pnpm run --filter=onepager-nextjs dev"
-  },
-  "dependencies": {
-    "hastscript": "^9.0.1"
   }
 }
