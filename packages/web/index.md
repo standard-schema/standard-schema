@@ -205,6 +205,7 @@ These are the libraries that have already implemented the Standard Schema interf
 - [ArkType](https://github.com/arktypeio/arktype): TypeScript's 1:1 validator, optimized from editor to runtime ⛵
 - [Valibot](https://github.com/fabian-hiller/valibot): The modular and type safe schema library for validating structural data 🤖
 - [Zod](https://github.com/colinhacks/zod) (v3.24+): TypeScript-first schema validation with static type inference
+- [Raptor (Validator)](https://raptorjs.com/docs/validation) (v0.9.0+): An elegant, type-safe validation library for Raptor (and beyond).
 
 ### Third Parties
 
