@@ -142,7 +142,8 @@ These are the libraries that have already implemented the Standard Schema interf
 | [jsonv-ts](https://github.com/dswbx/jsonv-ts)                                      | v0.3.0+    | [PR](https://github.com/dswbx/jsonv-ts/pull/7)                                                             |
 | [Evolu](https://github.com/evoluhq/evolu)                                          | v6.0.1+    | [PR](https://github.com/evoluhq/evolu/pull/605)                                                            |
 | [zeed](https://github.com/holtwick/zeed)                                           | v1.1.0+    | [Commit](https://github.com/holtwick/zeed/commit/05fb980df7ed0722f45a417bad8f1560195c7e1b)                 |
-| [GraphQL Standard Schema](https://github.com/apollographql/graphql-standard-schema)| v0.1.0+    | from the start                                                                                             |
+| [GraphQL Standard Schema](https://github.com/apollographql/graphql-standard-schema)| v0.2.1+    | from the start                                                                                             |
+| [Paseri](https://paseri.dev)                                                       | v1.1.0+    | [Commit](https://github.com/vbudovski/paseri/commit/fa08ee01947de7d6b229d9a7ac21b66164f682d4)              |
 | [VineJS](https://github.com/vinejs/vine)                                           | v4.0.0+    | [Commit](https://github.com/vinejs/vine/commit/768beed3a6b0230b1fb1f340615c8b880c98515a)                   |
 | [validate.js](https://github.com/jakelazaroff/validate.js)                         | v0.1.0+    | from the start                                                                                             |
 
