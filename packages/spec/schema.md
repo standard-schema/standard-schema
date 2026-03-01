@@ -211,6 +211,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [@zap-studio/fetch](https://github.com/zap-studio/monorepo)                   | A type-safe fetch wrapper with Standard Schema validation                                                                             | [Docs](https://www.zapstudio.dev/packages/fetch)                                                      |
 | [@restatedev/restate-sdk](https://github.com/restatedev/sdk-typescript/)      | Durable functions and agents with typesafe interfaces & clients validation                                                            | [Docs](https://docs.restate.dev/develop/ts/serialization)                                             |
 | [WireTyped](https://github.com/kasperrt/wiretyped)                            | Universal fetch-based, typed HTTP client with error-first ergonomics, retries, caching, SSE, and Standard Schema validation           | [Docs](https://wiretyped.io/)                                                                         |
+| [OpenWorkflow](https://openworkflow.dev)                                      | A TypeScript framework for building durable, resumable workflows                                                                      | [Docs](https://openworkflow.dev/docs/standard-schema)                                                 |
 
 <!-- ## How can my schema library implement the spec?
 
