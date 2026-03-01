@@ -1,0 +1,25 @@
+{
+  "$schema": "https://biomejs.dev/schemas/2.1.3/schema.json",
+  "extends": "//",
+  "linter": {
+    "rules": {
+      "style": {
+        "useNamingConvention": {
+          "level": "error",
+          "options": {
+            "conventions": [
+              {
+                "formats": ["PascalCase"],
+                "match": "(T|T[A-Z][A-Za-z]+)",
+                "selector": {
+                  "kind": "typeParameter"
+                }
+              }
+            ],
+            "strictCase": false
+          }
+        }
+      }
+    }
+  }
+}
