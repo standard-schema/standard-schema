@@ -145,7 +145,8 @@ These are the libraries that have already implemented the Standard Schema interf
 | [GraphQL Standard Schema](https://github.com/apollographql/graphql-standard-schema)| v0.2.1+    | from the start                                                                                             |
 | [Paseri](https://paseri.dev)                                                       | v0.2.1+    | [Commit](https://github.com/vbudovski/paseri/commit/fa08ee01947de7d6b229d9a7ac21b66164f682d4)              |
 | [VineJS](https://github.com/vinejs/vine)                                           | v4.0.0+    | [Commit](https://github.com/vinejs/vine/commit/768beed3a6b0230b1fb1f340615c8b880c98515a)                   |
-| [validate.js](https://github.com/jakelazaroff/validate.js)                         | v0.1.0+    | from the start                                                                                             |
+| [validate.js](https://github.com/jakelazaroff/validate.js)                         | v0.1.0+    | from the start
+| [Raptor (Validator)](https://raptorjs.com)         | v0.9.0+      | [PR](https://github.com/raptor-js/validator/releases/tag/0.9.0)
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -210,7 +211,8 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [Tako](https://takojs.github.io/)                                             | A CLI framework that works on any JavaScript runtime                                                                                  | [Docs](https://github.com/takojs/tako/blob/main/README.md)                                            |
 | [@zap-studio/fetch](https://github.com/zap-studio/monorepo)                   | A type-safe fetch wrapper with Standard Schema validation                                                                             | [Docs](https://www.zapstudio.dev/packages/fetch)                                                      |
 | [@restatedev/restate-sdk](https://github.com/restatedev/sdk-typescript/)      | Durable functions and agents with typesafe interfaces & clients validation                                                            | [Docs](https://docs.restate.dev/develop/ts/serialization)                                             |
-| [WireTyped](https://github.com/kasperrt/wiretyped)                            | Universal fetch-based, typed HTTP client with error-first ergonomics, retries, caching, SSE, and Standard Schema validation           | [Docs](https://wiretyped.io/)                                                                         |
+| [WireTyped](https://github.com/kasperrt/wiretyped)                            | Universal fetch-based, typed HTTP client with error-first ergonomics, retries, caching, SSE, and Standard Schema validation           | [Docs](https://wiretyped.io/)
+| [Raptor](https://raptorjs.com) | A lightweight middleware framework for Deno, Bun & Node.js | [Docs](https://raptorjs.com/docs) |
 
 <!-- ## How can my schema library implement the spec?
 
