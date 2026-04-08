@@ -146,7 +146,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [Paseri](https://paseri.dev)                                                       | v0.2.1+    | [Commit](https://github.com/vbudovski/paseri/commit/fa08ee01947de7d6b229d9a7ac21b66164f682d4)              |
 | [VineJS](https://github.com/vinejs/vine)                                           | v4.0.0+    | [Commit](https://github.com/vinejs/vine/commit/768beed3a6b0230b1fb1f340615c8b880c98515a)                   |
 | [validate.js](https://github.com/jakelazaroff/validate.js)                         | v0.1.0+    | from the start                                                                                             |
-| [@cleverbrush/schema](https://docs.cleverbrush.com/schema)                         | v2.0.0     | [from v2.0.0](https://github.com/cleverbrush/framework/blob/master/libs/schema/README.md)
+| [@cleverbrush/schema](https://docs.cleverbrush.com/schema)                         | v2.0.0+     | [Commit](https://github.com/cleverbrush/framework/commit/d65d3af4326f32de7a5defc307a0e40d5562e63e) |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
