@@ -146,6 +146,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [Paseri](https://paseri.dev)                                                       | v0.2.1+    | [Commit](https://github.com/vbudovski/paseri/commit/fa08ee01947de7d6b229d9a7ac21b66164f682d4)              |
 | [VineJS](https://github.com/vinejs/vine)                                           | v4.0.0+    | [Commit](https://github.com/vinejs/vine/commit/768beed3a6b0230b1fb1f340615c8b880c98515a)                   |
 | [validate.js](https://github.com/jakelazaroff/validate.js)                         | v0.1.0+    | from the start                                                                                             |
+| [@chrock-studio/overload](https://jsr.io/@chrock-studio/overload)                  | v0.2.0+    | [Commit](https://github.com/chrock-studio/toolbox/commit/0ca93098d666c19f2728761deefc68b995ede4dc)         |
 
 ## What tools / frameworks accept spec-compliant schemas?
 
@@ -211,6 +212,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [@zap-studio/validation](https://github.com/zap-studio/monorepo)                   | Standard Schema utilities and ValidationError helpers                                                                             | [Docs](https://www.zapstudio.dev/docs/packages/validation)                                                      |
 | [@restatedev/restate-sdk](https://github.com/restatedev/sdk-typescript/)      | Durable functions and agents with typesafe interfaces & clients validation                                                            | [Docs](https://docs.restate.dev/develop/ts/serialization)                                             |
 | [WireTyped](https://github.com/kasperrt/wiretyped)                            | Universal fetch-based, typed HTTP client with error-first ergonomics, retries, caching, SSE, and Standard Schema validation           | [Docs](https://wiretyped.io/)                                                                         |
+| [@chrock-studio/overload](https://jsr.io/@chrock-studio/overload)             | Type-safe runtime function overloading, validation with Standard Schema                                                               | [Docs](https://jsr.io/@chrock-studio/overload/doc) |
 
 <!-- ## How can my schema library implement the spec?
 
