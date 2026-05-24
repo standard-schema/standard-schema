@@ -211,6 +211,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [@zap-studio/validation](https://github.com/zap-studio/monorepo)                   | Standard Schema utilities and ValidationError helpers                                                                             | [Docs](https://www.zapstudio.dev/docs/packages/validation)                                                      |
 | [@restatedev/restate-sdk](https://github.com/restatedev/sdk-typescript/)      | Durable functions and agents with typesafe interfaces & clients validation                                                            | [Docs](https://docs.restate.dev/develop/ts/serialization)                                             |
 | [WireTyped](https://github.com/kasperrt/wiretyped)                            | Universal fetch-based, typed HTTP client with error-first ergonomics, retries, caching, SSE, and Standard Schema validation           | [Docs](https://wiretyped.io/)                                                                         |
+| [editate](https://github.com/inokawa/editate)                                 | A type-safe contenteditable state manager.                                                                                            | [Repo](https://github.com/inokawa/editate)                                                            |
 
 <!-- ## How can my schema library implement the spec?
 
