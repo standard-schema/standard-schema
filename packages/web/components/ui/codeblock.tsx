@@ -13,7 +13,7 @@ export async function CodeBlock(props: Props) {
     themes: {
       light: "github-light-default",
       dark: "github-dark-default",
-    },
+    }
   });
 
   return <div dangerouslySetInnerHTML={{ __html: out }} />;
