@@ -224,6 +224,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [Zen Router](https://zenrouter.liveblocks.io)                                 | Opinionated HTTP router with typed path params, built-in body validation, and a clean model for authentication                        | [Docs](https://zenrouter.liveblocks.io)                                                               |
 | [Raptor](https://raptorjs.com)                                                | A lightweight middleware framework for Deno, Bun & Node.js                                                                            | [Docs](https://raptorjs.com/docs)                                                                     |
 | [OpenWorkflow](https://openworkflow.dev)                                      | A TypeScript framework for building durable, resumable workflows                                                                      | [Docs](https://openworkflow.dev/docs/standard-schema)                                                 |
+| [ArkEnv](https://arkenv.js.org)                                               | Typesafe environment variables for Node.js, Vite, Bun, Next.js, and Nuxt, validated with any Standard Schema library                  | [Docs](https://arkenv.js.org/docs/arkenv/integrations/standard-schema)                                |
 
 <!-- ## How can my schema library implement the spec?
 
