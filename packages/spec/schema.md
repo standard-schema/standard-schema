@@ -123,6 +123,7 @@ These are the libraries that have already implemented the Standard Schema interf
 | [Zod](https://zod.dev)                                                             | 3.24.0+    | [PR](https://github.com/colinhacks/zod/pull/3850)                                                          |
 | [Valibot](https://valibot.dev/)                                                    | v1.0+      | [PR](https://github.com/fabian-hiller/valibot/pull/845)                                                    |
 | [ArkType](https://arktype.io/)                                                     | v2.0+      | [PR](https://github.com/arktypeio/arktype/pull/1194/files)                                                 |
+| [litetype](https://litetype.org/)                                                  | v0.3.1+    | [Commit](https://github.com/nightsumx/litetype/commit/98afa76a9d882a87a2b8146df9cc971f682aca24)            |
 | [Effect Schema](https://effect.website/docs/schema/introduction/) (⚠️ via adapter) | v3.13.0+   | [PR](https://github.com/Effect-TS/effect/pull/4359)                                                        |
 | [Arri Schema](https://github.com/modiimedia/arri)                                  | v0.71.0+   | [PR](https://github.com/modiimedia/arri/pull/130)                                                          |
 | [Formgator](https://github.com/GauBen/formgator)                                   | v0.1.0+    | [Commit](https://github.com/GauBen/formgator/commit/12c8a90)                                               |
