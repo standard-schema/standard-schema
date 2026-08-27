@@ -195,4 +195,56 @@ export declare namespace StandardJSONSchemaV1 {
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
 }
+
+// #########################
+// ###   Standard Codec  ###
+// #########################
+
+/** The Standard Codec interface. */
+export interface StandardCodecV1<Input = unknown, Output = Input> {
+  /** The Standard Codec properties. */
+  readonly "~standard": StandardCodecV1.Props<Input, Output>;
+}
+
+export declare namespace StandardCodecV1 {
+  /** The Standard Codec properties interface. */
+  export interface Props<Input = unknown, Output = Input>
+    extends StandardSchemaV1.Props<Input, Output> {
+    /** Encodes unknown values into the input type. This is the inverse of `validate`. */
+    readonly encode: (
+      value: unknown,
+      options?: StandardCodecV1.Options | undefined
+    ) => Result<Input> | Promise<Result<Input>>;
+  }
+
+  /** The options for the encode function. */
+  export interface Options extends StandardSchemaV1.Options {}
+
+  /** The result interface of the encode function. */
+  export type Result<Input> = StandardSchemaV1.Result<Input>;
+
+  /** The result interface if encoding succeeds. */
+  export type SuccessResult<Input> = StandardSchemaV1.SuccessResult<Input>;
+
+  /** The result interface if encoding fails. */
+  export type FailureResult = StandardSchemaV1.FailureResult;
+
+  /** The issue interface of the failure output. */
+  export type Issue = StandardSchemaV1.Issue;
+
+  /** The path segment interface of the issue. */
+  export type PathSegment = StandardSchemaV1.PathSegment;
+
+  /** The Standard types interface. */
+  export interface Types<Input = unknown, Output = Input>
+    extends StandardTypedV1.Types<Input, Output> {}
+
+  /** Infers the input type of a Standard. */
+  export type InferInput<Schema extends StandardTypedV1> =
+    StandardTypedV1.InferInput<Schema>;
+
+  /** Infers the output type of a Standard. */
+  export type InferOutput<Schema extends StandardTypedV1> =
+    StandardTypedV1.InferOutput<Schema>;
+}
 ```
