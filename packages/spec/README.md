@@ -217,23 +217,11 @@ export declare namespace StandardCodecV1 {
     ) => Result<Input> | Promise<Result<Input>>;
   }
 
-  /** The options for the encode function. */
-  export interface Options extends StandardSchemaV1.Options {}
-
   /** The result interface of the encode function. */
   export type Result<Input> = StandardSchemaV1.Result<Input>;
 
-  /** The result interface if encoding succeeds. */
-  export type SuccessResult<Input> = StandardSchemaV1.SuccessResult<Input>;
-
-  /** The result interface if encoding fails. */
-  export type FailureResult = StandardSchemaV1.FailureResult;
-
-  /** The issue interface of the failure output. */
-  export type Issue = StandardSchemaV1.Issue;
-
-  /** The path segment interface of the issue. */
-  export type PathSegment = StandardSchemaV1.PathSegment;
+  /** The options for the encode function. */
+  export interface Options extends StandardSchemaV1.Options {}
 
   /** The Standard types interface. */
   export interface Types<Input = unknown, Output = Input>

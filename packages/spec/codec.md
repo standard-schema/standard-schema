@@ -13,31 +13,19 @@
 
 Standard Codec is a common interface designed to be implemented by JavaScript and TypeScript entities that can transform data in _both_ directions.
 
-A Standard Schema converts an unknown input into a typed output. A Standard Codec does that too, and can also run the transformation in reverse.
-
-```ts
-// decode: string -> Date
-codec['~standard'].validate('2025-01-01T00:00:00.000Z');
-// => { value: Date("2025-01-01T00:00:00.000Z") }
-
-// encode: Date -> string
-codec['~standard'].encode(new Date('2025-01-01T00:00:00.000Z'));
-// => { value: "2025-01-01T00:00:00.000Z" }
-```
+The goal is to make it easier for ecosystem tools to accept user-defined transformations without needing to write custom logic or adapters for each supported library. And since Standard Codec is a specification, they can do so with no additional runtime dependencies.
 
 ## Motivation
 
-Serialization boundaries are bidirectional. A framework that reads a `Date` out of a query string usually has to write one back into a URL, and a framework that parses a request body usually has to serialize the response.
-
-Standard Schema only describes the read direction. Tools that need the write direction have three options today, and all three are bad: hard-code an adapter per schema library, ask the user to define the inverse transform by hand, or reject transforming schemas outright.
-
-These are the boundaries where the reverse direction is needed:
+Many libraries sit on a serialization boundary that has to be crossed in both directions:
 
 - URL search params and route params
 - Form data
 - Cookies, `localStorage`, and other string-keyed stores
 - Database columns — dates, bigints, and JSON blobs
-- RPC and serialization boundaries, where the client encodes a request that the server decodes, then decodes a response that the server encoded
+- RPC, where the client encodes a request that the server decodes, then decodes a response that the server encoded
+
+Standard Schema describes only the read direction. Tools that need the write direction have to hard-code an adapter per schema library, ask the user to define the inverse transform by hand, or reject transforming schemas outright. This spec provides a standardized way to run a transformation in reverse.
 
 ## The interface
 
@@ -165,23 +153,11 @@ export declare namespace StandardCodecV1 {
     ) => Result<Input> | Promise<Result<Input>>;
   }
 
-  /** The options for the encode function. */
-  export interface Options extends StandardSchemaV1.Options {}
-
   /** The result interface of the encode function. */
   export type Result<Input> = StandardSchemaV1.Result<Input>;
 
-  /** The result interface if encoding succeeds. */
-  export type SuccessResult<Input> = StandardSchemaV1.SuccessResult<Input>;
-
-  /** The result interface if encoding fails. */
-  export type FailureResult = StandardSchemaV1.FailureResult;
-
-  /** The issue interface of the failure output. */
-  export type Issue = StandardSchemaV1.Issue;
-
-  /** The path segment interface of the issue. */
-  export type PathSegment = StandardSchemaV1.PathSegment;
+  /** The options for the encode function. */
+  export interface Options extends StandardSchemaV1.Options {}
 
   /** The Standard types interface. */
   export interface Types<Input = unknown, Output = Input>
@@ -196,36 +172,6 @@ export declare namespace StandardCodecV1 {
     StandardTypedV1.InferOutput<Schema>;
 }
 ```
-
-## Decoding and encoding
-
-The two directions are named after the `Input` and `Output` type parameters that every spec in this family shares.
-
-| Direction | Method     | Signature                     |
-| --------- | ---------- | ----------------------------- |
-| Decode    | `validate` | `unknown -> Result<Output>`   |
-| Encode    | `encode`   | `unknown -> Result<Input>`    |
-
-There is no separate `decode` method. A Standard Codec is a Standard Schema, and `~standard.validate()` already _is_ the decode direction — it accepts the encoded representation and returns the decoded one. Adding a second method with the same job would create two sources of truth.
-
-Both methods accept `unknown`, both return the same `Result` union, and both may return a `Promise`. A codec that receives a value it can't handle returns `issues` rather than throwing, in either direction.
-
-```ts
-// encoding validates too
-codec['~standard'].encode('not a date');
-// => { issues: [{ message: "Expected a valid Date", path: [] }] }
-```
-
-## Round-tripping
-
-A codec should be lossless in both directions. For any value that decodes successfully, encoding the result should reproduce the original input, and vice versa.
-
-```ts
-const decoded = codec['~standard'].validate(input); // { value: output }
-const encoded = codec['~standard'].encode(output); // { value: input }
-```
-
-This is a semantic expectation, not something the type system enforces. Codecs that are lossy — one that trims whitespace, or one that decodes several representations into a single canonical form — should document where the round-trip breaks down.
 
 ## Design goals
 
@@ -268,9 +214,36 @@ Standard Codec _extends_ Standard Schema. Its properties interface inherits `val
 
 This differs from _Standard JSON Schema_, which is orthogonal to Standard Schema and shares only the `StandardTypedV1` base. JSON Schema conversion has nothing to do with validation, but encoding is defined as the inverse of validation, so the two cannot be separated.
 
-### Why not add `encode` to `StandardSchemaV1` directly?
+### Which method is the decode direction?
 
-It would be a breaking change for every library that implements the spec today, and encoding isn't universally implementable — a schema built around a one-way transform has no inverse to expose. A separate interface keeps `StandardSchemaV1` stable and lets consumers opt into requiring the reverse direction.
+Validation is. A Standard Codec _is_ a Standard Schema, so `~standard.validate()` already accepts the encoded representation and returns the decoded one. There is no separate `decode` method; a second method with the same job would create two sources of truth.
+
+| Direction | Method     | Signature                   |
+| --------- | ---------- | --------------------------- |
+| Decode    | `validate` | `unknown -> Result<Output>` |
+| Encode    | `encode`   | `unknown -> Result<Input>`  |
+
+Both methods accept `unknown`, both return the same `Result` union, and both may return a `Promise`. A codec that receives a value it can't handle returns `issues` rather than throwing, in either direction.
+
+```ts
+codec['~standard'].encode('not a date');
+// => { issues: [{ message: "Expected a valid Date", path: [] }] }
+```
+
+### Should a codec round-trip?
+
+Yes, wherever it can. For any value that decodes successfully, encoding the result should reproduce the original input, and vice versa.
+
+```ts
+const decoded = codec['~standard'].validate(input); // { value: output }
+const encoded = codec['~standard'].encode(output); // { value: input }
+```
+
+This is a semantic expectation, not something the type system enforces. Codecs that are lossy — one that trims whitespace, or one that decodes several representations into a single canonical form — should document where the round-trip breaks down.
+
+### Why is this a separate spec instead of adding to `StandardSchemaV1`?
+
+Adding a required method to `StandardSchemaV1` would be a breaking change for every library that implements it today, and encoding isn't universally implementable — a schema built around a one-way transform has no inverse to expose. A separate interface keeps `StandardSchemaV1` stable and lets consumers opt into requiring the reverse direction.
 
 ### Only some of my schemas are encodable. What should I do?
 
