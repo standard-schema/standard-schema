@@ -250,6 +250,7 @@ When creating a PR to add your tool, please add a new row to the table below wit
 | [xsAI](https://github.com/moeru-ai/xsai) | Extra-small AI SDK | [PR](https://github.com/moeru-ai/xsai/pull/238) |
 | [GQLoom](https://gqloom.dev/) | Weave GraphQL schema and resolvers using Standard Schema | [PR](https://github.com/modevol-com/gqloom/pull/242) |
 | [@restatedev/restate-sdk](https://github.com/restatedev/sdk-typescript/) | Durable functions and agents with typesafe interfaces & clients validation | [Docs](https://docs.restate.dev/develop/ts/serialization) |
+| [standard-tool](https://github.com/finom/standard-tool) | One interface for an LLM tool, emitting the provider's JSON Schema from its input and output schemas | [Docs](https://standard-tool.js.org) |
 
 ## FAQ
 
