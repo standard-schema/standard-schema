@@ -1,7 +1,7 @@
 {
   "name": "@standard-schema/spec",
   "description": "A family of specs for interoperable TypeScript",
-  "version": "1.1.1",
+  "version": "1.1.0",
   "license": "MIT",
   "author": "Colin McDonnell",
   "homepage": "https://standardschema.dev",
@@ -17,7 +17,6 @@
     "interface"
   ],
   "type": "module",
-  "preinstall": "node meta.mjs",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
@@ -35,7 +34,6 @@
   },
   "sideEffects": false,
   "files": [
-    "meta.mjs",
     "dist"
   ],
   "publishConfig": {
