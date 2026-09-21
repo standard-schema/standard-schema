@@ -1,7 +1,7 @@
 {
   "name": "@standard-schema/utils",
   "description": "The official runtime utils for Standard Schema",
-  "version": "0.3.1",
+  "version": "0.3.0",
   "license": "MIT",
   "author": "Fabian Hiller",
   "repository": {
@@ -29,10 +29,8 @@
       }
     }
   },
-  "preinstall": "node meta.mjs",
   "sideEffects": false,
   "files": [
-    "meta.mjs",
     "dist"
   ],
   "publishConfig": {
