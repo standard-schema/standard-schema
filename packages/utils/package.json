@@ -29,10 +29,8 @@
       }
     }
   },
-  "preinstall": "node meta.mjs",
   "sideEffects": false,
   "files": [
-    "meta.mjs",
     "dist"
   ],
   "publishConfig": {
