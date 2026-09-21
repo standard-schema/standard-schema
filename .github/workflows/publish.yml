@@ -1,8 +1,9 @@
 name: Publish
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - "v*"
   workflow_dispatch:
 
 jobs:
@@ -13,6 +14,7 @@ jobs:
   spec_npm:
     name: Publish /spec to NPM
     needs: ci
+    if: ${{ github.event_name == 'workflow_dispatch' || !endsWith(github.ref_name, '-utils') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -47,6 +49,7 @@ jobs:
   spec_jsr:
     name: Publish /spec to JSR
     needs: ci
+    if: ${{ github.event_name == 'workflow_dispatch' || !endsWith(github.ref_name, '-utils') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -61,6 +64,7 @@ jobs:
   utils_npm:
     name: Publish /utils to NPM
     needs: ci
+    if: ${{ github.event_name == 'workflow_dispatch' || endsWith(github.ref_name, '-utils') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -95,6 +99,7 @@ jobs:
   utils_jsr:
     name: Publish /utils to JSR
     needs: ci
+    if: ${{ github.event_name == 'workflow_dispatch' || endsWith(github.ref_name, '-utils') }}
     runs-on: ubuntu-latest
     permissions:
       contents: read
