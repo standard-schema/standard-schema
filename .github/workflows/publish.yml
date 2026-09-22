@@ -5,6 +5,12 @@ on:
     types: [published]
   workflow_dispatch:
 
+# npm publishing is STAGED. The trusted publisher on each @standard-schema package is stage-only,
+# so these jobs can put a version in npm's staged queue and nothing else; a maintainer then
+# approves it with 2FA, which is a proof of presence no CI credential can supply. Each npm job
+# waits for that approval, and each JSR job gates on its npm job, so JSR never carries a version
+# npm has not approved. There are no npm tokens: OIDC is the only way CI reaches the registry.
+
 jobs:
   ci:
     name: Run main CI
@@ -14,6 +20,7 @@ jobs:
     name: Publish /spec to NPM
     needs: ci
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     permissions:
       contents: read
       id-token: write
@@ -28,25 +35,33 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 24, not 20: `npm stage` needs a newer Node than the npm it ships with.
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
+      - name: Install an npm CLI that can stage
+        # `npm stage publish` arrived in npm 11.15; the npm bundled with Node 24 lags it.
+        run: | # zizmor: ignore[adhoc-packages] the npm CLI itself, pinned to the major that carries `npm stage`
+          npm install -g npm@11
+          v="$(npm --version)"
+          [ "$(printf '%s\n11.15.0\n' "$v" | sort -V | head -1)" = "11.15.0" ] \
+            || { echo "::error::npm $v cannot stage (need >= 11.15)"; exit 1; }
+          echo "npm $v"
       - name: Install dependencies
         shell: bash
         run: pnpm install
       - name: Build
         run: pnpm build
         working-directory: packages/spec
-      - name: Publish
-        run: pnpm publish --provenance --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
-        working-directory: packages/spec
+      - name: Stage
+        run: bash .github/scripts/npm-stage-publish.sh packages/spec
+      - name: Wait for approval
+        run: bash .github/scripts/npm-await-approval.sh packages/spec
 
   spec_jsr:
     name: Publish /spec to JSR
-    needs: ci
+    # spec_npm, not ci: JSR must not serve a version npm has not approved.
+    needs: spec_npm
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,13 +70,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Publish
-        run: npx jsr publish
+        # Idempotent, so a re-run after a late approval does not fail on JSR.
+        run: |
+          set -euo pipefail
+          name="$(node -p "require('./jsr.json').name")"
+          version="$(node -p "require('./jsr.json').version")"
+          if [ "$(curl -sS -o /dev/null -w '%{http_code}' "https://jsr.io/$name/${version}_meta.json")" = "200" ]; then
+            echo "✓ $name@$version is already on JSR — skipping"
+            exit 0
+          fi
+          npx jsr publish
         working-directory: packages/spec
 
   utils_npm:
     name: Publish /utils to NPM
     needs: ci
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     permissions:
       contents: read
       id-token: write
@@ -76,25 +101,33 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 24, not 20: `npm stage` needs a newer Node than the npm it ships with.
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
+      - name: Install an npm CLI that can stage
+        # `npm stage publish` arrived in npm 11.15; the npm bundled with Node 24 lags it.
+        run: | # zizmor: ignore[adhoc-packages] the npm CLI itself, pinned to the major that carries `npm stage`
+          npm install -g npm@11
+          v="$(npm --version)"
+          [ "$(printf '%s\n11.15.0\n' "$v" | sort -V | head -1)" = "11.15.0" ] \
+            || { echo "::error::npm $v cannot stage (need >= 11.15)"; exit 1; }
+          echo "npm $v"
       - name: Install dependencies
         shell: bash
         run: pnpm install
       - name: Build
         run: pnpm build
         working-directory: packages/utils
-      - name: Publish
-        run: pnpm publish --provenance --access public --no-git-checks
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
-        working-directory: packages/utils
+      - name: Stage
+        run: bash .github/scripts/npm-stage-publish.sh packages/utils
+      - name: Wait for approval
+        run: bash .github/scripts/npm-await-approval.sh packages/utils
 
   utils_jsr:
     name: Publish /utils to JSR
-    needs: ci
+    # utils_npm, not ci: JSR must not serve a version npm has not approved.
+    needs: utils_npm
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -103,5 +136,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Publish
-        run: npx jsr publish
+        # Idempotent, so a re-run after a late approval does not fail on JSR.
+        run: |
+          set -euo pipefail
+          name="$(node -p "require('./jsr.json').name")"
+          version="$(node -p "require('./jsr.json').version")"
+          if [ "$(curl -sS -o /dev/null -w '%{http_code}' "https://jsr.io/$name/${version}_meta.json")" = "200" ]; then
+            echo "✓ $name@$version is already on JSR — skipping"
+            exit 0
+          fi
+          npx jsr publish
         working-directory: packages/utils
