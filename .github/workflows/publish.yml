@@ -1,8 +1,13 @@
 name: Publish
 
 on:
-  release:
-    types: [published]
+  # Dispatch only, and deliberately so. A `workflow_dispatch` needs a GitHub session or token
+  # carrying write access; a stolen git push credential carries neither, so it can no longer start a
+  # release by landing a commit or cutting a tag. That is the shape of the 2026-09-21 nubjs/nub
+  # compromise, where a stolen push credential cut a tag and 18 packages published unattended.
+  # Publishing used to run off `release: published`, which made drafting a GitHub release the
+  # trigger; the release is now created by this workflow instead, after the staged versions are
+  # approved with 2FA, so nothing on GitHub ever describes a version npm has not served.
   workflow_dispatch:
 
 # npm publishing is STAGED. The trusted publisher on each @standard-schema package is stage-only,
@@ -12,8 +17,22 @@ on:
 # npm has not approved. There are no npm tokens: OIDC is the only way CI reaches the registry.
 
 jobs:
+  # A job of its own, because `ci` below calls a reusable workflow and so cannot carry steps. A
+  # job-level `if:` would not do either: a skipped job is silent, and the run would go green having
+  # released nothing while looking like it had. A failing guard job makes the run red.
+  guard:
+    name: Refuse to release from any ref but main
+    runs-on: ubuntu-latest
+    # It reads one environment variable and checks out nothing, so it needs no token at all.
+    permissions: {}
+    steps:
+      - name: Refuse to release from any ref but main
+        run: |
+          [ "$GITHUB_REF" = "refs/heads/main" ] || { echo "::error::publish.yml runs from main only, got $GITHUB_REF"; exit 1; }
+
   ci:
     name: Run main CI
+    needs: guard
     uses: ./.github/workflows/main.yml
 
   spec_npm:
@@ -22,7 +41,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     permissions:
-      contents: read
+      # write, to create the tag and the GitHub release below; drafting one by hand used to be the
+      # trigger, so nothing else creates it now that the workflow is dispatch-only.
+      contents: write
       id-token: write
     steps:
       - name: Checkout
@@ -57,6 +78,23 @@ jobs:
         run: bash .github/scripts/npm-stage-publish.sh packages/spec
       - name: Wait for approval
         run: bash .github/scripts/npm-await-approval.sh packages/spec
+      # After the wait, never before it: the tag and the release describe a version npm actually
+      # serves. Idempotent, so a re-run after a late approval repairs missing metadata rather than
+      # failing. `gh release create` cuts the tag too, at the commit this job built.
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./packages/spec/package.json').version")"
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "✓ v$version is already released"
+            exit 0
+          fi
+          gh release create "v$version" \
+            --target "$GITHUB_SHA" \
+            --title "v$version" \
+            --generate-notes
 
   spec_jsr:
     name: Publish /spec to JSR
@@ -88,7 +126,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 360
     permissions:
-      contents: read
+      # write, to create the tag and the GitHub release below; drafting one by hand used to be the
+      # trigger, so nothing else creates it now that the workflow is dispatch-only.
+      contents: write
       id-token: write
     steps:
       - name: Checkout
@@ -123,6 +163,22 @@ jobs:
         run: bash .github/scripts/npm-stage-publish.sh packages/utils
       - name: Wait for approval
         run: bash .github/scripts/npm-await-approval.sh packages/utils
+      # `-utils`, because /spec owns the bare `vX.Y.Z` tag and the two packages version
+      # independently. Otherwise as in spec_npm: after the wait, and idempotent on a re-run.
+      - name: Tag and release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./packages/utils/package.json').version")"
+          if gh release view "v$version-utils" > /dev/null 2>&1; then
+            echo "✓ v$version-utils is already released"
+            exit 0
+          fi
+          gh release create "v$version-utils" \
+            --target "$GITHUB_SHA" \
+            --title "v$version (@standard-schema/utils)" \
+            --generate-notes
 
   utils_jsr:
     name: Publish /utils to JSR
