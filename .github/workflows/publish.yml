@@ -1,21 +1,49 @@
 name: Publish
 
 on:
-  release:
-    types: [published]
+  # Dispatch only, and deliberately so. A `workflow_dispatch` needs a GitHub session or token
+  # carrying write access; a stolen git push credential carries neither, so it can no longer start a
+  # release by landing a commit or cutting a tag. That is the shape of the 2026-09-21 nubjs/nub
+  # compromise, where a stolen push credential cut a tag and 18 packages published unattended.
+  # Publishing used to run off `release: published`, which made drafting a GitHub release the
+  # trigger; the release is now created by this workflow instead, after the staged versions are
+  # approved with 2FA, so nothing on GitHub ever describes a version npm has not served.
   workflow_dispatch:
 
+# npm publishing is STAGED. The trusted publisher on each @standard-schema package is stage-only,
+# so these jobs can put a version in npm's staged queue and nothing else; a maintainer then
+# approves it with 2FA, which is a proof of presence no CI credential can supply. Each npm job
+# waits for that approval, and each JSR job gates on its npm job, so JSR never carries a version
+# npm has not approved. There are no npm tokens: OIDC is the only way CI reaches the registry.
+
 jobs:
+  # A job of its own, because `ci` below calls a reusable workflow and so cannot carry steps. A
+  # job-level `if:` would not do either: a skipped job is silent, and the run would go green having
+  # released nothing while looking like it had. A failing guard job makes the run red.
+  guard:
+    name: Refuse to release from any ref but main
+    runs-on: ubuntu-latest
+    # It reads one environment variable and checks out nothing, so it needs no token at all.
+    permissions: {}
+    steps:
+      - name: Refuse to release from any ref but main
+        run: |
+          [ "$GITHUB_REF" = "refs/heads/main" ] || { echo "::error::publish.yml runs from main only, got $GITHUB_REF"; exit 1; }
+
   ci:
     name: Run main CI
+    needs: guard
     uses: ./.github/workflows/main.yml
 
   spec_npm:
     name: Publish /spec to NPM
     needs: ci
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     permissions:
-      contents: read
+      # write, to create the tag and the GitHub release below; drafting one by hand used to be the
+      # trigger, so nothing else creates it now that the workflow is dispatch-only.
+      contents: write
       id-token: write
     steps:
       - name: Checkout
@@ -28,25 +56,50 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 24, not 20: `npm stage` needs a newer Node than the npm it ships with.
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
+      - name: Install an npm CLI that can stage
+        # `npm stage publish` arrived in npm 11.15; the npm bundled with Node 24 lags it.
+        run: | # zizmor: ignore[adhoc-packages] the npm CLI itself, pinned to the major that carries `npm stage`
+          npm install -g npm@11
+          v="$(npm --version)"
+          [ "$(printf '%s\n11.15.0\n' "$v" | sort -V | head -1)" = "11.15.0" ] \
+            || { echo "::error::npm $v cannot stage (need >= 11.15)"; exit 1; }
+          echo "npm $v"
       - name: Install dependencies
         shell: bash
         run: pnpm install
       - name: Build
         run: pnpm build
         working-directory: packages/spec
-      - name: Publish
-        run: pnpm publish --provenance --access public --no-git-checks
+      - name: Stage
+        run: bash .github/scripts/npm-stage-publish.sh packages/spec
+      - name: Wait for approval
+        run: bash .github/scripts/npm-await-approval.sh packages/spec
+      # After the wait, never before it: the tag and the release describe a version npm actually
+      # serves. Idempotent, so a re-run after a late approval repairs missing metadata rather than
+      # failing. `gh release create` cuts the tag too, at the commit this job built.
+      - name: Tag and release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
-        working-directory: packages/spec
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./packages/spec/package.json').version")"
+          if gh release view "v$version" > /dev/null 2>&1; then
+            echo "✓ v$version is already released"
+            exit 0
+          fi
+          gh release create "v$version" \
+            --target "$GITHUB_SHA" \
+            --title "v$version" \
+            --generate-notes
 
   spec_jsr:
     name: Publish /spec to JSR
-    needs: ci
+    # spec_npm, not ci: JSR must not serve a version npm has not approved.
+    needs: spec_npm
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -55,15 +108,27 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Publish
-        run: npx jsr publish
+        # Idempotent, so a re-run after a late approval does not fail on JSR.
+        run: |
+          set -euo pipefail
+          name="$(node -p "require('./jsr.json').name")"
+          version="$(node -p "require('./jsr.json').version")"
+          if [ "$(curl -sS -o /dev/null -w '%{http_code}' "https://jsr.io/$name/${version}_meta.json")" = "200" ]; then
+            echo "✓ $name@$version is already on JSR — skipping"
+            exit 0
+          fi
+          npx jsr publish
         working-directory: packages/spec
 
   utils_npm:
     name: Publish /utils to NPM
     needs: ci
     runs-on: ubuntu-latest
+    timeout-minutes: 360
     permissions:
-      contents: read
+      # write, to create the tag and the GitHub release below; drafting one by hand used to be the
+      # trigger, so nothing else creates it now that the workflow is dispatch-only.
+      contents: write
       id-token: write
     steps:
       - name: Checkout
@@ -76,25 +141,49 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: 20
+          # 24, not 20: `npm stage` needs a newer Node than the npm it ships with.
+          node-version: 24
           registry-url: 'https://registry.npmjs.org'
           cache: pnpm
+      - name: Install an npm CLI that can stage
+        # `npm stage publish` arrived in npm 11.15; the npm bundled with Node 24 lags it.
+        run: | # zizmor: ignore[adhoc-packages] the npm CLI itself, pinned to the major that carries `npm stage`
+          npm install -g npm@11
+          v="$(npm --version)"
+          [ "$(printf '%s\n11.15.0\n' "$v" | sort -V | head -1)" = "11.15.0" ] \
+            || { echo "::error::npm $v cannot stage (need >= 11.15)"; exit 1; }
+          echo "npm $v"
       - name: Install dependencies
         shell: bash
         run: pnpm install
       - name: Build
         run: pnpm build
         working-directory: packages/utils
-      - name: Publish
-        run: pnpm publish --provenance --access public --no-git-checks
+      - name: Stage
+        run: bash .github/scripts/npm-stage-publish.sh packages/utils
+      - name: Wait for approval
+        run: bash .github/scripts/npm-await-approval.sh packages/utils
+      # `-utils`, because /spec owns the bare `vX.Y.Z` tag and the two packages version
+      # independently. Otherwise as in spec_npm: after the wait, and idempotent on a re-run.
+      - name: Tag and release
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-        continue-on-error: true
-        working-directory: packages/utils
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="$(node -p "require('./packages/utils/package.json').version")"
+          if gh release view "v$version-utils" > /dev/null 2>&1; then
+            echo "✓ v$version-utils is already released"
+            exit 0
+          fi
+          gh release create "v$version-utils" \
+            --target "$GITHUB_SHA" \
+            --title "v$version (@standard-schema/utils)" \
+            --generate-notes
 
   utils_jsr:
     name: Publish /utils to JSR
-    needs: ci
+    # utils_npm, not ci: JSR must not serve a version npm has not approved.
+    needs: utils_npm
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -103,5 +192,14 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
       - name: Publish
-        run: npx jsr publish
+        # Idempotent, so a re-run after a late approval does not fail on JSR.
+        run: |
+          set -euo pipefail
+          name="$(node -p "require('./jsr.json').name")"
+          version="$(node -p "require('./jsr.json').version")"
+          if [ "$(curl -sS -o /dev/null -w '%{http_code}' "https://jsr.io/$name/${version}_meta.json")" = "200" ]; then
+            echo "✓ $name@$version is already on JSR — skipping"
+            exit 0
+          fi
+          npx jsr publish
         working-directory: packages/utils
