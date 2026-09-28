@@ -79,7 +79,7 @@ export declare namespace StandardSchemaV1 {
     /** Validates unknown input values. */
     readonly validate: (
       value: unknown,
-      options?: StandardSchemaV1.Options | undefined
+      options?: StandardSchemaV1.Options | undefined,
     ) => Result<Output> | Promise<Result<Output>>;
   }
 
@@ -154,11 +154,11 @@ export declare namespace StandardJSONSchemaV1 {
   export interface Converter {
     /** Converts the input type to JSON Schema. May throw if conversion is not supported. */
     readonly input: (
-      options: StandardJSONSchemaV1.Options
+      options: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
     /** Converts the output type to JSON Schema. May throw if conversion is not supported. */
     readonly output: (
-      options: StandardJSONSchemaV1.Options
+      options: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
   }
 
@@ -207,7 +207,7 @@ export interface StandardToolV1<
   InputIn = unknown,
   InputOut = InputIn,
   OutputIn = unknown,
-  OutputOut = OutputIn
+  OutputOut = OutputIn,
 > {
   /** The Standard Tool properties. */
   readonly "~standard": StandardToolV1.Props<
@@ -224,15 +224,17 @@ export declare namespace StandardToolV1 {
     InputIn = unknown,
     InputOut = InputIn,
     OutputIn = unknown,
-    OutputOut = OutputIn
+    OutputOut = OutputIn,
   > extends StandardTypedV1.Props<InputIn, OutputOut> {
     /** The name a model uses to call the tool. */
     readonly name: string;
     /** A description of what the tool does and when to use it. */
     readonly description: string;
     /** The schema of the tool's input. Its input JSON Schema describes the arguments a caller should provide, and callers validate those arguments with it before calling `execute`. */
-    readonly inputSchema: StandardSchemaV1<InputIn, InputOut> &
-      StandardJSONSchemaV1<InputIn, InputOut>;
+    readonly inputSchema?:
+      | (StandardSchemaV1<InputIn, InputOut> &
+          StandardJSONSchemaV1<InputIn, InputOut>)
+      | undefined;
     /** The schema of the tool's output, if any. Callers validate the value returned by `execute` with it, and its output JSON Schema describes the result. */
     readonly outputSchema?:
       | (StandardSchemaV1<OutputIn, OutputOut> &
@@ -242,7 +244,7 @@ export declare namespace StandardToolV1 {
     /** Runs the tool with input that has already been validated by `inputSchema`. */
     execute(
       input: InputOut,
-      options?: StandardToolV1.Options | undefined
+      options?: StandardToolV1.Options | undefined,
     ): OutputIn | Promise<OutputIn>;
   }
 
@@ -296,19 +298,19 @@ These are the most frequently asked questions about Standard Tool. Questions tha
 The `~standard.execute()` function might return a synchronous value _or_ a `Promise`, just like `~standard.validate()`. If you only accept synchronous tools, you can simply throw an error if either returns an instance of `Promise`.
 
 ```ts
-import type {StandardToolV1} from '@standard-schema/spec';
+import type { StandardToolV1 } from "@standard-schema/spec";
 
 function runTool(tool: StandardToolV1, input: unknown) {
-  const result = tool['~standard'].inputSchema['~standard'].validate(input);
+  const result = tool["~standard"].inputSchema["~standard"].validate(input);
   if (result instanceof Promise) {
-    throw new TypeError('Tool input validation must be synchronous');
+    throw new TypeError("Tool input validation must be synchronous");
   }
   // if the `issues` field exists, the input was invalid
   if (result.issues) return result;
 
-  const output = tool['~standard'].execute(result.value);
+  const output = tool["~standard"].execute(result.value);
   if (output instanceof Promise) {
-    throw new TypeError('Tool execution must be synchronous');
+    throw new TypeError("Tool execution must be synchronous");
   }
   // ...
 }
