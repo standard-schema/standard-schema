@@ -109,6 +109,23 @@ export default async function Home() {
               <ArrowRight className="text-white shrink-0 w-5 h-5 mt-1 group-hover:translate-x-1 transition-transform" />
             </div>
           </Link>
+          <Link
+            href="/tool"
+            className="border border-white rounded-lg p-6 hover:bg-white/5 transition-colors group"
+          >
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-2 flex-1">
+                <h3 className="text-xl font-semibold text-white">
+                  Standard Tool
+                </h3>
+                <p className="text-gray-300 text-sm">
+                  For tools that describe themselves to a caller and can be
+                  called by it
+                </p>
+              </div>
+              <ArrowRight className="text-white shrink-0 w-5 h-5 mt-1 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
         </div>
         <div className="h-[3vw]" />
         <hr className="border-t border-gray-700 w-full" />

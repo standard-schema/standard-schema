@@ -1,23 +1,25 @@
 <h1 align="center">
   <img alt="Standard Schema fire logo" loading="lazy" width="50" height="50" decoding="async" data-nimg="1" style="color:transparent" src="https://standardschema.dev/favicon.svg">
   </br>
-  Standard Schema</h1>
+  Standard Tool</h1>
 <p align="center">
-  A family of specs for interoperable TypeScript
+  A common interface for self-describing, callable tools
   <br/>
-  <a href="https://standardschema.dev">standardschema.dev</a>
+  <a href="https://standardschema.dev/tool">standardschema.dev/tool</a>
 </p>
 <br/>
 
 <!-- start -->
 
-The Standard Schema project is a set of interfaces that standardize the provision and consumption of shared functionality in the TypeScript ecosystem.
+Standard Tool is a common interface designed to be implemented by JavaScript and TypeScript tools that AI models can call.
 
-Its goal is to allow tools to accept a single input that includes all the types and capabilities they need— no library-specific adapters, no extra dependencies. The result is an ecosystem that's fair for implementers, friendly for consumers, and open for end users.
+The goal is to make it easier for frameworks to accept user-defined tools, without needing to write custom logic or adapters for each supported library. And since Standard Tool is a specification, they can do so with no additional runtime dependencies.
 
-## The specifications
+## The interface
 
-The specifications can be found below in their entirety. Libraries wishing to implement a spec can copy/paste the code block below into their codebase. They're also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
+The specification consists of a single TypeScript interface `StandardToolV1` to be implemented by any library wishing to be spec-compliant. It builds on `StandardSchemaV1` and `StandardJSONSchemaV1`, which are included below.
+
+This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
 
 ```ts
 // #########################
@@ -258,5 +260,56 @@ export declare namespace StandardToolV1 {
   /** Infers the output type of a Standard. */
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
+}
+```
+
+## Design goals
+
+The specification meets a few primary design objectives:
+
+- **Support tool calling.** Given a Standard Tool, you should be able to describe it to a model and run it with the arguments the model produces. Callers validate those arguments with the tool's input schema first, so invalid ones can be sent back to the model as issues.
+- **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" a tool's input and output types, so they can be extracted and used by frameworks.
+- **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing functions/methods.
+- **Avoid API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
+- **Do no harm to DX.** The `~standard` property is tilde-prefixed to [de-prioritize it in autocompletion](https://x.com/colinhacks/status/1816860780459073933). By contrast, an underscore-prefixed property would show up before properties/methods with alphanumeric names.
+
+## What libraries implement the spec?
+
+These are the libraries that have already implemented the Standard Tool interface. (If you maintain a library that implements the spec, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
+
+| Implementer | Version(s) | Link |
+| ----------- | ---------- | ---- |
+
+## What frameworks accept spec-compliant tools?
+
+The following frameworks accept user-defined tools conforming to the Standard Tool spec. (If you maintain a framework that supports Standard Tools, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
+
+| Integrator | Description | Link |
+| ---------- | ----------- | ---- |
+
+## FAQ
+
+These are the most frequently asked questions about Standard Tool. Questions that apply to every spec, like whether to depend on `@standard-schema/spec`, are answered in the [Standard Schema FAQ](https://standardschema.dev/schema#faq). If your question is not listed, feel free to create an issue.
+
+### How to only allow synchronous tools?
+
+The `~standard.execute()` function might return a synchronous value _or_ a `Promise`, just like `~standard.validate()`. If you only accept synchronous tools, you can simply throw an error if either returns an instance of `Promise`.
+
+```ts
+import type {StandardToolV1} from '@standard-schema/spec';
+
+function runTool(tool: StandardToolV1, input: unknown) {
+  const result = tool['~standard'].inputSchema['~standard'].validate(input);
+  if (result instanceof Promise) {
+    throw new TypeError('Tool input validation must be synchronous');
+  }
+  // if the `issues` field exists, the input was invalid
+  if (result.issues) return result;
+
+  const output = tool['~standard'].execute(result.value);
+  if (output instanceof Promise) {
+    throw new TypeError('Tool execution must be synchronous');
+  }
+  // ...
 }
 ```
