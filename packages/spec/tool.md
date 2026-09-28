@@ -295,14 +295,22 @@ The `~standard.execute()` function might return a synchronous value _or_ a `Prom
 import type { StandardToolV1 } from "@standard-schema/spec";
 
 function runTool(tool: StandardToolV1, input: unknown) {
-  const result = tool["~standard"].inputSchema["~standard"].validate(input);
-  if (result instanceof Promise) {
-    throw new TypeError("Tool input validation must be synchronous");
-  }
-  // if the `issues` field exists, the input was invalid
-  if (result.issues) return result;
+  // a tool without an input schema gets the arguments as-is
+  let value = input;
 
-  const output = tool["~standard"].execute(result.value);
+  const inputSchema = tool["~standard"].inputSchema;
+  if (inputSchema) {
+    const result = inputSchema["~standard"].validate(input);
+    if (result instanceof Promise) {
+      throw new TypeError("Tool input validation must be synchronous");
+    }
+    // if the `issues` field exists, the input was invalid
+    if (result.issues) return result;
+
+    value = result.value;
+  }
+
+  const output = tool["~standard"].execute(value);
   if (output instanceof Promise) {
     throw new TypeError("Tool execution must be synchronous");
   }
