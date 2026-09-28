@@ -191,8 +191,10 @@ export declare namespace StandardToolV1 {
     /** A description of what the tool does and when to use it. */
     readonly description: string;
     /** The schema of the tool's input. Its input JSON Schema describes the arguments a caller should provide, and callers validate those arguments with it before calling `execute`. */
-    readonly inputSchema: StandardSchemaV1<InputIn, InputOut> &
-      StandardJSONSchemaV1<InputIn, InputOut>;
+    readonly inputSchema?:
+      | (StandardSchemaV1<InputIn, InputOut> &
+          StandardJSONSchemaV1<InputIn, InputOut>)
+      | undefined;
     /** The schema of the tool's output, if any. Callers validate the value returned by `execute` with it, and its output JSON Schema describes the result. */
     readonly outputSchema?:
       | (StandardSchemaV1<OutputIn, OutputOut> &

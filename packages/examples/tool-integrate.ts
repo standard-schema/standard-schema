@@ -30,13 +30,17 @@ interface ToolResult {
 export function describeTools(
   tools: ReadonlyArray<StandardToolV1>,
 ): ToolDefinition[] {
-  return tools.map((tool) => ({
-    name: tool["~standard"].name,
-    description: tool["~standard"].description,
-    input_schema: tool["~standard"].inputSchema["~standard"].jsonSchema.input({
-      target: "draft-2020-12",
-    }),
-  }));
+  return tools.map((tool) => {
+    const inputSchema = tool["~standard"].inputSchema;
+    return {
+      name: tool["~standard"].name,
+      description: tool["~standard"].description,
+      // a tool without an input schema takes no arguments
+      input_schema: inputSchema
+        ? inputSchema["~standard"].jsonSchema.input({ target: "draft-2020-12" })
+        : { type: "object", properties: {} },
+    };
+  });
 }
 
 // Validate the input, run the tool, and validate its output.
@@ -44,14 +48,23 @@ async function executeTool(
   tool: StandardToolV1,
   input: unknown,
 ): Promise<StandardSchemaV1.Result<unknown>> {
-  // model-produced input is untrusted, so validate it before running the tool
-  let parsed = tool["~standard"].inputSchema["~standard"].validate(input);
-  if (parsed instanceof Promise) parsed = await parsed;
+  // a tool without an input schema gets the model's arguments as-is, just as
+  // one without an output schema returns its result as-is
+  let value = input;
 
-  // if the `issues` field exists, the input was invalid, so don't run the tool
-  if (parsed.issues) return parsed;
+  const inputSchema = tool["~standard"].inputSchema;
+  if (inputSchema) {
+    // model-produced input is untrusted, so validate it before running the tool
+    let parsed = inputSchema["~standard"].validate(input);
+    if (parsed instanceof Promise) parsed = await parsed;
 
-  let output = tool["~standard"].execute(parsed.value);
+    // if the `issues` field exists, the input was invalid, so don't run the tool
+    if (parsed.issues) return parsed;
+
+    value = parsed.value;
+  }
+
+  let output = tool["~standard"].execute(value);
   if (output instanceof Promise) output = await output;
 
   const outputSchema = tool["~standard"].outputSchema;
