@@ -11,6 +11,8 @@ export declare namespace StandardTypedV1 {
     readonly version: 1;
     /** The vendor name of the schema library. */
     readonly vendor: string;
+    /** Arbitrary metadata the vendor associates with this entity, such as a title or examples. Not interpreted by the spec. */
+    readonly meta?: Record<string, unknown> | undefined;
     /** Inferred types associated with the schema. */
     readonly types?: Types<Input, Output> | undefined;
   }
@@ -163,46 +165,66 @@ export declare namespace StandardJSONSchemaV1 {
 }
 
 /** The Standard Tool interface. */
-export interface StandardToolV1<
-  InputIn = unknown,
-  InputOut = InputIn,
-  OutputIn = unknown,
-  OutputOut = OutputIn,
-> {
+export interface StandardToolV1<Input = unknown, Output = Input> {
   /** The Standard Tool properties. */
-  readonly "~standard": StandardToolV1.Props<
-    InputIn,
-    InputOut,
-    OutputIn,
-    OutputOut
-  >;
+  readonly "~standard": StandardToolV1.Props<Input, Output>;
 }
 
 export declare namespace StandardToolV1 {
   /** The Standard Tool properties interface. */
-  export interface Props<
-    InputIn = unknown,
-    InputOut = InputIn,
-    OutputIn = unknown,
-    OutputOut = OutputIn,
-  > extends StandardTypedV1.Props<InputIn, OutputOut> {
+  export interface Props<Input = unknown, Output = Input>
+    extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" for anonymous tools. */
     readonly name: string;
     /** A description of the function's functionality. Set to "" for undescribed tools. */
     readonly description: string;
-    /** The schema of the tool's input. Its input JSON Schema describes the arguments a caller should provide, and callers validate those arguments with it before calling `execute`. */
-    readonly inputSchema?:
-      | (StandardSchemaV1<InputIn, InputOut> &
-          StandardJSONSchemaV1<InputIn, InputOut>)
-      | undefined;
-    /** The schema of the tool's output, if any. Callers validate the value returned by `execute` with it, and its output JSON Schema describes the result. */
-    readonly outputSchema?:
-      | (StandardSchemaV1<OutputIn, OutputOut> &
-          StandardJSONSchemaV1<OutputIn, OutputOut>)
-      | undefined;
-    // Method syntax keeps `input` bivariant, so any tool is assignable to `StandardToolV1`
-    /** Runs the tool with input that has already been validated by `inputSchema`. Callers pass only the input: a second argument is reserved for a future version of this spec, so implementations should not give it a meaning of their own. */
-    execute(input: InputOut): OutputIn | Promise<OutputIn>;
+
+    /** The function implementation */
+    readonly execute: (
+      input: Input,
+      options?: Options,
+    ) => Output | Promise<Output>;
+  }
+
+  /** The options passed by callers as the second argument of `execute`. */
+  export interface Options {
+    /** Signals that the caller no longer needs the result, so the tool should stop its work as soon as practical. */
+    readonly signal?: AbortSignal | undefined;
+
+    /** Explicit support for additional vendor-specific parameters, if needed. */
+    readonly libraryOptions?: Record<string, unknown> | undefined;
+  }
+
+  // Declared structurally so the spec depends on neither the DOM nor Node's
+  // types, while the built-in `AbortSignal` of both remains assignable to it
+  /** The subset of the built-in `AbortSignal` that tools can rely on. */
+  export interface AbortSignal {
+    /** Whether the caller has aborted. */
+    readonly aborted: boolean;
+    /** The reason given for the abort, if any. `undefined` until aborted. */
+    readonly reason: unknown;
+    /** Throws `reason` if the caller has aborted. */
+    readonly throwIfAborted: () => void;
+    // `once` omits `| undefined`, unlike other optional properties here, because the
+    // built-in options type does too, and it would otherwise be unassignable under
+    // `exactOptionalPropertyTypes`
+    /** Registers a listener called once the caller aborts. */
+    readonly addEventListener: (
+      type: "abort",
+      listener: (event: AbortEvent) => void,
+      options?: { readonly once?: boolean },
+    ) => void;
+    /** Removes a listener registered with `addEventListener`. */
+    readonly removeEventListener: (
+      type: "abort",
+      listener: (event: AbortEvent) => void,
+    ) => void;
+  }
+
+  /** The subset of the event passed to abort listeners that tools can rely on. */
+  export interface AbortEvent {
+    /** The event type. Always `"abort"` at runtime, though built-in types declare `string`. */
+    readonly type: string;
   }
 
   /** The Standard types interface. */
