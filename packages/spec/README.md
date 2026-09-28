@@ -224,9 +224,9 @@ export declare namespace StandardToolV1 {
     OutputIn = unknown,
     OutputOut = OutputIn
   > extends StandardTypedV1.Props<InputIn, OutputOut> {
-    /** The name a model uses to call the tool. */
+    /** The name of the function. Set to "" for anonymous tools. */
     readonly name: string;
-    /** A description of what the tool does and when to use it. */
+    /** A description of the function's functionality. Set to "" for undescribed tools. */
     readonly description: string;
     /** The schema of the tool's input. Its input JSON Schema describes the arguments a caller should provide, and callers validate those arguments with it before calling `execute`. */
     readonly inputSchema?:
