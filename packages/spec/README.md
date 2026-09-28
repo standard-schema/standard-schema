@@ -239,7 +239,7 @@ export declare namespace StandardToolV1 {
           StandardJSONSchemaV1<OutputIn, OutputOut>)
       | undefined;
     // Method syntax keeps `input` bivariant, so any tool is assignable to `StandardToolV1`
-    /** Runs the tool with input that has already been validated by `inputSchema`. */
+    /** Runs the tool with input that has already been validated by `inputSchema`. Callers pass only the input: a second argument is reserved for a future version of this spec, so implementations should not give it a meaning of their own. */
     execute(input: InputOut): OutputIn | Promise<OutputIn>;
   }
 
