@@ -200,14 +200,8 @@ export declare namespace StandardToolV1 {
       | undefined;
     // Method syntax keeps `input` bivariant, so any tool is assignable to `StandardToolV1`
     /** Runs the tool with input that has already been validated by `inputSchema`. */
-    execute(
-      input: InputOut,
-      options?: StandardToolV1.Options | undefined,
-    ): OutputIn | Promise<OutputIn>;
+    execute(input: InputOut): OutputIn | Promise<OutputIn>;
   }
-
-  /** The options for the execute function. */
-  export interface Options extends StandardSchemaV1.Options {}
 
   /** The Standard types interface. */
   export interface Types<Input = unknown, Output = unknown>
