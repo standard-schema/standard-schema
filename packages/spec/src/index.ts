@@ -165,67 +165,40 @@ export declare namespace StandardJSONSchemaV1 {
 }
 
 /** The Standard Tool interface. */
-export interface StandardToolV1<Input = unknown, Output = Input> {
+export interface StandardToolV1<Input = unknown, Output = unknown> {
   /** The Standard Tool properties. */
   readonly "~standard": StandardToolV1.Props<Input, Output>;
 }
 
 export declare namespace StandardToolV1 {
   /** The Standard Tool properties interface. */
-  export interface Props<Input = unknown, Output = Input>
+  export interface Props<Input = unknown, Output = unknown>
     extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" for anonymous tools. */
     readonly name: string;
     /** A description of the function's functionality. Set to "" for undescribed tools. */
     readonly description: string;
-
-    /** The function implementation */
-    readonly execute: (
-      input: Input,
-      options?: Options,
-    ) => Output | Promise<Output>;
+    // Method syntax keeps `input` bivariant, so any tool is assignable to `StandardToolV1`
+    /** Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`. */
+    execute(input: Input, options?: Options): Output | Promise<Output>;
   }
 
   /** The options passed by callers as the second argument of `execute`. */
   export interface Options {
-    /** Signals that the caller no longer needs the result, so the tool should stop its work as soon as practical. */
+    /** Aborted when the caller no longer needs the result, so the tool can stop its work early. */
     readonly signal?: AbortSignal | undefined;
-
     /** Explicit support for additional vendor-specific parameters, if needed. */
     readonly libraryOptions?: Record<string, unknown> | undefined;
   }
 
-  // Declared structurally so the spec depends on neither the DOM nor Node's
-  // types, while the built-in `AbortSignal` of both remains assignable to it
-  /** The subset of the built-in `AbortSignal` that tools can rely on. */
-  export interface AbortSignal {
-    /** Whether the caller has aborted. */
-    readonly aborted: boolean;
-    /** The reason given for the abort, if any. `undefined` until aborted. */
-    readonly reason: unknown;
-    /** Throws `reason` if the caller has aborted. */
-    readonly throwIfAborted: () => void;
-    // `once` omits `| undefined`, unlike other optional properties here, because the
-    // built-in options type does too, and it would otherwise be unassignable under
-    // `exactOptionalPropertyTypes`
-    /** Registers a listener called once the caller aborts. */
-    readonly addEventListener: (
-      type: "abort",
-      listener: (event: AbortEvent) => void,
-      options?: { readonly once?: boolean },
-    ) => void;
-    /** Removes a listener registered with `addEventListener`. */
-    readonly removeEventListener: (
-      type: "abort",
-      listener: (event: AbortEvent) => void,
-    ) => void;
+  // Resolved from the environment so the spec depends on neither the DOM nor Node's
+  // types, while tools can still pass the signal to built-in APIs like `fetch`
+  /** Your environment's built-in `AbortSignal` type, or `any` if it can't be detected. */
+  export type AbortSignal = typeof globalThis extends {
+    AbortSignal: { prototype: infer Signal };
   }
-
-  /** The subset of the event passed to abort listeners that tools can rely on. */
-  export interface AbortEvent {
-    /** The event type. Always `"abort"` at runtime, though built-in types declare `string`. */
-    readonly type: string;
-  }
+    ? Signal
+    : any;
 
   /** The Standard types interface. */
   export interface Types<Input = unknown, Output = unknown>

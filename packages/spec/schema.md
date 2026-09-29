@@ -39,6 +39,8 @@ export declare namespace StandardSchemaV1 {
     readonly version: 1;
     /** The vendor name of the schema library. */
     readonly vendor: string;
+    /** Arbitrary metadata the vendor associates with this entity, such as a title or examples. Not interpreted by the spec. */
+    readonly meta?: Record<string, unknown> | undefined;
     /** Validates unknown input values. */
     readonly validate: (
       value: unknown,

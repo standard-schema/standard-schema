@@ -1,7 +1,7 @@
 /**
  * This example shows how to implement the Standard Tool interface.
  * It demonstrates exposing a tool built from a schema and a handler, where
- * the handler receives input that the caller has already validated.
+ * the tool validates its own input before running the handler.
  */
 
 import type {
@@ -21,23 +21,20 @@ type ToolSchema<Input = unknown, Output = Input> = StandardSchemaV1<
   StandardJSONSchemaV1<Input, Output>;
 
 // A framework's own tool object can implement the spec alongside its existing API.
-interface MyTool<InputIn, InputOut, OutputIn, OutputOut>
-  extends StandardToolV1<InputIn, InputOut, OutputIn, OutputOut> {
+interface MyTool<Input, Output> extends StandardToolV1<Input, Output> {
   type: "tool";
 }
 
-export function tool<
-  InputIn,
-  InputOut,
-  OutputIn,
-  OutputOut = OutputIn,
->(definition: {
+export function tool<InputIn, InputOut, Output>(definition: {
   name: string;
   description: string;
   input: ToolSchema<InputIn, InputOut>;
-  output?: ToolSchema<OutputIn, OutputOut>;
-  run: (input: InputOut) => OutputIn | Promise<OutputIn>;
-}): MyTool<InputIn, InputOut, OutputIn, OutputOut> {
+  output?: StandardJSONSchemaV1<Output>;
+  run: (
+    input: InputOut,
+    options?: StandardToolV1.Options,
+  ) => Output | Promise<Output>;
+}): MyTool<InputIn, Output> {
   return {
     type: "tool",
     "~standard": {
@@ -45,10 +42,23 @@ export function tool<
       vendor: "example-lib",
       name: definition.name,
       description: definition.description,
-      inputSchema: definition.input,
-      outputSchema: definition.output,
-      // callers validate input with `inputSchema` first, so the handler can run as-is
-      execute: definition.run,
+      jsonSchema: {
+        // the model's arguments are described by the input schema's input
+        input: (options) =>
+          definition.input["~standard"].jsonSchema.input(options),
+        // without an output schema, the result can be any value
+        output: (options) =>
+          definition.output?.["~standard"].jsonSchema.output(options) ?? {},
+      },
+      async execute(input, options) {
+        // callers pass the model's arguments as-is, so validate them first
+        const result = await definition.input["~standard"].validate(input);
+        if (result.issues) {
+          throw new Error(JSON.stringify(result.issues));
+        }
+        // forward the signal so the handler can stop its work early
+        return definition.run(result.value, options);
+      },
     },
   };
 }
@@ -86,10 +96,17 @@ const getWeather = tool({
   name: "get_weather",
   description: "Get the current temperature in a city, in degrees Celsius",
   input: citySchema,
-  run: ({ city }) => ({ city, temperature: 21 }),
+  run: async ({ city }, options) => {
+    const response = await fetch(`https://example.com/weather/${city}`, {
+      signal: options?.signal ?? null,
+    });
+    const { temperature }: { temperature: number } = await response.json();
+    return { city, temperature };
+  },
 });
 
-// `execute` receives the output of `inputSchema`, which callers produce by
-// validating the model's arguments
-await getWeather["~standard"].execute({ city: "Paris" });
+await getWeather["~standard"].execute(
+  { city: "Paris" },
+  { signal: AbortSignal.timeout(10_000) },
+);
 // => { city: "Paris", temperature: 21 }
