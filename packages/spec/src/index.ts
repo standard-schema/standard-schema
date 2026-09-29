@@ -178,7 +178,6 @@ export declare namespace StandardToolV1 {
     readonly name: string;
     /** A description of the function's functionality. Set to "" for undescribed tools. */
     readonly description: string;
-    // Method syntax keeps `input` bivariant, so any tool is assignable to `StandardToolV1`
     /** Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`. */
     execute(input: Input, options?: Options): Output | Promise<Output>;
   }
@@ -191,8 +190,6 @@ export declare namespace StandardToolV1 {
     readonly libraryOptions?: Record<string, unknown> | undefined;
   }
 
-  // Resolved from the environment so the spec depends on neither the DOM nor Node's
-  // types, while tools can still pass the signal to built-in APIs like `fetch`
   /** Your environment's built-in `AbortSignal` type, or `any` if it can't be detected. */
   export type AbortSignal = typeof globalThis extends {
     AbortSignal: { prototype: infer Signal };
