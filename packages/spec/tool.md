@@ -17,7 +17,7 @@ The goal is to make it easier for frameworks to accept user-defined tools, witho
 
 ## The interface
 
-The specification consists of a single TypeScript interface `StandardToolV1` to be implemented by any library wishing to be spec-compliant. It builds on `StandardSchemaV1` and `StandardJSONSchemaV1`, which are included below.
+The specification consists of a single TypeScript interface `StandardToolV1` to be implemented by any library wishing to be spec-compliant. It extends `StandardJSONSchemaV1`, so a tool describes its own input and output as JSON Schema. The rest of the family is included below.
 
 This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
 
@@ -39,6 +39,8 @@ export declare namespace StandardTypedV1 {
     readonly version: 1;
     /** The vendor name of the schema library. */
     readonly vendor: string;
+    /** Arbitrary metadata the vendor associates with this entity, such as a title or examples. Not interpreted by the spec. */
+    readonly meta?: Record<string, unknown> | undefined;
     /** Inferred types associated with the schema. */
     readonly types?: Types<Input, Output> | undefined;
   }
@@ -173,7 +175,7 @@ export declare namespace StandardJSONSchemaV1 {
     | "draft-2020-12"
     | "draft-07"
     | "openapi-3.0"
-    // Accepts any string for future targets while preserving autocomplete
+    // Accepts any string: allows future targets while preserving autocomplete
     | ({} & string);
 
   /** The options for the input/output methods. */
@@ -203,47 +205,40 @@ export declare namespace StandardJSONSchemaV1 {
 // ########################
 
 /** The Standard Tool interface. */
-export interface StandardToolV1<
-  InputIn = unknown,
-  InputOut = InputIn,
-  OutputIn = unknown,
-  OutputOut = OutputIn,
-> {
+export interface StandardToolV1<Input = unknown, Output = unknown> {
   /** The Standard Tool properties. */
-  readonly "~standard": StandardToolV1.Props<
-    InputIn,
-    InputOut,
-    OutputIn,
-    OutputOut
-  >;
+  readonly "~standard": StandardToolV1.Props<Input, Output>;
 }
 
 export declare namespace StandardToolV1 {
   /** The Standard Tool properties interface. */
-  export interface Props<
-    InputIn = unknown,
-    InputOut = InputIn,
-    OutputIn = unknown,
-    OutputOut = OutputIn,
-  > extends StandardTypedV1.Props<InputIn, OutputOut> {
+  export interface Props<Input = unknown, Output = unknown>
+    extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" for anonymous tools. */
     readonly name: string;
     /** A description of the function's functionality. Set to "" for undescribed tools. */
     readonly description: string;
-    /** The schema of the tool's input. Its input JSON Schema describes the arguments a caller should provide, and callers validate those arguments with it before calling `execute`. */
-    readonly inputSchema?:
-      | (StandardSchemaV1<InputIn, InputOut> &
-          StandardJSONSchemaV1<InputIn, InputOut>)
-      | undefined;
-    /** The schema of the tool's output, if any. Callers validate the value returned by `execute` with it, and its output JSON Schema describes the result. */
-    readonly outputSchema?:
-      | (StandardSchemaV1<OutputIn, OutputOut> &
-          StandardJSONSchemaV1<OutputIn, OutputOut>)
-      | undefined;
     // Method syntax keeps `input` bivariant, so any tool is assignable to `StandardToolV1`
-    /** Runs the tool with input that has already been validated by `inputSchema`. Callers pass only the input: a second argument is reserved for a future version of this spec, so implementations should not give it a meaning of their own. */
-    execute(input: InputOut): OutputIn | Promise<OutputIn>;
+    /** Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`. */
+    execute(input: Input, options?: Options): Output | Promise<Output>;
   }
+
+  /** The options passed by callers as the second argument of `execute`. */
+  export interface Options {
+    /** Aborted when the caller no longer needs the result, so the tool can stop its work early. */
+    readonly signal?: AbortSignal | undefined;
+    /** Explicit support for additional vendor-specific parameters, if needed. */
+    readonly libraryOptions?: Record<string, unknown> | undefined;
+  }
+
+  // Resolved from the environment so the spec depends on neither the DOM nor Node's
+  // types, while tools can still pass the signal to built-in APIs like `fetch`
+  /** Your environment's built-in `AbortSignal` type, or `any` if it can't be detected. */
+  export type AbortSignal = typeof globalThis extends {
+    AbortSignal: { prototype: infer Signal };
+  }
+    ? Signal
+    : any;
 
   /** The Standard types interface. */
   export interface Types<Input = unknown, Output = unknown>
@@ -263,7 +258,8 @@ export declare namespace StandardToolV1 {
 
 The specification meets a few primary design objectives:
 
-- **Support tool calling.** Given a Standard Tool, you should be able to describe it to a model and run it with the arguments the model produces. Callers validate those arguments with the tool's input schema first, so invalid ones can be sent back to the model as issues.
+- **Support tool calling.** Given a Standard Tool, you should be able to describe it to a model with its name, description and input JSON Schema, and run it with the arguments the model produces.
+- **Support cancellation.** Callers can pass an `AbortSignal` to `execute`, so a tool can stop its work early once its result is no longer needed.
 - **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" a tool's input and output types, so they can be extracted and used by frameworks.
 - **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing functions/methods.
 - **Avoid API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
@@ -287,30 +283,19 @@ The following frameworks accept user-defined tools conforming to the Standard To
 
 These are the most frequently asked questions about Standard Tool. Questions that apply to every spec, like whether to depend on `@standard-schema/spec`, are answered in the [Standard Schema FAQ](https://standardschema.dev/schema#faq). If your question is not listed, feel free to create an issue.
 
+### Who validates a tool's input?
+
+The tool. Callers pass the model's arguments to `execute` as-is, and those arguments are expected to match `jsonSchema.input` but may not. A tool built from a schema library should validate its input with that schema before running, and throw if it is invalid. Callers can then report the error back to the model so it can correct its arguments.
+
 ### How to only allow synchronous tools?
 
-The `~standard.execute()` function might return a synchronous value _or_ a `Promise`, just like `~standard.validate()`. If you only accept synchronous tools, you can simply throw an error if either returns an instance of `Promise`.
+The `~standard.execute()` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous tools, you can simply throw an error if it returns an instance of `Promise`.
 
 ```ts
 import type { StandardToolV1 } from "@standard-schema/spec";
 
 function runTool(tool: StandardToolV1, input: unknown) {
-  // a tool without an input schema gets the arguments as-is
-  let value = input;
-
-  const inputSchema = tool["~standard"].inputSchema;
-  if (inputSchema) {
-    const result = inputSchema["~standard"].validate(input);
-    if (result instanceof Promise) {
-      throw new TypeError("Tool input validation must be synchronous");
-    }
-    // if the `issues` field exists, the input was invalid
-    if (result.issues) return result;
-
-    value = result.value;
-  }
-
-  const output = tool["~standard"].execute(value);
+  const output = tool["~standard"].execute(input);
   if (output instanceof Promise) {
     throw new TypeError("Tool execution must be synchronous");
   }

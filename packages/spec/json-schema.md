@@ -50,6 +50,8 @@ export declare namespace StandardTypedV1 {
     readonly version: 1;
     /** The vendor name of the schema library. */
     readonly vendor: string;
+    /** Arbitrary metadata the vendor associates with this entity, such as a title or examples. Not interpreted by the spec. */
+    readonly meta?: Record<string, unknown> | undefined;
     /** Inferred types associated with the schema. */
     readonly types?: Types<Input, Output> | undefined;
   }
