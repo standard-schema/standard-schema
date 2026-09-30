@@ -54,7 +54,8 @@ export function tool<InputIn, InputOut, Output>(definition: {
         // callers pass the model's arguments as-is, so validate them first
         const result = await definition.input["~standard"].validate(input);
         if (result.issues) {
-          throw new Error(JSON.stringify(result.issues));
+          // prefer the library's own summary, since it is what the model reads
+          throw new Error(result.message ?? JSON.stringify(result.issues));
         }
         // forward the signal so the handler can stop its work early
         return definition.run(result.value, options);
