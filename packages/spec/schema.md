@@ -70,6 +70,11 @@ export declare namespace StandardSchemaV1 {
   export interface FailureResult {
     /** The issues of failed validation. */
     readonly issues: ReadonlyArray<Issue>;
+    /**
+     * A human-readable summary of the failure, if provided by the library.
+     * When present, prefer it over deriving a message from `issues`.
+     */
+    readonly message?: string | undefined;
   }
 
   /** The issue interface of the failure output. */
@@ -361,5 +366,17 @@ function validateInput(schema: StandardSchemaV1, data: unknown) {
     throw new TypeError('Schema validation must be synchronous');
   }
   // ...
+}
+```
+
+### How do I get a single error message from a failed validation?
+
+Use the optional `message` property of the failure result when it is present. Libraries that already produce an overall summary of a failure can expose it there, which usually reads better than one assembled from individual issues. Fall back to the `issues` array when it is absent.
+
+```ts
+import type {StandardSchemaV1} from '@standard-schema/spec';
+
+function getErrorMessage(result: StandardSchemaV1.FailureResult): string {
+  return result.message ?? result.issues.map((issue) => issue.message).join('\n');
 }
 ```
