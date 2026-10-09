@@ -40,12 +40,10 @@ export function describeTools(
   }));
 }
 
-// Run the tool the model called, and report the outcome back to it. A framework passes each tool the context it
-// provides, like the current request; a tool that needs more than that is a type error in `tools`.
-export async function runToolCall<Context>(
-  tools: ReadonlyArray<StandardToolV1<unknown, unknown, Context>>,
+// Run the tool the model called, and report the outcome back to it.
+export async function runToolCall(
+  tools: ReadonlyArray<StandardToolV1>,
   call: ToolCall,
-  context: Context,
   // e.g. aborted when the user stops the conversation
   signal?: AbortSignal,
 ): Promise<ToolResult> {
@@ -60,10 +58,7 @@ export async function runToolCall<Context>(
 
   try {
     // the tool validates the model's arguments itself, so pass them as-is
-    const output = await tool["~standard"].execute(call.input, {
-      signal,
-      context,
-    });
+    const output = await tool["~standard"].execute(call.input, { signal });
     return {
       tool_use_id: call.id,
       content: JSON.stringify(output),
@@ -79,11 +74,10 @@ export async function runToolCall<Context>(
   }
 }
 
-// Run a tool directly, with its input, output and context types inferred.
-export async function callTool<T extends StandardToolV1<any, any, any>>(
+// Run a tool directly, with its input and output types inferred.
+export async function callTool<T extends StandardToolV1>(
   tool: T,
   input: StandardToolV1.InferInput<T>,
-  context: StandardToolV1.InferContext<T>,
 ): Promise<StandardToolV1.InferOutput<T>> {
-  return tool["~standard"].execute(input, { context });
+  return tool["~standard"].execute(input);
 }

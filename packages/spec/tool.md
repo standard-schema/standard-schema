@@ -210,36 +210,21 @@ export declare namespace StandardJSONSchemaV1 {
 // ########################
 
 /** The Standard Tool interface. */
-export interface StandardToolV1<
-  Input = unknown,
-  Output = unknown,
-  Context = unknown,
-> {
+export interface StandardToolV1<Input = unknown, Output = unknown> {
   /** The Standard Tool properties. */
-  readonly "~standard": StandardToolV1.Props<Input, Output, Context>;
+  readonly "~standard": StandardToolV1.Props<Input, Output>;
 }
 
 export declare namespace StandardToolV1 {
   /** The Standard Tool properties interface. */
-  export interface Props<Input = unknown, Output = unknown, Context = unknown>
+  export interface Props<Input = unknown, Output = unknown>
     extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" for anonymous tools. */
     readonly name: string;
     /** A description of the function's functionality. Set to "" for undescribed tools. */
     readonly description: string;
-    /**
-     * Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`.
-     * `context` is what the tool needs from its caller to run, like a database client or the current user, and is
-     * required unless `Context` includes `undefined`.
-     */
-    execute(
-      input: Input,
-      ...options: undefined extends Context
-        ? [options?: Options & { readonly context?: Context }]
-        : [options: Options & { readonly context: Context }]
-    ): Output | Promise<Output>;
-    /** Inferred types associated with the tool. */
-    readonly types?: Types<Input, Output, Context> | undefined;
+    /** Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`. */
+    execute(input: Input, options?: Options): Output | Promise<Output>;
   }
 
   /** The options passed by callers as the second argument of `execute`. */
@@ -257,12 +242,9 @@ export declare namespace StandardToolV1 {
     ? Signal
     : any;
 
-  /** The Standard Tool types interface. */
-  export interface Types<Input = unknown, Output = unknown, Context = unknown>
-    extends StandardTypedV1.Types<Input, Output> {
-    /** The context the tool requires, as a parameter so a tool needing more is not assignable to one needing less. */
-    readonly context: (context: Context) => void;
-  }
+  /** The Standard types interface. */
+  export interface Types<Input = unknown, Output = unknown>
+    extends StandardTypedV1.Types<Input, Output> {}
 
   /** Infers the input type of a Standard. */
   export type InferInput<Schema extends StandardTypedV1> =
@@ -271,14 +253,6 @@ export declare namespace StandardToolV1 {
   /** Infers the output type of a Standard. */
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
-
-  /** Infers the context type of a Standard Tool. */
-  export type InferContext<Tool extends StandardToolV1<any, any, any>> =
-    NonNullable<Tool["~standard"]["types"]>["context"] extends (
-      context: infer Context,
-    ) => void
-      ? Context
-      : unknown;
 }
 ```
 
@@ -288,7 +262,6 @@ The specification meets a few primary design objectives:
 
 - **Support tool calling.** Given a Standard Tool, you should be able to describe it to a model with its name, description and input JSON Schema, and run it with the arguments the model produces.
 - **Support cancellation.** Callers can pass an `AbortSignal` to `execute`, so a tool can stop its work early once its result is no longer needed.
-- **Support caller context.** A tool can declare a `Context` it needs from its caller, like a database client or the current user, and callers pass it to `execute`. A tool needing a context its caller does not provide is a type error, not a crash at runtime.
 - **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" a tool's input and output types, so they can be extracted and used by frameworks.
 - **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing functions/methods.
 - **Avoid API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
@@ -315,29 +288,6 @@ These are the most frequently asked questions about Standard Tool. Questions tha
 ### Who validates a tool's input?
 
 The tool. Callers pass the model's arguments to `execute` as-is, and those arguments are expected to match `jsonSchema.input` but may not. A tool built from a schema library should validate its input with that schema before running, and throw if it is invalid. Callers can then report the error back to the model so it can correct its arguments.
-
-### How does a tool get what it needs from its caller?
-
-Through its `Context`, the third type parameter. A tool that needs a database client declares `StandardToolV1<Input, Output, { db: Db }>`, and callers must pass `execute(input, { context: { db } })`. A tool that needs nothing leaves `Context` as `unknown`, so any caller can run it, with or without a context.
-
-A framework that provides a context types its tools with it, so a tool needing more than the framework provides is rejected at compile time:
-
-```ts
-import type { StandardToolV1 } from "@standard-schema/spec";
-
-interface RequestContext {
-  db: Db;
-  userId: string;
-}
-
-function registerTools(
-  tools: ReadonlyArray<StandardToolV1<unknown, unknown, RequestContext>>,
-) {
-  // each tool is run with `execute(input, { context: requestContext })`
-}
-```
-
-A framework that provides no context types its tools with `undefined`, `StandardToolV1<unknown, unknown, undefined>`, which accepts every tool whose `Context` includes `undefined`.
 
 ### How to only allow synchronous tools?
 
