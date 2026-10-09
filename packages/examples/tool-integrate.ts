@@ -43,7 +43,7 @@ export function describeTools(
 // Run the tool the model called, and report the outcome back to it. A framework passes each tool the context it
 // provides, like the current request; a tool that needs more than that is a type error in `tools`.
 export async function runToolCall<Context>(
-  tools: ReadonlyArray<StandardToolV1<any, unknown, Context>>,
+  tools: ReadonlyArray<StandardToolV1<unknown, unknown, Context>>,
   call: ToolCall,
   context: Context,
   // e.g. aborted when the user stops the conversation
@@ -80,7 +80,7 @@ export async function runToolCall<Context>(
 }
 
 // Run a tool directly, with its input, output and context types inferred.
-export async function callTool<T extends StandardToolV1<any, unknown, any>>(
+export async function callTool<T extends StandardToolV1<any, any, any>>(
   tool: T,
   input: StandardToolV1.InferInput<T>,
   context: StandardToolV1.InferContext<T>,
