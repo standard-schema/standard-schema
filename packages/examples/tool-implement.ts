@@ -21,20 +21,26 @@ type ToolSchema<Input = unknown, Output = Input> = StandardSchemaV1<
   StandardJSONSchemaV1<Input, Output>;
 
 // A framework's own tool object can implement the spec alongside its existing API.
-interface MyTool<Input, Output> extends StandardToolV1<Input, Output> {
+interface MyTool<Input, Output, Context>
+  extends StandardToolV1<Input, Output, Context> {
   type: "tool";
 }
 
-export function tool<InputIn, InputOut, Output>(definition: {
+// What the handler receives beside its input: the caller's signal and context.
+interface RunOptions<Context> extends StandardToolV1.Options {
+  context: Context;
+}
+
+export function tool<InputIn, InputOut, Output, Context = unknown>(definition: {
   name: string;
   description: string;
   input: ToolSchema<InputIn, InputOut>;
   output?: StandardJSONSchemaV1<Output>;
   run: (
     input: InputOut,
-    options?: StandardToolV1.Options,
+    options: RunOptions<Context>,
   ) => Output | Promise<Output>;
-}): MyTool<InputIn, Output> {
+}): MyTool<InputIn, Output, Context> {
   return {
     type: "tool",
     "~standard": {
@@ -50,15 +56,18 @@ export function tool<InputIn, InputOut, Output>(definition: {
         output: (options) =>
           definition.output?.["~standard"].jsonSchema.output(options) ?? {},
       },
-      async execute(input, options) {
+      async execute(input, ...[options]) {
         // callers pass the model's arguments as-is, so validate them first
         const result = await definition.input["~standard"].validate(input);
         if (result.issues) {
           // prefer the library's own summary, since it is what the model reads
           throw new Error(result.message ?? JSON.stringify(result.issues));
         }
-        // forward the signal so the handler can stop its work early
-        return definition.run(result.value, options);
+        // forward the signal so the handler can stop its work early, and the context it needs
+        return definition.run(result.value, {
+          ...options,
+          context: options?.context as Context,
+        });
       },
     },
   };
@@ -99,7 +108,7 @@ const getWeather = tool({
   input: citySchema,
   run: async ({ city }, options) => {
     const response = await fetch(`https://example.com/weather/${city}`, {
-      signal: options?.signal ?? null,
+      signal: options.signal ?? null,
     });
     const { temperature }: { temperature: number } = await response.json();
     return { city, temperature };
@@ -111,3 +120,28 @@ await getWeather["~standard"].execute(
   { signal: AbortSignal.timeout(10_000) },
 );
 // => { city: "Paris", temperature: 21 }
+
+// A tool that needs something from its caller declares it as its context.
+interface Db {
+  getUser(id: string): Promise<{ name: string }>;
+}
+
+const greet = tool({
+  name: "greet",
+  description: "Greet the current user in a city",
+  input: citySchema,
+  run: async (
+    { city },
+    { context }: RunOptions<{ db: Db; userId: string }>,
+  ) => {
+    const user = await context.db.getUser(context.userId);
+    return `Hello ${user.name}, welcome to ${city}`;
+  },
+});
+
+declare const db: Db;
+await greet["~standard"].execute(
+  { city: "Paris" },
+  { context: { db, userId: "1" } },
+);
+// leaving out the context is a type error, since greet cannot run without it
