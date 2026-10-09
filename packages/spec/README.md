@@ -209,7 +209,7 @@ export declare namespace StandardJSONSchemaV1 {
 
 /** The Standard Tool interface. */
 export interface StandardToolV1<
-  Input = unknown,
+  Input = any,
   Output = unknown,
   Context = unknown,
 > {
@@ -219,7 +219,7 @@ export interface StandardToolV1<
 
 export declare namespace StandardToolV1 {
   /** The Standard Tool properties interface. */
-  export interface Props<Input = unknown, Output = unknown, Context = unknown>
+  export interface Props<Input = any, Output = unknown, Context = unknown>
     extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" for anonymous tools. */
     readonly name: string;
@@ -230,14 +230,12 @@ export declare namespace StandardToolV1 {
      * `context` is what the tool needs from its caller to run, like a database client or the current user, and is
      * required unless `Context` includes `undefined`.
      */
-    execute(
+    readonly execute: (
       input: Input,
       ...options: undefined extends Context
         ? [options?: Options & { readonly context?: Context }]
         : [options: Options & { readonly context: Context }]
-    ): Output | Promise<Output>;
-    /** Inferred types associated with the tool. */
-    readonly types?: Types<Input, Output, Context> | undefined;
+    ) => Output | Promise<Output>;
   }
 
   /** The options passed by callers as the second argument of `execute`. */
@@ -255,12 +253,9 @@ export declare namespace StandardToolV1 {
     ? Signal
     : any;
 
-  /** The Standard Tool types interface. */
-  export interface Types<Input = unknown, Output = unknown, Context = unknown>
-    extends StandardTypedV1.Types<Input, Output> {
-    /** The context the tool requires, as a parameter so a tool needing more is not assignable to one needing less. */
-    readonly context: (context: Context) => void;
-  }
+  /** The Standard types interface. */
+  export interface Types<Input = unknown, Output = unknown>
+    extends StandardTypedV1.Types<Input, Output> {}
 
   /** Infers the input type of a Standard. */
   export type InferInput<Schema extends StandardTypedV1> =
@@ -271,10 +266,10 @@ export declare namespace StandardToolV1 {
     StandardTypedV1.InferOutput<Schema>;
 
   /** Infers the context type of a Standard Tool. */
-  export type InferContext<Tool extends StandardToolV1<any, any, any>> =
-    NonNullable<Tool["~standard"]["types"]>["context"] extends (
-      context: infer Context,
-    ) => void
+  export type InferContext<Tool extends StandardToolV1<any, unknown, any>> =
+    Parameters<Tool["~standard"]["execute"]>[1] extends
+      | { readonly context?: infer Context }
+      | undefined
       ? Context
       : unknown;
 }
