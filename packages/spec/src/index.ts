@@ -123,11 +123,11 @@ export declare namespace StandardJSONSchemaV1 {
 
   /** The Standard JSON Schema converter interface. */
   export interface Converter {
-    /** Converts the input type to JSON Schema. May throw if conversion is not supported. */
+    /** Converts the input type to JSON Schema. Throws if and only if an option is unsupported. Unknown or unrepresentable input is converted to `{}`. */
     readonly input: (
       options: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
-    /** Converts the output type to JSON Schema. May throw if conversion is not supported. */
+    /** Converts the output type to JSON Schema. Throws if and only if an option is unsupported. Unknown or unrepresentable output is converted to `{}`. */
     readonly output: (
       options: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
@@ -136,7 +136,7 @@ export declare namespace StandardJSONSchemaV1 {
   /**
    * The target version of the generated JSON Schema.
    *
-   * It is *strongly recommended* that implementers support `"draft-2020-12"` and `"draft-07"`, as they are both in wide use. All other targets can be implemented on a best-effort basis. Libraries should throw if they don't support a specified target.
+   * It is *strongly recommended* that implementers support `"draft-2020-12"` and `"draft-07"`, as they are both in wide use. All other targets can be implemented on a best-effort basis. Libraries must throw if they don't support a specified target.
    *
    * The `"openapi-3.0"` target is intended as a standardized specifier for OpenAPI 3.0 which is a superset of JSON Schema `"draft-04"`.
    */
@@ -149,7 +149,7 @@ export declare namespace StandardJSONSchemaV1 {
 
   /** The options for the input/output methods. */
   export interface Options {
-    /** Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. */
+    /** Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library must throw. */
     readonly target: Target;
 
     /** Explicit support for additional vendor-specific parameters, if needed. */
@@ -170,30 +170,48 @@ export declare namespace StandardJSONSchemaV1 {
 }
 
 /** The Standard Tool interface. */
-export interface StandardToolV1<Input = unknown, Output = unknown> {
+export interface StandardToolV1<
+  Input = any,
+  Output = unknown,
+  Context = unknown,
+> {
   /** The Standard Tool properties. */
-  readonly "~standard": StandardToolV1.Props<Input, Output>;
+  readonly "~standard": StandardToolV1.Props<Input, Output, Context>;
 }
 
 export declare namespace StandardToolV1 {
   /** The Standard Tool properties interface. */
-  export interface Props<Input = unknown, Output = unknown>
+  export interface Props<Input = any, Output = unknown, Context = unknown>
     extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" for anonymous tools. */
     readonly name: string;
     /** A description of the function's functionality. Set to "" for undescribed tools. */
     readonly description: string;
-    /** Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`. */
-    execute(input: Input, options?: Options): Output | Promise<Output>;
+    /**
+     * Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`. Throws if the tool fails, including when its input is invalid.
+     */
+    readonly execute: (
+      input: Input,
+      ...options: ExecuteOptions<Context>
+    ) => Output | Promise<Output>;
+    /** Inferred types associated with the tool. */
+    readonly types?: Types<Input, Output> | undefined;
   }
 
   /** The options passed by callers as the second argument of `execute`. */
-  export interface Options {
+  export interface Options<Context = unknown> {
     /** Aborted when the caller no longer needs the result, so the tool can stop its work early. */
     readonly signal?: AbortSignal | undefined;
-    /** Explicit support for additional vendor-specific parameters, if needed. */
-    readonly libraryOptions?: Record<string, unknown> | undefined;
+    /** The identifier of the tool call being executed, such as the id the model assigned to it. Omitted if the caller has none. */
+    readonly callId?: string | undefined;
+    /** What the tool needs from its caller to run, like a database client or the current user. */
+    readonly context?: Context;
   }
+
+  /** The options argument of `execute`, which is required along with its `context` unless `Context` includes `undefined`. */
+  export type ExecuteOptions<Context = unknown> = undefined extends Context
+    ? [options?: Options<Context>]
+    : [options: Options<Context> & { readonly context: Context }];
 
   /** Your environment's built-in `AbortSignal` type, or `any` if it can't be detected. */
   export type AbortSignal = typeof globalThis extends {
@@ -202,7 +220,7 @@ export declare namespace StandardToolV1 {
     ? Signal
     : any;
 
-  /** The Standard types interface. */
+  /** The Standard Tool types interface. */
   export interface Types<Input = unknown, Output = unknown>
     extends StandardTypedV1.Types<Input, Output> {}
 
@@ -213,4 +231,12 @@ export declare namespace StandardToolV1 {
   /** Infers the output type of a Standard. */
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
+
+  /** Infers the context type of a Standard Tool. */
+  export type InferContext<Tool extends StandardToolV1<any, any, any>> =
+    NonNullable<Parameters<Tool["~standard"]["execute"]>[1]> extends {
+      readonly context?: infer Context;
+    }
+      ? Context
+      : unknown;
 }

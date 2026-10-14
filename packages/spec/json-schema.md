@@ -91,11 +91,11 @@ export declare namespace StandardJSONSchemaV1 {
 
   /** The Standard JSON Schema converter interface. */
   export interface Converter {
-    /** Converts the input type to JSON Schema. May throw if conversion is not supported. */
+    /** Converts the input type to JSON Schema. Throws if and only if an option is unsupported. Unknown or unrepresentable input is converted to `{}`. */
     readonly input: (
       options: StandardJSONSchemaV1.Options
     ) => Record<string, unknown>;
-    /** Converts the output type to JSON Schema. May throw if conversion is not supported. */
+    /** Converts the output type to JSON Schema. Throws if and only if an option is unsupported. Unknown or unrepresentable output is converted to `{}`. */
     readonly output: (
       options: StandardJSONSchemaV1.Options
     ) => Record<string, unknown>;
@@ -104,7 +104,7 @@ export declare namespace StandardJSONSchemaV1 {
   /**
    * The target version of the generated JSON Schema.
    *
-   * It is *strongly recommended* that implementers support `"draft-2020-12"` and `"draft-07"`, as they are both in wide use. All other targets can be implemented on a best-effort basis. Libraries should throw if they don't support a specified target.
+   * It is *strongly recommended* that implementers support `"draft-2020-12"` and `"draft-07"`, as they are both in wide use. All other targets can be implemented on a best-effort basis. Libraries must throw if they don't support a specified target.
    *
    * The `"openapi-3.0"` target is intended as a standardized specifier for OpenAPI 3.0 which is a superset of JSON Schema `"draft-04"`.
    */
@@ -117,7 +117,7 @@ export declare namespace StandardJSONSchemaV1 {
 
   /** The options for the input/output methods. */
   export interface Options {
-    /** Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library should throw. */
+    /** Specifies the target version of the generated JSON Schema. Support for all versions is on a best-effort basis. If a given version is not supported, the library must throw. */
     readonly target: Target;
 
     /** Explicit support for additional vendor-specific parameters, if needed. */
@@ -281,7 +281,9 @@ Many schemas perform transformations during validation. For example, a schema mi
 
 ### What about error handling?
 
-If a given schema/entity cannot be converted to JSON Schema, the conversion method call may throw. They may also throw if the entity is non-convertible or otherwise cannot be soundly represented as JSON Schema. Any integrating frameworks/libraries should account for this.
+The conversion methods throw if and only if they receive an option they don't support, such as a `target` they don't implement. Integrating frameworks/libraries should account for this.
+
+They never throw because of the schema/entity itself. Any input or output data that is unknown or cannot be represented as JSON Schema, such as the result of a transformation, is converted to `{}`, which accepts any value. For example, a schema that parses a string with an arbitrary transform might return `{ "type": "string" }` from `jsonSchema.input` and `{}` from `jsonSchema.output`.
 
 ### Why is this a separate spec instead of adding to `StandardSchemaV1`?
 

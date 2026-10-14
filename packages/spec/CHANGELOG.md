@@ -4,8 +4,9 @@ All notable changes to the library will be documented in this file.
 
 ## Unreleased
 
-- Add Standard Tool (`StandardToolV1`), for tools that describe their input and output as JSON Schema and can be called by AI models
+- Add Standard Tool (`StandardToolV1`), for tools that describe their input and output as JSON Schema and can be called by AI models, with an optional `Context` a tool requires from its caller
 - Add optional `meta` to `StandardTypedV1`, for arbitrary vendor metadata
+- Specify that `StandardJSONSchemaV1` conversion methods throw if and only if an option is unsupported, and convert unknown or unrepresentable data to `{}`
 
 ## v1.1.0 (December 15, 2025)
 

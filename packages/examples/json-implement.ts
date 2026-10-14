@@ -23,6 +23,25 @@ interface MySchema extends StandardSchemaWithJSONSchema<string, string> {
   type: "string";
 }
 
+function stringJSONSchema(
+  params: StandardJSONSchemaV1.Options,
+): Record<string, unknown> {
+  const schema: Record<string, unknown> = {
+    type: "string",
+  };
+
+  // Add schema version based on target
+  if (params.target === "draft-2020-12") {
+    schema.$schema = "https://json-schema.org/draft/2020-12/schema";
+  } else if (params.target === "draft-07") {
+    schema.$schema = "http://json-schema.org/draft-07/schema#";
+  } else {
+    throw new Error(`Unsupported target: ${params.target}`);
+  }
+
+  return schema;
+}
+
 export function stringWithJSON(): MySchema {
   return {
     type: "string",
@@ -35,26 +54,9 @@ export function stringWithJSON(): MySchema {
           : { issues: [{ message: "Invalid string", path: [] }] };
       },
       jsonSchema: {
-        input(params) {
-          const schema: Record<string, unknown> = {
-            type: "string",
-          };
-
-          // Add schema version based on target
-          if (params.target === "draft-2020-12") {
-            schema.$schema = "https://json-schema.org/draft/2020-12/schema";
-          } else if (params.target === "draft-07") {
-            schema.$schema = "http://json-schema.org/draft-07/schema#";
-          } else {
-            throw new Error(`Unsupported target: ${params.target}`);
-          }
-
-          return schema;
-        },
-        output(params) {
-          // input and output are the same in this example
-          return this.input(params);
-        },
+        input: stringJSONSchema,
+        // input and output are the same in this example
+        output: stringJSONSchema,
       },
     },
   };
