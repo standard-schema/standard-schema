@@ -26,8 +26,9 @@ interface ToolResult {
   is_error: boolean;
 }
 
-// Describing a tool doesn't run it, so it can need any context.
-type AnyContextTool = StandardToolV1<any, unknown, any>;
+// Describing a tool doesn't run it, so it can need any context. Context is
+// passed into a tool, so `never`, not `any`, is the context every tool accepts.
+type AnyContextTool = StandardToolV1<any, unknown, never>;
 
 // Providers require a non-empty name, so name anonymous tools by position.
 function toolName(tool: AnyContextTool, index: number): string {
@@ -110,10 +111,10 @@ export async function runToolCall<Context>(
 }
 
 // Run a tool directly, with its input, output and context types inferred.
-export async function callTool<T extends StandardToolV1<any, any, any>>(
-  tool: T,
-  input: StandardToolV1.InferInput<T>,
-  context: StandardToolV1.InferContext<T>,
-): Promise<StandardToolV1.InferOutput<T>> {
+export async function callTool<Input, Output, Context>(
+  tool: StandardToolV1<Input, Output, Context>,
+  input: Input,
+  context: Context,
+): Promise<Output> {
   return tool["~standard"].execute(input, { context });
 }

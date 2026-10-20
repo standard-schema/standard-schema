@@ -37,7 +37,7 @@ export declare namespace StandardTypedV1 {
   export interface Props<Input = unknown, Output = Input> {
     /** The version number of the standard. */
     readonly version: 1;
-    /** The vendor name of the schema library. */
+    /** The name of the library that implements this interface. */
     readonly vendor: string;
     /** Arbitrary metadata the vendor associates with this entity, such as a title or examples. Not interpreted by the spec. */
     readonly meta?: Record<string, unknown> | undefined;
@@ -273,12 +273,8 @@ export declare namespace StandardToolV1 {
     StandardTypedV1.InferOutput<Schema>;
 
   /** Infers the context type of a Standard Tool. */
-  export type InferContext<Tool extends StandardToolV1<any, any, any>> =
-    NonNullable<Parameters<Tool["~standard"]["execute"]>[1]> extends {
-      readonly context?: infer Context;
-    }
-      ? Context
-      : unknown;
+  export type InferContext<Tool extends StandardToolV1<any, any, never>> =
+    Tool extends StandardToolV1<any, any, infer Context> ? Context : never;
 }
 ```
 
@@ -316,6 +312,10 @@ These are the most frequently asked questions about Standard Tool. Questions tha
 
 The tool. Callers pass the model's arguments to `execute` as-is, and those arguments are expected to match `jsonSchema.input` but may not. A tool built from a schema library should validate its input with that schema before running, and throw if it is invalid. Callers can then report the error back to the model so it can correct its arguments.
 
+### What if a tool's input isn't an object?
+
+A tool's input can be any type, like a string or an array. Many targets only accept objects: model providers and MCP require a tool's input schema to have `type: "object"`. A framework that can't accept a non-object input should throw a descriptive error when the tool is registered, rather than wrapping the input in an object of its own.
+
 ### How does a tool get what it needs from its caller?
 
 Through its `Context`, the third type parameter. A tool that needs a database client declares `StandardToolV1<Input, Output, { db: Db }>`, and callers must pass `execute(input, { context: { db } })`. A tool that needs nothing leaves `Context` as `unknown`, so any caller can run it.
@@ -337,7 +337,7 @@ function registerTools(
 }
 ```
 
-A framework that provides no context types its tools with `undefined`, as in `StandardToolV1<any, unknown, undefined>`, which accepts every tool whose `Context` includes `undefined`. A plain `StandardToolV1` accepts only tools that need no context at all.
+A framework that provides no context types its tools with `undefined`, as in `StandardToolV1<any, unknown, undefined>`, which accepts every tool whose `Context` includes `undefined`. A plain `StandardToolV1` accepts only tools that need no context at all. A framework that only describes tools without running them can accept every tool, whatever its context, as `StandardToolV1<any, unknown, never>`. Use `never` here, not `any`, since a context of `any` doesn't require one, so it rejects tools that do.
 
 Callers pass their context object as-is, so a tool receives the same object, with the same identity and prototype, that its caller holds. The spec's own options, `signal` and `callId`, sit beside `context` rather than inside it, so no key a tool chooses for its context can collide with them.
 

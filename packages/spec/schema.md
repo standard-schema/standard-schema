@@ -37,7 +37,7 @@ export declare namespace StandardSchemaV1 {
   export interface Props<Input = unknown, Output = Input> {
     /** The version number of the standard. */
     readonly version: 1;
-    /** The vendor name of the schema library. */
+    /** The name of the library that implements this interface. */
     readonly vendor: string;
     /** Arbitrary metadata the vendor associates with this entity, such as a title or examples. Not interpreted by the spec. */
     readonly meta?: Record<string, unknown> | undefined;
