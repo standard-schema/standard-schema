@@ -224,6 +224,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [Zen Router](https://zenrouter.liveblocks.io)                                 | Opinionated HTTP router with typed path params, built-in body validation, and a clean model for authentication                        | [Docs](https://zenrouter.liveblocks.io)                                                               |
 | [Raptor](https://raptorjs.com)                                                | A lightweight middleware framework for Deno, Bun & Node.js                                                                            | [Docs](https://raptorjs.com/docs)                                                                     |
 | [OpenWorkflow](https://openworkflow.dev)                                      | A TypeScript framework for building durable, resumable workflows                                                                      | [Docs](https://openworkflow.dev/docs/standard-schema)                                                 |
+| [Vovk.ts](https://vovk.dev) | Back-end framework for Next.js App Router route handlers, with typed clients, OpenAPI and AI tools from the same procedures | [Docs](https://vovk.dev/procedure#procedure-function) |
 
 <!-- ## How can my schema library implement the spec?
 
