@@ -9,5 +9,8 @@ export default defineConfig({
       include: ["src"],
       exclude: ["**/index.ts", "**/*.test.ts"],
     },
+    typecheck: {
+      enabled: true,
+    },
   },
 });
