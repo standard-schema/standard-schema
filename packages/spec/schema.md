@@ -224,6 +224,7 @@ The following tools accept user-defined schemas conforming to the Standard Schem
 | [Zen Router](https://zenrouter.liveblocks.io)                                 | Opinionated HTTP router with typed path params, built-in body validation, and a clean model for authentication                        | [Docs](https://zenrouter.liveblocks.io)                                                               |
 | [Raptor](https://raptorjs.com)                                                | A lightweight middleware framework for Deno, Bun & Node.js                                                                            | [Docs](https://raptorjs.com/docs)                                                                     |
 | [OpenWorkflow](https://openworkflow.dev)                                      | A TypeScript framework for building durable, resumable workflows                                                                      | [Docs](https://openworkflow.dev/docs/standard-schema)                                                 |
+| [@auth70/bodyguard](https://github.com/auth70/bodyguard)                      | Fetch API compatible streaming JSON and form data body parser and guard                                                               | [Commit](https://github.com/auth70/bodyguard/commit/5987039444dd28f3e9123f130362e671f1573779)         |
 
 <!-- ## How can my schema library implement the spec?
 
