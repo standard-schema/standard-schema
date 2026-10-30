@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@standard-schema/spec": "workspace:*",
+    "@standard-schema/utils": "workspace:*",
     "arktype": "^2.0.0",
     "typescript": "^5.6.2",
     "valibot": "1.0.0-beta.12",
