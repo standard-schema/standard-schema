@@ -235,7 +235,8 @@ export declare namespace StandardToolV1 {
   /** Infers the context type of a Standard Tool. */
   export type InferContext<
     Tool extends StandardToolV1<unknown, unknown, never>,
-  > = Tool extends StandardToolV1<unknown, unknown, infer Context>
-    ? Context
-    : unknown;
+  > =
+    Tool extends StandardToolV1<unknown, unknown, infer Context>
+      ? Context
+      : unknown;
 }
