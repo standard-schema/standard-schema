@@ -206,42 +206,44 @@ export declare namespace StandardJSONSchemaV1 {
 export interface StandardFunctionV1<
   Input = any,
   Output = unknown,
-  in Context = unknown,
+  in Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
 > {
   /** The Standard Function properties. */
-  readonly "~standard": StandardFunctionV1.Props<Input, Output, Context>;
+  readonly "~standard": StandardFunctionV1.Props<Input, Output, Options>;
 }
 
 export declare namespace StandardFunctionV1 {
   /** The Standard Function properties interface. */
-  export interface Props<Input = any, Output = unknown, in Context = unknown>
-    extends StandardJSONSchemaV1.Props<Input, Output> {
+  export interface Props<
+    Input = any,
+    Output = unknown,
+    in Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
+  > extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" if it has none. */
     readonly name: string;
     /** A description of what the function does. Set to "" if it has none. */
     readonly description: string;
-    /** Runs the function with the context it needs from its caller, passed as-is. Returns a failure the caller may act on, or throws if something unexpected happens. */
+    /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
     readonly execute: (
       input: Input,
-      context: Context,
-      options?: Options,
+      options: Options,
     ) => Result<Output> | Promise<Result<Output>>;
     /** Runs the function and yields its results as they become available, if supported. */
     readonly executeStream?:
-      | ((
-          input: Input,
-          context: Context,
-          options?: Options,
-        ) => AsyncIterable<Result<Output>>)
+      | ((input: Input, options: Options) => AsyncIterable<Result<Output>>)
       | undefined;
     /** Inferred types associated with the function. */
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The options passed by callers as the third argument of `execute` and `executeStream`. */
+  /** The options passed by callers as the second argument of `execute` and `executeStream`. A function that needs more, like a context or options of a specific caller, intersects this with what it needs. */
   export interface Options {
     /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
     readonly signal?: AbortSignal | undefined;
+    /** The id of this call, like the id a model assigned to a tool call. Omitted if the caller has none. */
+    readonly callId?: string | undefined;
+    /** What the function needs from its caller's code, like a database client or the current user. Passed as-is. */
+    readonly context?: unknown;
   }
 
   /** The result interface of the execute function. */
@@ -282,11 +284,11 @@ export declare namespace StandardFunctionV1 {
   export type InferOutput<Function extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Function>;
 
-  /** Infers the context needed to run a Standard Function. For a union of functions, infers the context needed to run all of them. */
-  export type InferContext<
+  /** Infers the options needed to run a Standard Function. For a union of functions, infers the options needed to run all of them. */
+  export type InferOptions<
     Function extends StandardFunctionV1<any, unknown, never>,
-  > = [Function] extends [StandardFunctionV1<any, unknown, infer Context>]
-    ? Context
+  > = [Function] extends [StandardFunctionV1<any, unknown, infer Options>]
+    ? Options
     : never;
 }
 ```
@@ -298,9 +300,9 @@ The specification meets a few primary design objectives:
 - **Describe and run any function.** Given a Standard Function, you should be able to describe it with its name, description and JSON Schemas, for example as a tool for a model, and run it with the input you have.
 - **One interface for tools, agents and model calls.** A function's body is a black box. It may validate, transform, call other functions or call models. Callers only see its input, its output and its failures.
 - **Failures the caller can act on.** A function returns failures it wants its caller to see, with the same issues as Standard Schema, and throws for anything unexpected.
-- **Support caller context.** A function declares the `Context` it needs from its caller, like a database client or the current user. A caller that doesn't provide it is a type error, not a crash at runtime.
+- **Support caller context.** A function declares the options it needs from its caller, like a database client in its `context`. A caller that doesn't provide them is a type error, not a crash at runtime.
 - **Support cancellation and streaming.** Callers can pass an `AbortSignal`, and functions can stream their results.
-- **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" a function's input, output and context types, so they can be extracted and used by frameworks.
+- **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" a function's input, output and options types, so they can be extracted and used by frameworks.
 - **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing functions/methods.
 - **Avoid API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
 - **Do no harm to DX.** The `~standard` property is tilde-prefixed to [de-prioritize it in autocompletion](https://x.com/colinhacks/status/1816860780459073933). By contrast, an underscore-prefixed property would show up before properties/methods with alphanumeric names.
@@ -371,34 +373,51 @@ Then `jsonSchema.output` returns `{}`, which accepts any value. Like in Standard
 
 ### How does a function get what it needs from its caller?
 
-Through its `Context`, the third type parameter, which callers pass as the second argument of `execute`. A function that needs a database client is a `StandardFunctionV1<Input, Output, { db: Db }>`, and callers run it with `execute(input, { db })`. A function that needs nothing leaves `Context` as `unknown`, so any caller can run it.
+Through its options, the second argument of `execute`. Their type is the function's third type parameter. Every caller may pass the standard `signal` and `callId`, and what a function needs from its caller's code, like a database client or the current user, goes in `context`. A function that needs a database client is a `StandardFunctionV1<Input, Output, StandardFunctionV1.Options & { context: { db: Db } }>`, and callers run it with `execute(input, { context: { db } })`. A function that needs nothing else leaves the type parameter as `StandardFunctionV1.Options`, so any caller can run it with `execute(input, {})`.
 
-Callers pass their context object as-is, so a function receives the same object, with the same identity and prototype, that its caller holds. The spec doesn't say what goes in a context or how its keys are named. Anything a function needs from its caller belongs there, like a database client, the current user, the id of a tool call, a way to report usage or progress, or a tracing span.
+Callers pass their context object as-is, so a function receives the same object, with the same identity and prototype, that its caller holds. The spec doesn't say what goes in a context or how its keys are named. Anything a function needs from its caller's code belongs there, like a database client, the current user, a way to report usage or progress, or a tracing span.
 
-### How do I accept functions that need the context my framework provides?
+### What about options a framework provides, like a stream writer?
 
-Type them with that context. `Context` is something a function receives, so a function that needs less than the framework provides is accepted, and one that needs more is rejected at compile time:
+A framework may pass options of its own next to the standard ones, like a writer for streaming progress, the messages of a conversation, or a way to suspend a run. A function that uses them says so in its options type:
 
 ```ts
 import type { StandardFunctionV1 } from "@standard-schema/spec";
 
-interface RequestContext {
-  db: Db;
-  userId: string;
-}
+type SearchOptions = StandardFunctionV1.Options & {
+  context: { db: Db };
+  writer: { write(chunk: string): void };
+};
+
+type Search = StandardFunctionV1<{ query: string }, string[], SearchOptions>;
+```
+
+Such a function only runs where a caller provides a compatible `writer`, and anywhere else it's a type error. A function that only needs the standard options and a context runs with every caller that provides that context.
+
+### How do I accept functions that need the options my framework provides?
+
+Type them with those options. Options are something a function receives, so a function that needs less than the framework provides is accepted, and one that needs more is rejected at compile time:
+
+```ts
+import type { StandardFunctionV1 } from "@standard-schema/spec";
+
+type FrameworkOptions = StandardFunctionV1.Options & {
+  context: { db: Db; userId: string };
+  writer: { write(chunk: string): void };
+};
 
 function registerTools(
-  tools: ReadonlyArray<StandardFunctionV1<any, unknown, RequestContext>>,
+  tools: ReadonlyArray<StandardFunctionV1<any, unknown, FrameworkOptions>>,
 ) {
-  // each tool is run with `execute(input, requestContext)`
+  // each tool is run with `execute(input, { signal, callId, context, writer })`
 }
 ```
 
-A framework that provides no context types its functions with `undefined`, as in `StandardFunctionV1<any, unknown, undefined>`, which accepts every function whose `Context` includes `undefined`. A plain `StandardFunctionV1` accepts only functions that need no context at all. A framework that only describes functions without running them can accept every function, whatever its context, as `StandardFunctionV1<any, unknown, never>`. `any` would accept them too, but it would also let you run them with any context, while `never` makes running them a type error.
+A plain `StandardFunctionV1` accepts only functions that need nothing beyond the standard options, so a framework that provides nothing else types its functions that way. A framework that only describes functions without running them can accept every function, whatever it needs, as `StandardFunctionV1<any, unknown, never>`. `any` would accept them too, but it would also let you run them with any options, while `never` makes running them a type error.
 
-### How do I infer the context needed to run several functions?
+### How do I infer the options needed to run several functions?
 
-With `StandardFunctionV1.InferContext`. For a union of functions, it infers the intersection of their contexts, so an agent can require exactly what its tools need:
+With `StandardFunctionV1.InferOptions`. For a union of functions, it infers the intersection of the options they need, so an agent can require exactly the context its tools need:
 
 ```ts
 import type { StandardFunctionV1 } from "@standard-schema/spec";
@@ -407,23 +426,27 @@ type AnyFunction = StandardFunctionV1<any, unknown, never>;
 
 function defineAgent<const Tools extends ReadonlyArray<AnyFunction>>(config: {
   tools: Tools;
-  context: StandardFunctionV1.InferContext<Tools[number]>;
+  context: StandardFunctionV1.InferOptions<Tools[number]>["context"];
 }) {
   // ...
 }
 ```
 
-Don't infer it with `function defineAgent<Context>(tools: StandardFunctionV1<any, unknown, Context>[])`: TypeScript infers `Context` from the first tool only, and then rejects the others.
+Don't infer it with `function defineAgent<Options extends StandardFunctionV1.Options>(tools: StandardFunctionV1<any, unknown, Options>[])`: TypeScript infers `Options` from the first tool only, and then rejects the others.
 
-### Why is the context of `execute` required?
+### Why are the options of `execute` required?
 
-So `Context` stays a plain parameter type, which keeps TypeScript's checks sound and its inference simple. Callers always pass their context, even if it's `undefined`: `execute(input, undefined)`.
+So their type stays a plain parameter type, which keeps TypeScript's checks sound and its inference simple. Callers always pass an options object, even an empty one: `execute(input, {})`.
 
-### Why is `signal` a separate option, and not part of the context?
+### Why are `signal` and `callId` standard options?
 
-Every caller and every function can understand cancellation without agreeing on anything else, and `AbortSignal` is built into the platform. If it lived in the context under a key of the caller's choosing, a framework could only cancel functions that happened to use the same key. And a context usually lasts a whole request or run, while a signal can change with every call. If callers had to add the signal to their context, they would copy the context for each call, and a function would no longer receive the object its caller holds. So, like `fetch` and `addEventListener`, `execute` takes the signal in an options object of its own. A function that calls other functions or models should forward its `signal` to them.
+Every caller and every function can understand cancellation without agreeing on anything else, and `AbortSignal` is built into the platform. If each caller passed it under a key of its own choosing, a framework could only cancel functions that happened to use the same key. Like `fetch` and `addEventListener`, `execute` takes it as `signal` in an options object. A function that calls other functions or models should forward its `signal` to them.
 
-The id of a tool call only exists for some callers, so it belongs in the context of the callers that have one.
+The same goes for `callId`. Many callers identify each call, like a model's tool call or an RPC request, and a function can use the id to tie its logs, progress or side effects to the call without agreeing on a key name with each caller. Callers that have no id leave it out.
+
+### Why is the context an option of its own?
+
+A context usually lasts a whole request or run, while options like `signal` and `callId` can change with every call. Callers create new options for each call and put the context in them as-is, so a function receives the same object its caller holds, and the context's keys can't collide with the standard options or a framework's own.
 
 ### How does streaming work?
 
@@ -432,10 +455,10 @@ A function that can stream its results implements `executeStream`, which yields 
 ```ts
 import type { StandardFunctionV1 } from "@standard-schema/spec";
 
-async function runStreaming(fn: StandardFunctionV1<any, unknown, undefined>) {
+async function runStreaming(fn: StandardFunctionV1) {
   const { executeStream, execute } = fn["~standard"];
-  if (!executeStream) return execute({}, undefined);
-  for await (const result of executeStream({}, undefined)) {
+  if (!executeStream) return execute({}, {});
+  for await (const result of executeStream({}, {})) {
     // show each result as it arrives
   }
 }
@@ -452,8 +475,8 @@ The `~standard.execute()` function might return a synchronous value _or_ a `Prom
 ```ts
 import type { StandardFunctionV1 } from "@standard-schema/spec";
 
-function runSync(fn: StandardFunctionV1<any, unknown, undefined>, input: unknown) {
-  const result = fn["~standard"].execute(input, undefined);
+function runSync(fn: StandardFunctionV1, input: unknown) {
+  const result = fn["~standard"].execute(input, {});
   if (result instanceof Promise) {
     throw new TypeError("Function must be synchronous");
   }

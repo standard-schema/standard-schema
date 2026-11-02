@@ -166,42 +166,44 @@ export declare namespace StandardJSONSchemaV1 {
 export interface StandardFunctionV1<
   Input = any,
   Output = unknown,
-  in Context = unknown,
+  in Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
 > {
   /** The Standard Function properties. */
-  readonly "~standard": StandardFunctionV1.Props<Input, Output, Context>;
+  readonly "~standard": StandardFunctionV1.Props<Input, Output, Options>;
 }
 
 export declare namespace StandardFunctionV1 {
   /** The Standard Function properties interface. */
-  export interface Props<Input = any, Output = unknown, in Context = unknown>
-    extends StandardJSONSchemaV1.Props<Input, Output> {
+  export interface Props<
+    Input = any,
+    Output = unknown,
+    in Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
+  > extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" if it has none. */
     readonly name: string;
     /** A description of what the function does. Set to "" if it has none. */
     readonly description: string;
-    /** Runs the function with the context it needs from its caller, passed as-is. Returns a failure the caller may act on, or throws if something unexpected happens. */
+    /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
     readonly execute: (
       input: Input,
-      context: Context,
-      options?: Options,
+      options: Options,
     ) => Result<Output> | Promise<Result<Output>>;
     /** Runs the function and yields its results as they become available, if supported. */
     readonly executeStream?:
-      | ((
-          input: Input,
-          context: Context,
-          options?: Options,
-        ) => AsyncIterable<Result<Output>>)
+      | ((input: Input, options: Options) => AsyncIterable<Result<Output>>)
       | undefined;
     /** Inferred types associated with the function. */
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The options passed by callers as the third argument of `execute` and `executeStream`. */
+  /** The options passed by callers as the second argument of `execute` and `executeStream`. A function that needs more, like a context or options of a specific caller, intersects this with what it needs. */
   export interface Options {
     /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
     readonly signal?: AbortSignal | undefined;
+    /** The id of this call, like the id a model assigned to a tool call. Omitted if the caller has none. */
+    readonly callId?: string | undefined;
+    /** What the function needs from its caller's code, like a database client or the current user. Passed as-is. */
+    readonly context?: unknown;
   }
 
   /** The result interface of the execute function. */
@@ -242,10 +244,10 @@ export declare namespace StandardFunctionV1 {
   export type InferOutput<Function extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Function>;
 
-  /** Infers the context needed to run a Standard Function. For a union of functions, infers the context needed to run all of them. */
-  export type InferContext<
+  /** Infers the options needed to run a Standard Function. For a union of functions, infers the options needed to run all of them. */
+  export type InferOptions<
     Function extends StandardFunctionV1<any, unknown, never>,
-  > = [Function] extends [StandardFunctionV1<any, unknown, infer Context>]
-    ? Context
+  > = [Function] extends [StandardFunctionV1<any, unknown, infer Options>]
+    ? Options
     : never;
 }

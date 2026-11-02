@@ -18,96 +18,138 @@ interface Db {
 interface User {
   id: string;
 }
+interface Writer {
+  write(chunk: string): void;
+}
 type Empty = Record<string, never>;
+type Options = StandardFunctionV1.Options;
 
 declare const needsDb: StandardFunctionV1<
   { sql: string },
   unknown[],
-  { db: Db }
+  Options & { context: { db: Db } }
 >;
-declare const needsUser: StandardFunctionV1<Empty, string, { user: User }>;
+declare const needsUser: StandardFunctionV1<
+  Empty,
+  string,
+  Options & { context: { user: User } }
+>;
 declare const needsNothing: StandardFunctionV1<Empty, string>;
 declare const maybeDb: StandardFunctionV1<
   Empty,
   string,
-  { db: Db } | undefined
+  Options & { context?: { db: Db } | undefined }
 >;
 declare const needsSecret: StandardFunctionV1<
   Empty,
   string,
-  { secret: string }
+  Options & { context: { secret: string } }
+>;
+// A function that also needs an option a framework provides, next to the standard ones.
+declare const needsWriter: StandardFunctionV1<
+  Empty,
+  string,
+  Options & { context: { db: Db }; writer: Writer }
 >;
 
-// A framework that provides a context accepts every function needing at most that.
-type AppContext = { db: Db; user: User };
+// A framework accepts every function needing at most the options it provides.
+type AppOptions = Options & { context: { db: Db; user: User }; writer: Writer };
 declare function register(
-  functions: ReadonlyArray<StandardFunctionV1<any, unknown, AppContext>>,
+  functions: ReadonlyArray<StandardFunctionV1<any, unknown, AppOptions>>,
 ): void;
-register([needsDb, needsUser, needsNothing, maybeDb]);
+register([needsDb, needsUser, needsNothing, maybeDb, needsWriter]);
 // @ts-expect-error needs a secret the framework doesn't provide
 register([needsSecret]);
 
+// A framework without a writer rejects functions that need one.
+declare function registerWithoutWriter(
+  functions: ReadonlyArray<
+    StandardFunctionV1<any, unknown, Options & { context: { db: Db } }>
+  >,
+): void;
+registerWithoutWriter([needsDb, needsNothing]);
+// @ts-expect-error needs a writer
+registerWithoutWriter([needsWriter]);
+
 // A framework that may not have a user rejects functions that require one.
 declare function registerAnonymous(
-  functions: ReadonlyArray<StandardFunctionV1<any, unknown, { user?: User }>>,
+  functions: ReadonlyArray<
+    StandardFunctionV1<any, unknown, Options & { context: { user?: User } }>
+  >,
 ): void;
 // @ts-expect-error requires a user
 registerAnonymous([needsUser]);
 
 // `never` accepts every function, for code that describes functions without running them.
 export const described: ReadonlyArray<StandardFunctionV1<any, unknown, never>> =
-  [needsDb, needsUser, needsNothing, maybeDb, needsSecret];
+  [needsDb, needsUser, needsNothing, maybeDb, needsSecret, needsWriter];
 
-// A plain `StandardFunctionV1` needs no context, so it accepts only functions that need none.
+// A plain `StandardFunctionV1` needs only the standard options, so it accepts only functions that need nothing else.
 export const plain: StandardFunctionV1 = needsNothing;
 // @ts-expect-error needs a db
 export const plainDb: StandardFunctionV1 = needsDb;
 
-// The context is always passed, even when it's `undefined`. The options are optional.
-needsNothing["~standard"].execute({}, undefined);
-needsDb["~standard"].execute({ sql: "" }, { db: {} as Db });
-needsDb["~standard"].execute(
-  { sql: "" },
-  { db: {} as Db },
-  { signal: new AbortController().signal },
+// Options are always passed, with a context when the function needs one.
+needsNothing["~standard"].execute({}, {});
+needsNothing["~standard"].execute(
+  {},
+  { signal: new AbortController().signal, callId: "call_1" },
 );
-// @ts-expect-error the context is required
+needsDb["~standard"].execute({ sql: "" }, { context: { db: {} as Db } });
+// @ts-expect-error options are required
 needsNothing["~standard"].execute({});
-// @ts-expect-error the context needs a db
+// @ts-expect-error the context is required
 needsDb["~standard"].execute({ sql: "" }, {});
+// @ts-expect-error the context needs a db
+needsDb["~standard"].execute({ sql: "" }, { context: {} });
+// @ts-expect-error the standard options have standard types
+needsNothing["~standard"].execute({}, { callId: 1 });
 
-// Generic framework code can pass its context blindly.
-export function runAll<Context>(
-  functions: ReadonlyArray<StandardFunctionV1<any, unknown, Context>>,
-  context: Context,
+// Generic framework code can pass its options blindly.
+export function runAll<Opts extends Options>(
+  functions: ReadonlyArray<StandardFunctionV1<any, unknown, Opts>>,
+  options: Opts,
 ): unknown[] {
-  return functions.map((fn) => fn["~standard"].execute({}, context));
+  return functions.map((fn) => fn["~standard"].execute({}, options));
 }
 
-// The context needed to run a union of functions is the intersection of their contexts.
+// The options needed to run a union of functions are the intersection of theirs.
 type _single = Assert<
-  Equal<StandardFunctionV1.InferContext<typeof needsDb>, { db: Db }>
->;
-type _union = Assert<
   Equal<
-    StandardFunctionV1.InferContext<
-      typeof needsDb | typeof needsUser | typeof needsNothing | typeof maybeDb
-    >,
+    StandardFunctionV1.InferOptions<typeof needsDb>,
+    Options & { context: { db: Db } }
+  >
+>;
+type _unionContext = Assert<
+  Equal<
+    StandardFunctionV1.InferOptions<
+      typeof needsDb | typeof needsUser | typeof needsNothing
+    >["context"],
     { db: Db } & { user: User }
   >
 >;
+type _unionWriter = Assert<
+  Equal<
+    StandardFunctionV1.InferOptions<
+      typeof needsUser | typeof needsWriter
+    > extends { writer: Writer }
+      ? true
+      : false,
+    true
+  >
+>;
 type _none = Assert<
-  Equal<StandardFunctionV1.InferContext<typeof needsNothing>, unknown>
+  Equal<StandardFunctionV1.InferOptions<typeof needsNothing>, Options>
 >;
 
-// So a framework can infer the context it must provide from the functions it is given.
+// So a framework can infer the context it must be given from the functions it is given.
 declare function defineAgent<
   const Functions extends ReadonlyArray<
     StandardFunctionV1<any, unknown, never>
   >,
 >(config: {
   functions: Functions;
-  context: StandardFunctionV1.InferContext<Functions[number]>;
+  context: StandardFunctionV1.InferOptions<Functions[number]>["context"];
 }): void;
 defineAgent({
   functions: [needsDb, needsUser],
@@ -118,6 +160,13 @@ defineAgent({
   // @ts-expect-error missing the user
   context: { db: {} as Db },
 });
+
+// Inferring the options from an array of functions infers them from the first one only.
+declare function defineAgentWrongly<Opts extends Options>(
+  functions: ReadonlyArray<StandardFunctionV1<any, unknown, Opts>>,
+): void;
+// @ts-expect-error `Opts` is inferred from `needsDb`, so `needsUser` is rejected
+defineAgentWrongly([needsDb, needsUser]);
 
 // A failure always names its source; success has no issues.
 type Result = StandardFunctionV1.Result<string>;
@@ -140,12 +189,12 @@ export function read(result: Result): string {
 
 // `executeStream` yields results of the same output type.
 export async function last(
-  fn: StandardFunctionV1<Empty, string, undefined>,
+  fn: StandardFunctionV1<Empty, string>,
 ): Promise<Result | undefined> {
   const stream = fn["~standard"].executeStream;
-  if (!stream) return fn["~standard"].execute({}, undefined);
+  if (!stream) return fn["~standard"].execute({}, {});
   let result: Result | undefined;
-  for await (const item of stream({}, undefined)) result = item;
+  for await (const item of stream({}, {})) result = item;
   return result;
 }
 

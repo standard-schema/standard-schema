@@ -26,9 +26,9 @@ interface ToolResult {
   is_error: boolean;
 }
 
-// Describing a function doesn't run it, so it can need any context. `never`
-// accepts every function and, unlike `any`, doesn't let you run one with a
-// made-up context.
+// Describing a function doesn't run it, so it can need any options. `never`
+// accepts every function and, unlike `any`, doesn't let you run one with
+// made-up options.
 type AnyFunction = StandardFunctionV1<any, unknown, never>;
 
 // Providers require a non-empty name, so name anonymous functions by position.
@@ -53,11 +53,20 @@ export function describeTools(
   });
 }
 
+// The functions this framework can run: they need at most the standard options
+// and a context. A function that needs another option, like a stream writer
+// this framework doesn't provide, is a type error where it's passed in.
+type RunnableFunction<Context> = StandardFunctionV1<
+  any,
+  unknown,
+  StandardFunctionV1.Options & { context: Context }
+>;
+
 // Run the function the model called with the framework's context, and report
 // the outcome back to the model. A function that needs more than `Context` is
 // a type error where `functions` is passed in.
 export async function runToolCall<Context>(
-  functions: ReadonlyArray<StandardFunctionV1<any, unknown, Context>>,
+  functions: ReadonlyArray<RunnableFunction<Context>>,
   call: ToolCall,
   context: Context,
   signal?: AbortSignal,
@@ -74,7 +83,11 @@ export async function runToolCall<Context>(
   let result: StandardFunctionV1.Result<unknown>;
   try {
     // the function validates the model's arguments itself, so pass them as-is
-    result = await fn["~standard"].execute(call.input, context, { signal });
+    result = await fn["~standard"].execute(call.input, {
+      signal,
+      callId: call.id,
+      context,
+    });
   } catch {
     // thrown errors are unexpected and may contain internal details, so don't
     // show them to the model
@@ -113,20 +126,18 @@ export async function runToolCall<Context>(
 }
 
 // An agent that infers the context it must be given from its functions: the
-// context needed to run a union of functions is the intersection of theirs.
+// options needed to run a union of functions are the intersection of theirs.
 export function defineAgent<
-  const Functions extends ReadonlyArray<AnyFunction>,
+  const Functions extends ReadonlyArray<RunnableFunction<never>>,
 >(config: {
   functions: Functions;
-  context: StandardFunctionV1.InferContext<Functions[number]>;
+  context: StandardFunctionV1.InferOptions<Functions[number]>["context"];
 }): (call: ToolCall) => Promise<ToolResult> {
-  // the functions are typed `never` to accept any of them, so cast them to the
-  // context they were checked against before running them
+  // the functions are typed with a `never` context to accept any context, so
+  // cast them to the context they were checked against before running them
   const functions = config.functions as unknown as ReadonlyArray<
-    StandardFunctionV1<
-      any,
-      unknown,
-      StandardFunctionV1.InferContext<Functions[number]>
+    RunnableFunction<
+      StandardFunctionV1.InferOptions<Functions[number]>["context"]
     >
   >;
   return (call) => runToolCall(functions, call, config.context);
@@ -134,15 +145,17 @@ export function defineAgent<
 
 // Stream a function's results when it supports streaming, for example to
 // show progress, and fall back to `execute` otherwise.
-export async function* streamResults<Context>(
-  fn: StandardFunctionV1<any, unknown, Context>,
+export async function* streamResults<
+  Options extends StandardFunctionV1.Options,
+>(
+  fn: StandardFunctionV1<any, unknown, Options>,
   input: unknown,
-  context: Context,
+  options: Options,
 ): AsyncGenerator<StandardFunctionV1.Result<unknown>> {
   const { executeStream, execute } = fn["~standard"];
   if (executeStream) {
-    yield* executeStream(input, context);
+    yield* executeStream(input, options);
   } else {
-    yield await execute(input, context);
+    yield await execute(input, options);
   }
 }

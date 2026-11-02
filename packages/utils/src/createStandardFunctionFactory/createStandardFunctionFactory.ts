@@ -21,7 +21,7 @@ export interface StandardFunctionConfig<
   TParsed,
   TReturn,
   TOutput,
-  TContext,
+  TOptions extends StandardFunctionV1.Options,
 > {
   /**
    * The name of the function, if any.
@@ -42,13 +42,12 @@ export interface StandardFunctionConfig<
    */
   readonly output?: StandardFunctionSchema<TReturn, TOutput> | undefined;
   /**
-   * Executes the function with a validated input and the caller's context.
+   * Executes the function with a validated input and the caller's options.
    * Throws a `FunctionFailure` to report a failure its caller may act on.
    */
   readonly execute: (
     input: TParsed,
-    context: TContext,
-    options: StandardFunctionV1.Options,
+    options: TOptions,
   ) => TReturn | Promise<TReturn>;
 }
 
@@ -60,10 +59,10 @@ export type CreateStandardFunction = <
   TParsed = TInput,
   TReturn = unknown,
   TOutput = TReturn,
-  TContext = unknown,
+  TOptions extends StandardFunctionV1.Options = StandardFunctionV1.Options,
 >(
-  config: StandardFunctionConfig<TInput, TParsed, TReturn, TOutput, TContext>,
-) => StandardFunctionV1<TInput, TOutput, TContext>;
+  config: StandardFunctionConfig<TInput, TParsed, TReturn, TOutput, TOptions>,
+) => StandardFunctionV1<TInput, TOutput, TOptions>;
 
 /**
  * Creates a `createStandardFunction` function with the vendor name of your
@@ -94,7 +93,7 @@ export function createStandardFunctionFactory(
         output: (options) =>
           config.output?.["~standard"].jsonSchema.output(options) ?? {},
       },
-      async execute(value, context, options = {}) {
+      async execute(value, options) {
         let input: unknown = value;
         if (config.input) {
           const result = await config.input["~standard"].validate(value);
@@ -105,7 +104,7 @@ export function createStandardFunctionFactory(
         }
         let output: unknown;
         try {
-          output = await config.execute(input as never, context, options);
+          output = await config.execute(input as never, options);
         } catch (error) {
           if (!(error instanceof FunctionFailure)) {
             throw error;

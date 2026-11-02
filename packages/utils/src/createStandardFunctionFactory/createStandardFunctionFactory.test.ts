@@ -103,8 +103,8 @@ describe("createStandardFunctionFactory", () => {
       StandardFunctionV1.InferOutput<typeof fn>
     >().toEqualTypeOf<string>();
     expectTypeOf<
-      StandardFunctionV1.InferContext<typeof fn>
-    >().toEqualTypeOf<unknown>();
+      StandardFunctionV1.InferOptions<typeof fn>
+    >().toEqualTypeOf<StandardFunctionV1.Options>();
     createStandardFunction({
       output: temperatureSchema,
       // @ts-expect-error
@@ -128,9 +128,7 @@ describe("createStandardFunctionFactory", () => {
       output: temperatureSchema,
       execute: ({ city }) => city.length,
     });
-    expect(
-      await fn["~standard"].execute({ city: "Berlin" }, undefined),
-    ).toEqual({
+    expect(await fn["~standard"].execute({ city: "Berlin" }, {})).toEqual({
       value: "6 °C",
     });
   });
@@ -146,7 +144,7 @@ describe("createStandardFunctionFactory", () => {
     const result = await fn["~standard"].execute(
       // @ts-expect-error: callers may pass input that doesn't match its type
       { city: 1 },
-      undefined,
+      {},
     );
     expect(result).toEqual({
       source: "input",
@@ -161,7 +159,7 @@ describe("createStandardFunctionFactory", () => {
       // @ts-expect-error
       execute: () => "21",
     });
-    expect(await fn["~standard"].execute(undefined, undefined)).toEqual({
+    expect(await fn["~standard"].execute(undefined, {})).toEqual({
       source: "output",
       issues: [{ message: "Invalid temperature" }],
     });
@@ -183,7 +181,7 @@ describe("createStandardFunctionFactory", () => {
         throw new FunctionFailure("Payment declined");
       },
     });
-    expect(await fn["~standard"].execute(undefined, undefined)).toEqual({
+    expect(await fn["~standard"].execute(undefined, {})).toEqual({
       source: "execution",
       issues: [{ message: "Payment declined" }],
     });
@@ -192,47 +190,41 @@ describe("createStandardFunctionFactory", () => {
 
   test("should pass value through without schemas", async () => {
     const fn = createStandardFunction({ execute: (input) => input });
-    expect(await fn["~standard"].execute(123, undefined)).toEqual({
+    expect(await fn["~standard"].execute(123, {})).toEqual({
       value: 123,
     });
   });
 
-  test("should infer context and pass it with the options as-is", async () => {
+  test("should infer options and pass them as-is", async () => {
     const fn = createStandardFunction({
       input: citySchema,
-      execute: ({ city }, context: { prefix: string }) =>
-        `${context.prefix} ${city}`,
+      execute: (
+        { city },
+        {
+          context,
+        }: StandardFunctionV1.Options & { context: { prefix: string } },
+      ) => `${context.prefix} ${city}`,
     });
-    expectTypeOf<StandardFunctionV1.InferContext<typeof fn>>().toEqualTypeOf<{
-      prefix: string;
-    }>();
-    expectTypeOf(fn["~standard"].execute).parameter(1).toEqualTypeOf<{
-      prefix: string;
-    }>();
+    expectTypeOf<
+      StandardFunctionV1.InferOptions<typeof fn>["context"]
+    >().toEqualTypeOf<{ prefix: string }>();
     expect(
-      await fn["~standard"].execute({ city: "Berlin" }, { prefix: "Hello" }),
+      await fn["~standard"].execute(
+        { city: "Berlin" },
+        { context: { prefix: "Hello" } },
+      ),
     ).toEqual({ value: "Hello Berlin" });
 
-    const ctx = { prefix: "Hello" };
-    const signal = new AbortController().signal;
+    const options = {
+      signal: new AbortController().signal,
+      callId: "call_1",
+      context: { prefix: "Hello" },
+    };
     const echo = createStandardFunction({
-      execute: (_, context: typeof ctx, options) => ({ context, options }),
+      execute: (_, options: StandardFunctionV1.Options) => options,
     });
-    const result = await echo["~standard"].execute(undefined, ctx, { signal });
-    expect(result.issues).toBeUndefined();
-    expect(result.issues ? undefined : result.value.context).toBe(ctx);
-    expect(result.issues ? undefined : result.value.options.signal).toBe(
-      signal,
-    );
-  });
-
-  test("should pass empty options if none are given", async () => {
-    const fn = createStandardFunction({
-      execute: (_, _context, options) => options,
-    });
-    expect(await fn["~standard"].execute(undefined, undefined)).toEqual({
-      value: {},
-    });
+    const result = await echo["~standard"].execute(undefined, options);
+    expect(result.issues ? undefined : result.value).toBe(options);
   });
 
   test("should not catch other errors", async () => {
@@ -241,7 +233,7 @@ describe("createStandardFunctionFactory", () => {
         throw new Error("Failed");
       },
     });
-    await expect(fn["~standard"].execute(undefined, undefined)).rejects.toThrow(
+    await expect(fn["~standard"].execute(undefined, {})).rejects.toThrow(
       "Failed",
     );
   });
