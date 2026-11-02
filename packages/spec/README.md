@@ -234,8 +234,17 @@ export declare namespace StandardFunctionV1 {
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The options passed by callers as the second argument of `execute` and `executeStream`. A function that needs more, like a context or options of a specific caller, intersects this with what it needs. */
-  export interface Options {
+  /** The options passed by callers as the second argument of `execute` and `executeStream`: the options every caller may pass, and the `Extra` options a function needs, like its `context` or an option of a specific caller. Extra options with the name of a standard one keep its type. */
+  export type Options<
+    Extra extends {
+      readonly [Key in keyof Extra]: Key extends keyof BaseOptions
+        ? BaseOptions[Key]
+        : unknown;
+    } = object,
+  > = BaseOptions & Extra;
+
+  /** The options every caller may pass. */
+  export interface BaseOptions {
     /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
     readonly signal?: AbortSignal | undefined;
     /** The id of this call, like the id a model assigned to a tool call. Omitted if the caller has none. */

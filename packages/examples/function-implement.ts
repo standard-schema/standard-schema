@@ -131,7 +131,7 @@ interface WeatherContext {
 export const getWeather: StandardFunctionV1<
   { city: string },
   { city: string; temperature: number },
-  StandardFunctionV1.Options & { context: WeatherContext }
+  StandardFunctionV1.Options<{ context: WeatherContext }>
 > = defineFunction({
   name: "get_weather",
   description: "Get the current temperature in a city, in degrees Celsius",
@@ -142,7 +142,7 @@ export const getWeather: StandardFunctionV1<
     {
       signal,
       context,
-    }: StandardFunctionV1.Options & { context: WeatherContext },
+    }: StandardFunctionV1.Options<{ context: WeatherContext }>,
   ) => {
     const response = await fetch(`https://example.com/weather/${city}`, {
       headers: { authorization: context.apiKey },

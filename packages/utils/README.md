@@ -117,7 +117,7 @@ const getWeather = createStandardFunction({
     {
       signal,
       context,
-    }: StandardFunctionV1.Options & { context: { apiKey: string } },
+    }: StandardFunctionV1.Options<{ context: { apiKey: string } }>,
   ) {
     const response = await fetch(`https://example.com/weather/${city}`, {
       headers: { authorization: context.apiKey },
@@ -144,7 +144,7 @@ const chargeCard = createStandardFunction({
   input: type({ amount: "number" }),
   async execute(
     { amount },
-    { context }: StandardFunctionV1.Options & { context: { payments: Payments } },
+    { context }: StandardFunctionV1.Options<{ context: { payments: Payments } }>,
   ) {
     const charge = await context.payments.charge(amount);
     if (charge.declined) {

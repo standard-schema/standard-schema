@@ -202,7 +202,7 @@ describe("createStandardFunctionFactory", () => {
         { city },
         {
           context,
-        }: StandardFunctionV1.Options & { context: { prefix: string } },
+        }: StandardFunctionV1.Options<{ context: { prefix: string } }>,
       ) => `${context.prefix} ${city}`,
     });
     expectTypeOf<

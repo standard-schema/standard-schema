@@ -236,8 +236,17 @@ export declare namespace StandardFunctionV1 {
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The options passed by callers as the second argument of `execute` and `executeStream`. A function that needs more, like a context or options of a specific caller, intersects this with what it needs. */
-  export interface Options {
+  /** The options passed by callers as the second argument of `execute` and `executeStream`: the options every caller may pass, and the `Extra` options a function needs, like its `context` or an option of a specific caller. Extra options with the name of a standard one keep its type. */
+  export type Options<
+    Extra extends {
+      readonly [Key in keyof Extra]: Key extends keyof BaseOptions
+        ? BaseOptions[Key]
+        : unknown;
+    } = object,
+  > = BaseOptions & Extra;
+
+  /** The options every caller may pass. */
+  export interface BaseOptions {
     /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
     readonly signal?: AbortSignal | undefined;
     /** The id of this call, like the id a model assigned to a tool call. Omitted if the caller has none. */
@@ -373,7 +382,7 @@ Then `jsonSchema.output` returns `{}`, which accepts any value. Like in Standard
 
 ### How does a function get what it needs from its caller?
 
-Through its options, the second argument of `execute`. Their type is the function's third type parameter. Every caller may pass the standard `signal` and `callId`, and what a function needs from its caller's code, like a database client or the current user, goes in `context`. A function that needs a database client is a `StandardFunctionV1<Input, Output, StandardFunctionV1.Options & { context: { db: Db } }>`, and callers run it with `execute(input, { context: { db } })`. A function that needs nothing else leaves the type parameter as `StandardFunctionV1.Options`, so any caller can run it with `execute(input, {})`.
+Through its options, the second argument of `execute`. Their type is the function's third type parameter. Every caller may pass the standard `signal` and `callId`, and what a function needs from its caller's code, like a database client or the current user, goes in `context`. A function that needs a database client is a `StandardFunctionV1<Input, Output, StandardFunctionV1.Options<{ context: { db: Db } }>>`, and callers run it with `execute(input, { context: { db } })`. A function that needs nothing else leaves the type parameter as `StandardFunctionV1.Options`, so any caller can run it with `execute(input, {})`.
 
 Callers pass their context object as-is, so a function receives the same object, with the same identity and prototype, that its caller holds. The spec doesn't say what goes in a context or how its keys are named. Anything a function needs from its caller's code belongs there, like a database client, the current user, a way to report usage or progress, or a tracing span.
 
@@ -384,15 +393,15 @@ A framework may pass options of its own next to the standard ones, like a writer
 ```ts
 import type { StandardFunctionV1 } from "@standard-schema/spec";
 
-type SearchOptions = StandardFunctionV1.Options & {
+type SearchOptions = StandardFunctionV1.Options<{
   context: { db: Db };
   writer: { write(chunk: string): void };
-};
+}>;
 
 type Search = StandardFunctionV1<{ query: string }, string[], SearchOptions>;
 ```
 
-Such a function only runs where a caller provides a compatible `writer`, and anywhere else it's a type error. A function that only needs the standard options and a context runs with every caller that provides that context.
+Such a function only runs where a caller provides a compatible `writer`, and anywhere else it's a type error. A function that only needs the standard options and a context runs with every caller that provides that context. An option with the name of a standard one keeps its type, so `StandardFunctionV1.Options<{ callId: number }>` is a type error.
 
 ### How do I accept functions that need the options my framework provides?
 
@@ -401,10 +410,10 @@ Type them with those options. Options are something a function receives, so a fu
 ```ts
 import type { StandardFunctionV1 } from "@standard-schema/spec";
 
-type FrameworkOptions = StandardFunctionV1.Options & {
+type FrameworkOptions = StandardFunctionV1.Options<{
   context: { db: Db; userId: string };
   writer: { write(chunk: string): void };
-};
+}>;
 
 function registerTools(
   tools: ReadonlyArray<StandardFunctionV1<any, unknown, FrameworkOptions>>,

@@ -59,7 +59,7 @@ export function describeTools(
 type RunnableFunction<Context> = StandardFunctionV1<
   any,
   unknown,
-  StandardFunctionV1.Options & { context: Context }
+  StandardFunctionV1.Options<{ context: Context }>
 >;
 
 // Run the function the model called with the framework's context, and report
