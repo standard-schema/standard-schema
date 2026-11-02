@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## Unreleased
+
+- Add `createStandardFunctionFactory` and `createStandardFunction` functions and `FunctionFailure` class to create Standard Functions
+
 ## v0.3.0 (November 27, 2024)
 
 - Update utils to new Standard Schema spec

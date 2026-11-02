@@ -465,6 +465,8 @@ function runSync(fn: StandardFunctionV1<any, unknown, undefined>, input: unknown
 
 Refer to the [implementation example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/function-implement.ts) for a worked example.
 
+If your functions are built from schemas, `createStandardFunctionFactory` from [`@standard-schema/utils`](https://github.com/standard-schema/standard-schema/tree/main/packages/utils) implements the spec for you. It validates the input and output with the schemas and returns failures with the right `source`, and your users don't need to install anything else.
+
 ### I want to accept functions from a user. How do I do that?
 
 Refer to the [integration example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/function-integrate.ts), which describes functions to a model as tools, runs the ones it calls and reports the results back to it.
