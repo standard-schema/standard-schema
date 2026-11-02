@@ -220,28 +220,28 @@ export declare namespace StandardFunctionV1 {
     readonly name: string;
     /** A description of what the function does. Set to "" if it has none. */
     readonly description: string;
-    /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
+    /** Runs the function with the context it needs from its caller, passed as-is. Returns a failure the caller may act on, or throws if something unexpected happens. */
     readonly execute: (
       input: Input,
-      options: Options<Context>,
+      context: Context,
+      options?: Options,
     ) => Result<Output> | Promise<Result<Output>>;
     /** Runs the function and yields its results as they become available, if supported. */
     readonly executeStream?:
       | ((
           input: Input,
-          options: Options<Context>,
+          context: Context,
+          options?: Options,
         ) => AsyncIterable<Result<Output>>)
       | undefined;
     /** Inferred types associated with the function. */
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The options passed by callers as the second argument of `execute` and `executeStream`. */
-  export interface Options<Context = unknown> {
+  /** The options passed by callers as the third argument of `execute` and `executeStream`. */
+  export interface Options {
     /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
     readonly signal?: AbortSignal | undefined;
-    /** What the function needs from its caller. Passed as-is. */
-    readonly context: Context;
   }
 
   /** The result interface of the execute function. */
@@ -371,7 +371,7 @@ Then `jsonSchema.output` returns `{}`, which accepts any value. Like in Standard
 
 ### How does a function get what it needs from its caller?
 
-Through its `Context`, the third type parameter. A function that needs a database client is a `StandardFunctionV1<Input, Output, { db: Db }>`, and callers run it with `execute(input, { context: { db } })`. A function that needs nothing leaves `Context` as `unknown`, so any caller can run it.
+Through its `Context`, the third type parameter, which callers pass as the second argument of `execute`. A function that needs a database client is a `StandardFunctionV1<Input, Output, { db: Db }>`, and callers run it with `execute(input, { db })`. A function that needs nothing leaves `Context` as `unknown`, so any caller can run it.
 
 Callers pass their context object as-is, so a function receives the same object, with the same identity and prototype, that its caller holds. The spec doesn't say what goes in a context or how its keys are named. Anything a function needs from its caller belongs there, like a database client, the current user, the id of a tool call, a way to report usage or progress, or a tracing span.
 
@@ -390,7 +390,7 @@ interface RequestContext {
 function registerTools(
   tools: ReadonlyArray<StandardFunctionV1<any, unknown, RequestContext>>,
 ) {
-  // each tool is run with `execute(input, { context: requestContext })`
+  // each tool is run with `execute(input, requestContext)`
 }
 ```
 
@@ -415,13 +415,13 @@ function defineAgent<const Tools extends ReadonlyArray<AnyFunction>>(config: {
 
 Don't infer it with `function defineAgent<Context>(tools: StandardFunctionV1<any, unknown, Context>[])`: TypeScript infers `Context` from the first tool only, and then rejects the others.
 
-### Why are the options of `execute` required?
+### Why is the context of `execute` required?
 
-So `Context` stays a plain parameter type, which keeps TypeScript's checks sound and its inference simple. Callers always pass their context, even if it's `undefined`: `execute(input, { context: undefined })`.
+So `Context` stays a plain parameter type, which keeps TypeScript's checks sound and its inference simple. Callers always pass their context, even if it's `undefined`: `execute(input, undefined)`.
 
-### Why is `signal` part of the options, but not the id of a tool call?
+### Why is `signal` a separate option, and not part of the context?
 
-Every caller and every function can understand cancellation without agreeing on anything else, and `AbortSignal` is built into the platform. If it lived in the context under a key of the caller's choosing, a framework could only cancel functions that happened to use the same key. A function that calls other functions or models should forward its `signal` to them.
+Every caller and every function can understand cancellation without agreeing on anything else, and `AbortSignal` is built into the platform. If it lived in the context under a key of the caller's choosing, a framework could only cancel functions that happened to use the same key. And a context usually lasts a whole request or run, while a signal can change with every call. If callers had to add the signal to their context, they would copy the context for each call, and a function would no longer receive the object its caller holds. So, like `fetch` and `addEventListener`, `execute` takes the signal in an options object of its own. A function that calls other functions or models should forward its `signal` to them.
 
 The id of a tool call only exists for some callers, so it belongs in the context of the callers that have one.
 
@@ -434,8 +434,8 @@ import type { StandardFunctionV1 } from "@standard-schema/spec";
 
 async function runStreaming(fn: StandardFunctionV1<any, unknown, undefined>) {
   const { executeStream, execute } = fn["~standard"];
-  if (!executeStream) return execute({}, { context: undefined });
-  for await (const result of executeStream({}, { context: undefined })) {
+  if (!executeStream) return execute({}, undefined);
+  for await (const result of executeStream({}, undefined)) {
     // show each result as it arrives
   }
 }
@@ -453,7 +453,7 @@ The `~standard.execute()` function might return a synchronous value _or_ a `Prom
 import type { StandardFunctionV1 } from "@standard-schema/spec";
 
 function runSync(fn: StandardFunctionV1<any, unknown, undefined>, input: unknown) {
-  const result = fn["~standard"].execute(input, { context: undefined });
+  const result = fn["~standard"].execute(input, undefined);
   if (result instanceof Promise) {
     throw new TypeError("Function must be synchronous");
   }

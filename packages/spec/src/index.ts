@@ -180,28 +180,28 @@ export declare namespace StandardFunctionV1 {
     readonly name: string;
     /** A description of what the function does. Set to "" if it has none. */
     readonly description: string;
-    /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
+    /** Runs the function with the context it needs from its caller, passed as-is. Returns a failure the caller may act on, or throws if something unexpected happens. */
     readonly execute: (
       input: Input,
-      options: Options<Context>,
+      context: Context,
+      options?: Options,
     ) => Result<Output> | Promise<Result<Output>>;
     /** Runs the function and yields its results as they become available, if supported. */
     readonly executeStream?:
       | ((
           input: Input,
-          options: Options<Context>,
+          context: Context,
+          options?: Options,
         ) => AsyncIterable<Result<Output>>)
       | undefined;
     /** Inferred types associated with the function. */
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The options passed by callers as the second argument of `execute` and `executeStream`. */
-  export interface Options<Context = unknown> {
+  /** The options passed by callers as the third argument of `execute` and `executeStream`. */
+  export interface Options {
     /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
     readonly signal?: AbortSignal | undefined;
-    /** What the function needs from its caller. Passed as-is. */
-    readonly context: Context;
   }
 
   /** The result interface of the execute function. */

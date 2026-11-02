@@ -42,12 +42,13 @@ export interface StandardFunctionConfig<
    */
   readonly output?: StandardFunctionSchema<TReturn, TOutput> | undefined;
   /**
-   * Executes the function with a validated input. Throws a `FunctionFailure`
-   * to report a failure its caller may act on.
+   * Executes the function with a validated input and the caller's context.
+   * Throws a `FunctionFailure` to report a failure its caller may act on.
    */
   readonly execute: (
     input: TParsed,
-    options: StandardFunctionV1.Options<TContext>,
+    context: TContext,
+    options: StandardFunctionV1.Options,
   ) => TReturn | Promise<TReturn>;
 }
 
@@ -93,7 +94,7 @@ export function createStandardFunctionFactory(
         output: (options) =>
           config.output?.["~standard"].jsonSchema.output(options) ?? {},
       },
-      async execute(value, options) {
+      async execute(value, context, options = {}) {
         let input: unknown = value;
         if (config.input) {
           const result = await config.input["~standard"].validate(value);
@@ -104,7 +105,7 @@ export function createStandardFunctionFactory(
         }
         let output: unknown;
         try {
-          output = await config.execute(input as never, options);
+          output = await config.execute(input as never, context, options);
         } catch (error) {
           if (!(error instanceof FunctionFailure)) {
             throw error;

@@ -74,7 +74,7 @@ export async function runToolCall<Context>(
   let result: StandardFunctionV1.Result<unknown>;
   try {
     // the function validates the model's arguments itself, so pass them as-is
-    result = await fn["~standard"].execute(call.input, { signal, context });
+    result = await fn["~standard"].execute(call.input, context, { signal });
   } catch {
     // thrown errors are unexpected and may contain internal details, so don't
     // show them to the model
@@ -141,8 +141,8 @@ export async function* streamResults<Context>(
 ): AsyncGenerator<StandardFunctionV1.Result<unknown>> {
   const { executeStream, execute } = fn["~standard"];
   if (executeStream) {
-    yield* executeStream(input, { context });
+    yield* executeStream(input, context);
   } else {
-    yield await execute(input, { context });
+    yield await execute(input, context);
   }
 }

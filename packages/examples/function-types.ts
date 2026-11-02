@@ -63,12 +63,17 @@ export const plain: StandardFunctionV1 = needsNothing;
 // @ts-expect-error needs a db
 export const plainDb: StandardFunctionV1 = needsDb;
 
-// Options are always passed, with the caller's context.
-needsNothing["~standard"].execute({}, { context: undefined });
-needsDb["~standard"].execute({ sql: "" }, { context: { db: {} as Db } });
-// @ts-expect-error options are required
-needsNothing["~standard"].execute({});
+// The context is always passed, even when it's `undefined`. The options are optional.
+needsNothing["~standard"].execute({}, undefined);
+needsDb["~standard"].execute({ sql: "" }, { db: {} as Db });
+needsDb["~standard"].execute(
+  { sql: "" },
+  { db: {} as Db },
+  { signal: new AbortController().signal },
+);
 // @ts-expect-error the context is required
+needsNothing["~standard"].execute({});
+// @ts-expect-error the context needs a db
 needsDb["~standard"].execute({ sql: "" }, {});
 
 // Generic framework code can pass its context blindly.
@@ -76,7 +81,7 @@ export function runAll<Context>(
   functions: ReadonlyArray<StandardFunctionV1<any, unknown, Context>>,
   context: Context,
 ): unknown[] {
-  return functions.map((fn) => fn["~standard"].execute({}, { context }));
+  return functions.map((fn) => fn["~standard"].execute({}, context));
 }
 
 // The context needed to run a union of functions is the intersection of their contexts.
@@ -138,9 +143,9 @@ export async function last(
   fn: StandardFunctionV1<Empty, string, undefined>,
 ): Promise<Result | undefined> {
   const stream = fn["~standard"].executeStream;
-  if (!stream) return fn["~standard"].execute({}, { context: undefined });
+  if (!stream) return fn["~standard"].execute({}, undefined);
   let result: Result | undefined;
-  for await (const item of stream({}, { context: undefined })) result = item;
+  for await (const item of stream({}, undefined)) result = item;
   return result;
 }
 

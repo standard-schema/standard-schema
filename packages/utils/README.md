@@ -74,10 +74,10 @@ export function tool(config) {
     description: config.description,
     input: config.inputSchema,
     // map the options of the spec to the options of your API
-    execute: (input, options) =>
+    execute: (input, context, options) =>
       config.execute(input, {
         abortSignal: options.signal,
-        context: options.context,
+        context,
       }),
   });
   return { ...config, ...standardFunction };
@@ -110,8 +110,9 @@ const getWeather = createStandardFunction({
   output: toStandardJsonSchema(
     v.object({ city: v.string(), temperature: v.number() }),
   ),
-  async execute({ city }, { signal }) {
+  async execute({ city }, context: { apiKey: string }, { signal }) {
     const response = await fetch(`https://example.com/weather/${city}`, {
+      headers: { authorization: context.apiKey },
       signal,
     });
     const { temperature } = await response.json();
@@ -125,7 +126,6 @@ const getWeather = createStandardFunction({
 To report a failure its caller may act on, like a model correcting its input, a function created with `createStandardFunction` throws a `FunctionFailure`. It is returned as an issue with the source `"execution"`. Its message is shown to the caller, so it must not contain internal details. Any other error is thrown as-is.
 
 ```ts
-import type { StandardFunctionV1 } from "@standard-schema/spec";
 import { createStandardFunction, FunctionFailure } from "@standard-schema/utils";
 import { type } from "arktype";
 
@@ -133,10 +133,7 @@ const chargeCard = createStandardFunction({
   name: "charge_card",
   description: "Charge the current user's card",
   input: type({ amount: "number" }),
-  async execute(
-    { amount },
-    { context }: StandardFunctionV1.Options<{ payments: Payments }>,
-  ) {
+  async execute({ amount }, context: { payments: Payments }) {
     const charge = await context.payments.charge(amount);
     if (charge.declined) {
       throw new FunctionFailure("The payment was declined");

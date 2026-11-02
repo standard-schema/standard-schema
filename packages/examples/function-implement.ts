@@ -37,7 +37,8 @@ export function defineFunction<
   output?: FunctionSchema<Return, Output>;
   run: (
     input: InputOut,
-    options: StandardFunctionV1.Options<Context>,
+    context: Context,
+    options: StandardFunctionV1.Options,
   ) => Return | Promise<Return>;
 }): StandardFunctionV1<InputIn, Output, Context> {
   return {
@@ -54,14 +55,14 @@ export function defineFunction<
         output: (options) =>
           definition.output?.["~standard"].jsonSchema.output(options) ?? {},
       },
-      async execute(value, options) {
+      async execute(value, context, options = {}) {
         // callers may pass arguments a model produced, so validate them first
         const input = await definition.input["~standard"].validate(value);
         if (input.issues) return { source: "input", issues: input.issues };
 
         let output: unknown;
         try {
-          output = await definition.run(input.value, options);
+          output = await definition.run(input.value, context, options);
         } catch (error) {
           // only failures the handler chose to report are returned; anything
           // else is unexpected, may contain internal details, and is rethrown
@@ -140,10 +141,7 @@ export const getWeather: StandardFunctionV1<
   description: "Get the current temperature in a city, in degrees Celsius",
   input: citySchema,
   output: weatherSchema,
-  run: async (
-    { city },
-    { signal, context }: StandardFunctionV1.Options<WeatherContext>,
-  ) => {
+  run: async ({ city }, context: WeatherContext, { signal }) => {
     const response = await fetch(`https://example.com/weather/${city}`, {
       headers: { authorization: context.apiKey },
       signal: signal ?? null,
@@ -158,7 +156,8 @@ export const getWeather: StandardFunctionV1<
 
 await getWeather["~standard"].execute(
   { city: "Paris" },
-  { signal: AbortSignal.timeout(10_000), context: { apiKey: "..." } },
+  { apiKey: "..." },
+  { signal: AbortSignal.timeout(10_000) },
 );
 // => { value: { city: "Paris", temperature: 21 } }
 
@@ -182,15 +181,15 @@ export const forecast: StandardFunctionV1<{ city: string }, Forecast> = {
         },
       }),
     },
-    async execute(input, options) {
+    async execute(input, context, options) {
       // `execute` returns the last result of the stream
       let last: StandardFunctionV1.Result<Forecast> | undefined;
-      for await (const result of this.executeStream!(input, options)) {
+      for await (const result of this.executeStream!(input, context, options)) {
         last = result;
       }
       return last!;
     },
-    async *executeStream(value, { signal }) {
+    async *executeStream(value, _context, { signal } = {}) {
       const input = await citySchema["~standard"].validate(value);
       if (input.issues) {
         yield { source: "input", issues: input.issues };
