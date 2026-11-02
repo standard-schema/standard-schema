@@ -422,7 +422,7 @@ function registerTools(
 }
 ```
 
-A plain `StandardFunctionV1` accepts only functions that need nothing beyond the standard options, so a framework that provides nothing else types its functions that way. A framework that only describes functions without running them can accept every function, whatever it needs, as `StandardFunctionV1<any, unknown, never>`. `any` would accept them too, but it would also let you run them with any options, while `never` makes running them a type error.
+A plain `StandardFunctionV1` accepts only functions that need nothing beyond the standard options, so a framework that provides nothing else types its functions that way. A framework that never passes a context can say so with `StandardFunctionV1.Options<{ context?: undefined }>`, which also accepts functions whose context is optional. A framework that only describes functions without running them can accept every function, whatever it needs, as `StandardFunctionV1<any, unknown, never>`. `any` would accept them too, but it would also let you run them with any options, while `never` makes running them a type error.
 
 ### How do I infer the options needed to run several functions?
 
