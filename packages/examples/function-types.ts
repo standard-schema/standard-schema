@@ -204,6 +204,50 @@ declare function defineAgentWrongly<Opts extends Options>(
 // @ts-expect-error `Opts` is inferred from `needsDb`, so `needsUser` is rejected
 defineAgentWrongly([needsDb, needsUser]);
 
+// Options written without the `Options` helper still include the standard ones,
+// both for the function that reads them and for the host that passes them.
+declare const rawOptions: StandardFunctionV1<
+  Empty,
+  string,
+  { context: { db: Db } }
+>;
+declare function runWith<
+  const Functions extends ReadonlyArray<
+    StandardFunctionV1<any, unknown, never>
+  >,
+>(
+  functions: Functions,
+  options: StandardFunctionV1.InferOptions<Functions[number]>,
+): void;
+runWith([rawOptions], {
+  signal: new AbortController().signal,
+  callId: "call_1",
+  context: { db: {} as Db },
+});
+type _rawSignal = Assert<
+  Equal<
+    StandardFunctionV1.InferOptions<typeof rawOptions>["signal"],
+    AbortSignal | undefined
+  >
+>;
+export const readsStandardOptions: StandardFunctionV1<
+  Empty,
+  string,
+  { context: { db: Db } }
+> = {
+  "~standard": {
+    version: 1,
+    vendor: "example",
+    name: "",
+    description: "",
+    jsonSchema: { input: () => ({}), output: () => ({}) },
+    execute: (_input, { signal, callId }) => {
+      signal?.throwIfAborted();
+      return { value: callId ?? "" };
+    },
+  },
+};
+
 // A failure always names its source; success has no issues.
 type Result = StandardFunctionV1.Result<string>;
 export const inputFailure: Result = {

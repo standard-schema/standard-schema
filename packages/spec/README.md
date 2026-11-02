@@ -224,11 +224,14 @@ export declare namespace StandardFunctionV1 {
     /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
     readonly execute: (
       input: Input,
-      options: Options,
+      options: BaseOptions & Options,
     ) => Result<Output> | Promise<Result<Output>>;
     /** Runs the function and yields its results as they become available, if supported. */
     readonly executeStream?:
-      | ((input: Input, options: Options) => AsyncIterable<Result<Output>>)
+      | ((
+          input: Input,
+          options: BaseOptions & Options,
+        ) => AsyncIterable<Result<Output>>)
       | undefined;
     /** Inferred types associated with the function. */
     readonly types?: Types<Input, Output> | undefined;
@@ -291,11 +294,11 @@ export declare namespace StandardFunctionV1 {
   export type InferOutput<Function extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Function>;
 
-  /** Infers the options needed to run a Standard Function. For a union of functions, infers the options needed to run all of them. */
+  /** Infers the options needed to run a Standard Function, including the standard ones. For a union of functions, infers the options needed to run all of them. */
   export type InferOptions<
     Function extends StandardFunctionV1<any, unknown, never>,
   > = [Function] extends [StandardFunctionV1<any, unknown, infer Options>]
-    ? Options
+    ? BaseOptions & Options
     : never;
 }
 ```

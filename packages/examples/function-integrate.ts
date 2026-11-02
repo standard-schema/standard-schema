@@ -53,13 +53,13 @@ export function describeTools(
   });
 }
 
-// The functions this framework can run: they need at most the standard options
-// and a context. A function that needs another option, like a stream writer
+// The functions this framework can run: they need at most the standard options,
+// with the call id this framework always has, and a context. A function that needs another option, like a stream writer
 // this framework doesn't provide, is a type error where it's passed in.
 type RunnableFunction<Context> = StandardFunctionV1<
   any,
   unknown,
-  StandardFunctionV1.Options<{ context: Context }>
+  StandardFunctionV1.Options<{ callId: string; context: Context }>
 >;
 
 // Run the function the model called with the framework's context, and report

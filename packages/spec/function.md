@@ -226,11 +226,14 @@ export declare namespace StandardFunctionV1 {
     /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
     readonly execute: (
       input: Input,
-      options: Options,
+      options: BaseOptions & Options,
     ) => Result<Output> | Promise<Result<Output>>;
     /** Runs the function and yields its results as they become available, if supported. */
     readonly executeStream?:
-      | ((input: Input, options: Options) => AsyncIterable<Result<Output>>)
+      | ((
+          input: Input,
+          options: BaseOptions & Options,
+        ) => AsyncIterable<Result<Output>>)
       | undefined;
     /** Inferred types associated with the function. */
     readonly types?: Types<Input, Output> | undefined;
@@ -293,11 +296,11 @@ export declare namespace StandardFunctionV1 {
   export type InferOutput<Function extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Function>;
 
-  /** Infers the options needed to run a Standard Function. For a union of functions, infers the options needed to run all of them. */
+  /** Infers the options needed to run a Standard Function, including the standard ones. For a union of functions, infers the options needed to run all of them. */
   export type InferOptions<
     Function extends StandardFunctionV1<any, unknown, never>,
   > = [Function] extends [StandardFunctionV1<any, unknown, infer Options>]
-    ? Options
+    ? BaseOptions & Options
     : never;
 }
 ```
@@ -449,7 +452,7 @@ So their type stays a plain parameter type, which keeps TypeScript's checks soun
 
 ### Why are `signal` and `callId` standard options?
 
-Every caller and every function can understand cancellation without agreeing on anything else, and `AbortSignal` is built into the platform. If each caller passed it under a key of its own choosing, a framework could only cancel functions that happened to use the same key. Like `fetch` and `addEventListener`, `execute` takes it as `signal` in an options object. A function that calls other functions or models should forward its `signal` to them.
+Every caller and every function can understand cancellation without agreeing on anything else, and `AbortSignal` is built into the platform. If each caller passed it under a key of its own choosing, a framework could only cancel functions that happened to use the same key. Like `fetch` and `addEventListener`, `execute` takes it as `signal` in an options object, though here the options object itself is always passed. A function that calls other functions or models should forward its `signal` to them.
 
 The same goes for `callId`. Many callers identify each call, like a model's tool call or an RPC request, and a function can use the id to tie its logs, progress or side effects to the call without agreeing on a key name with each caller. Callers that have no id leave it out.
 
