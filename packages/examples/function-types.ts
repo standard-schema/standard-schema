@@ -27,52 +27,55 @@ type Options = StandardFunctionV1.Options;
 declare const needsDb: StandardFunctionV1<
   { sql: string },
   unknown[],
-  StandardFunctionV1.Options<{ context: { db: Db } }>
+  { context: { db: Db } }
 >;
 declare const needsUser: StandardFunctionV1<
   Empty,
   string,
-  StandardFunctionV1.Options<{ context: { user: User } }>
+  { context: { user: User } }
 >;
 declare const needsNothing: StandardFunctionV1<Empty, string>;
 declare const maybeDb: StandardFunctionV1<
   Empty,
   string,
-  StandardFunctionV1.Options<{ context?: { db: Db } | undefined }>
+  { context?: { db: Db } | undefined }
 >;
 declare const needsSecret: StandardFunctionV1<
   Empty,
   string,
-  StandardFunctionV1.Options<{ context: { secret: string } }>
+  { context: { secret: string } }
 >;
 // A function that also needs an option a framework provides, next to the standard ones.
 declare const needsWriter: StandardFunctionV1<
   Empty,
   string,
-  StandardFunctionV1.Options<{ context: { db: Db }; writer: Writer }>
+  { context: { db: Db }; writer: Writer }
 >;
 // The extra options can be an interface, and don't need a standard option.
 interface WriterOptions {
   writer: Writer;
 }
-declare const needsOnlyWriter: StandardFunctionV1<
+declare const needsOnlyWriter: StandardFunctionV1<Empty, string, WriterOptions>;
+
+// An option with the name of a standard one keeps its type.
+// @ts-expect-error `signal` is an `AbortSignal`
+declare const badSignal: StandardFunctionV1<Empty, string, { signal: string }>;
+// @ts-expect-error `callId` is a string
+declare const badCallId: StandardFunctionV1<Empty, string, { callId: number }>;
+// Narrowing one is fine: this function requires a signal.
+declare const needsSignal: StandardFunctionV1<
   Empty,
   string,
-  StandardFunctionV1.Options<WriterOptions>
+  { signal: AbortSignal }
 >;
-
-// An extra option with the name of a standard one keeps its type.
-// @ts-expect-error `signal` is an `AbortSignal`
-type _badSignal = StandardFunctionV1.Options<{ signal: string }>;
-// @ts-expect-error `callId` is a string
-type _badCallId = StandardFunctionV1.Options<{ callId: number }>;
-type _narrowedSignal = StandardFunctionV1.Options<{ signal: AbortSignal }>;
+// @ts-expect-error the signal is required
+needsSignal["~standard"].execute({}, {});
 
 // A framework accepts every function needing at most the options it provides.
-type AppOptions = StandardFunctionV1.Options<{
+type AppOptions = {
   context: { db: Db; user: User };
   writer: Writer;
-}>;
+};
 declare function register(
   functions: ReadonlyArray<StandardFunctionV1<any, unknown, AppOptions>>,
 ): void;
@@ -90,11 +93,7 @@ register([needsSecret]);
 // A framework without a writer rejects functions that need one.
 declare function registerWithoutWriter(
   functions: ReadonlyArray<
-    StandardFunctionV1<
-      any,
-      unknown,
-      StandardFunctionV1.Options<{ context: { db: Db } }>
-    >
+    StandardFunctionV1<any, unknown, { context: { db: Db } }>
   >,
 ): void;
 registerWithoutWriter([needsDb, needsNothing]);
@@ -106,11 +105,7 @@ registerWithoutWriter([needsOnlyWriter]);
 // A framework that may not have a user rejects functions that require one.
 declare function registerAnonymous(
   functions: ReadonlyArray<
-    StandardFunctionV1<
-      any,
-      unknown,
-      StandardFunctionV1.Options<{ context: { user?: User } }>
-    >
+    StandardFunctionV1<any, unknown, { context: { user?: User } }>
   >,
 ): void;
 // @ts-expect-error requires a user
@@ -142,7 +137,7 @@ needsDb["~standard"].execute({ sql: "" }, { context: {} });
 needsNothing["~standard"].execute({}, { callId: 1 });
 
 // Generic framework code can pass its options blindly.
-export function runAll<Opts extends Options>(
+export function runAll<Opts extends Options & object>(
   functions: ReadonlyArray<StandardFunctionV1<any, unknown, Opts>>,
   options: Opts,
 ): unknown[] {
@@ -153,7 +148,7 @@ export function runAll<Opts extends Options>(
 type _single = Assert<
   Equal<
     StandardFunctionV1.InferOptions<typeof needsDb>,
-    StandardFunctionV1.Options<{ context: { db: Db } }>
+    StandardFunctionV1.Options & { context: { db: Db } }
   >
 >;
 type _unionContext = Assert<
@@ -198,7 +193,7 @@ defineAgent({
 });
 
 // Inferring the options from an array of functions infers them from the first one only.
-declare function defineAgentWrongly<Opts extends Options>(
+declare function defineAgentWrongly<Opts extends Options & object>(
   functions: ReadonlyArray<StandardFunctionV1<any, unknown, Opts>>,
 ): void;
 // @ts-expect-error `Opts` is inferred from `needsDb`, so `needsUser` is rejected

@@ -21,7 +21,7 @@ export interface StandardFunctionConfig<
   TParsed,
   TReturn,
   TOutput,
-  TOptions extends StandardFunctionV1.Options,
+  TOptions extends StandardFunctionV1.Options & object,
 > {
   /**
    * The name of the function, if any.
@@ -47,7 +47,7 @@ export interface StandardFunctionConfig<
    */
   readonly execute: (
     input: TParsed,
-    options: TOptions,
+    options: StandardFunctionV1.Options & TOptions,
   ) => TReturn | Promise<TReturn>;
 }
 
@@ -59,7 +59,8 @@ export type CreateStandardFunction = <
   TParsed = TInput,
   TReturn = unknown,
   TOutput = TReturn,
-  TOptions extends StandardFunctionV1.Options = StandardFunctionV1.Options,
+  TOptions extends StandardFunctionV1.Options &
+    object = StandardFunctionV1.Options,
 >(
   config: StandardFunctionConfig<TInput, TParsed, TReturn, TOutput, TOptions>,
 ) => StandardFunctionV1<TInput, TOutput, TOptions>;

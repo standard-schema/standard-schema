@@ -206,7 +206,8 @@ export declare namespace StandardJSONSchemaV1 {
 export interface StandardFunctionV1<
   Input = any,
   Output = unknown,
-  in Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
+  in Options extends StandardFunctionV1.Options &
+    object = StandardFunctionV1.Options,
 > {
   /** The Standard Function properties. */
   readonly "~standard": StandardFunctionV1.Props<Input, Output, Options>;
@@ -217,7 +218,8 @@ export declare namespace StandardFunctionV1 {
   export interface Props<
     Input = any,
     Output = unknown,
-    in Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
+    in Options extends StandardFunctionV1.Options &
+      object = StandardFunctionV1.Options,
   > extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" if it has none. */
     readonly name: string;
@@ -226,30 +228,21 @@ export declare namespace StandardFunctionV1 {
     /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
     readonly execute: (
       input: Input,
-      options: BaseOptions & Options,
+      options: StandardFunctionV1.Options & Options,
     ) => Result<Output> | Promise<Result<Output>>;
     /** Runs the function and yields its results as they become available, if supported. */
     readonly executeStream?:
       | ((
           input: Input,
-          options: BaseOptions & Options,
+          options: StandardFunctionV1.Options & Options,
         ) => AsyncIterable<Result<Output>>)
       | undefined;
     /** Inferred types associated with the function. */
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The options passed by callers as the second argument of `execute` and `executeStream`: the options every caller may pass, and the `Extra` options a function needs, like its `context` or an option of a specific caller. Extra options with the name of a standard one keep its type. */
-  export type Options<
-    Extra extends {
-      readonly [Key in keyof Extra]: Key extends keyof BaseOptions
-        ? BaseOptions[Key]
-        : unknown;
-    } = object,
-  > = BaseOptions & Extra;
-
-  /** The options every caller may pass. */
-  export interface BaseOptions {
+  /** The options every caller may pass, as the second argument of `execute` and `executeStream`. A function that needs more, like a context or an option of a specific caller, adds them in its own options type, where these keep their types. */
+  export interface Options {
     /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
     readonly signal?: AbortSignal | undefined;
     /** The id of this call, like the id a model assigned to a tool call. Omitted if the caller has none. */
@@ -300,7 +293,7 @@ export declare namespace StandardFunctionV1 {
   export type InferOptions<
     Function extends StandardFunctionV1<any, unknown, never>,
   > = [Function] extends [StandardFunctionV1<any, unknown, infer Options>]
-    ? BaseOptions & Options
+    ? StandardFunctionV1.Options & Options
     : never;
 }
 ```
@@ -385,7 +378,7 @@ Then `jsonSchema.output` returns `{}`, which accepts any value. Like in Standard
 
 ### How does a function get what it needs from its caller?
 
-Through its options, the second argument of `execute`. Their type is the function's third type parameter. Every caller may pass the standard `signal` and `callId`, and what a function needs from its caller's code, like a database client or the current user, goes in `context`. A function that needs a database client is a `StandardFunctionV1<Input, Output, StandardFunctionV1.Options<{ context: { db: Db } }>>`, and callers run it with `execute(input, { context: { db } })`. A function that needs nothing else leaves the type parameter as `StandardFunctionV1.Options`, so any caller can run it with `execute(input, {})`.
+Through its options, the second argument of `execute`. Their type is the function's third type parameter. Every caller may pass the standard `signal` and `callId`, and what a function needs from its caller's code, like a database client or the current user, goes in `context`. A function that needs a database client is a `StandardFunctionV1<Input, Output, { context: { db: Db } }>`, and callers run it with `execute(input, { context: { db } })`. A function that needs nothing else leaves the type parameter as `StandardFunctionV1.Options`, so any caller can run it with `execute(input, {})`.
 
 Callers pass their context object as-is, so a function receives the same object, with the same identity and prototype, that its caller holds. The spec doesn't say what goes in a context or how its keys are named. Anything a function needs from its caller's code belongs there, like a database client, the current user, a way to report usage or progress, or a tracing span.
 
@@ -396,15 +389,15 @@ A framework may pass options of its own next to the standard ones, like a writer
 ```ts
 import type { StandardFunctionV1 } from "@standard-schema/spec";
 
-type SearchOptions = StandardFunctionV1.Options<{
+type SearchOptions = {
   context: { db: Db };
   writer: { write(chunk: string): void };
-}>;
+};
 
 type Search = StandardFunctionV1<{ query: string }, string[], SearchOptions>;
 ```
 
-Such a function only runs where a caller provides a compatible `writer`, and anywhere else it's a type error. A function that only needs the standard options and a context runs with every caller that provides that context. An option with the name of a standard one keeps its type, so `StandardFunctionV1.Options<{ callId: number }>` is a type error.
+Such a function only runs where a caller provides a compatible `writer`, and anywhere else it's a type error. A function that only needs the standard options and a context runs with every caller that provides that context. An option with the name of a standard one keeps its type, so a function whose options type is `{ callId: number }` is a type error.
 
 ### How do I accept functions that need the options my framework provides?
 
@@ -413,10 +406,10 @@ Type them with those options. Options are something a function receives, so a fu
 ```ts
 import type { StandardFunctionV1 } from "@standard-schema/spec";
 
-type FrameworkOptions = StandardFunctionV1.Options<{
+type FrameworkOptions = {
   context: { db: Db; userId: string };
   writer: { write(chunk: string): void };
-}>;
+};
 
 function registerTools(
   tools: ReadonlyArray<StandardFunctionV1<any, unknown, FrameworkOptions>>,
@@ -425,7 +418,7 @@ function registerTools(
 }
 ```
 
-A plain `StandardFunctionV1` accepts only functions that need nothing beyond the standard options, so a framework that provides nothing else types its functions that way. A framework that never passes a context can say so with `StandardFunctionV1.Options<{ context?: undefined }>`, which also accepts functions whose context is optional. A framework that only describes functions without running them can accept every function, whatever it needs, as `StandardFunctionV1<any, unknown, never>`. `any` would accept them too, but it would also let you run them with any options, while `never` makes running them a type error.
+A plain `StandardFunctionV1` accepts only functions that need nothing beyond the standard options, so a framework that provides nothing else types its functions that way. A framework that never passes a context can say so with `StandardFunctionV1<any, unknown, { context?: undefined }>`, which also accepts functions whose context is optional. A framework that only describes functions without running them can accept every function, whatever it needs, as `StandardFunctionV1<any, unknown, never>`. `any` would accept them too, but it would also let you run them with any options, while `never` makes running them a type error.
 
 ### How do I infer the options needed to run several functions?
 
@@ -444,7 +437,7 @@ function defineAgent<const Tools extends ReadonlyArray<AnyFunction>>(config: {
 }
 ```
 
-Don't infer it with `function defineAgent<Options extends StandardFunctionV1.Options>(tools: StandardFunctionV1<any, unknown, Options>[])`: TypeScript infers `Options` from the first tool only, and then rejects the others.
+Don't infer it with `function defineAgent<Options extends StandardFunctionV1.Options & object>(tools: StandardFunctionV1<any, unknown, Options>[])`: TypeScript infers `Options` from the first tool only, and then rejects the others.
 
 ### Why are the options of `execute` required?
 

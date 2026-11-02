@@ -33,21 +33,21 @@ declare const writer: Writer;
 
 // Framework A, an agent library: every call has an id and sees the conversation.
 type AgentContext = { db: Db; userId: string };
-type AgentOptions = StandardFunctionV1.Options<{
+type AgentOptions = {
   signal?: AbortSignal | undefined;
   callId: string;
   context: AgentContext;
   messages: ReadonlyArray<Message>;
-}>;
+};
 
 // Framework B, a workflow engine: every run can be cancelled and streams progress.
 type WorkflowContext = { db: Db; tenantId: string };
-type WorkflowOptions = StandardFunctionV1.Options<{
+type WorkflowOptions = {
   signal: AbortSignal;
   callId?: string | undefined;
   context: WorkflowContext;
   writer: Writer;
-}>;
+};
 
 // A function written for A that uses what only A provides.
 declare const summarize: StandardFunctionV1<
@@ -66,7 +66,7 @@ declare const exportReport: StandardFunctionV1<
 declare const lookup: StandardFunctionV1<
   { id: string },
   unknown,
-  StandardFunctionV1.Options<{ context: { db: Db } }>
+  { context: { db: Db } }
 >;
 // The same function, typed with everything A provides, is tied to A.
 declare const lookupForAgents: StandardFunctionV1<
@@ -94,13 +94,13 @@ runInAgent([exportReport]);
 runInWorkflow([lookupForAgents]);
 
 // A host that provides everything both frameworks do runs functions from both.
-type HostOptions = StandardFunctionV1.Options<{
+type HostOptions = {
   signal: AbortSignal;
   callId: string;
   context: AgentContext & WorkflowContext;
   messages: ReadonlyArray<Message>;
   writer: Writer;
-}>;
+};
 declare function runInHost(
   functions: ReadonlyArray<StandardFunctionV1<any, unknown, HostOptions>>,
 ): void;
@@ -165,10 +165,10 @@ declare function runWithoutCallIds(
     StandardFunctionV1<
       any,
       unknown,
-      StandardFunctionV1.Options<{
+      {
         context: AgentContext;
         messages: ReadonlyArray<Message>;
-      }>
+      }
     >
   >,
 ): void;
@@ -181,7 +181,7 @@ runWithoutCallIds([lookup, now]);
 declare const numericUser: StandardFunctionV1<
   Record<string, never>,
   string,
-  StandardFunctionV1.Options<{ context: { userId: number } }>
+  { context: { userId: number } }
 >;
 // @ts-expect-error A's userId is a string
 runInAgent([numericUser]);
@@ -229,7 +229,7 @@ export const needsLess: StandardFunctionV1<any, unknown, AgentOptions> = lookup;
 export const needsMore: StandardFunctionV1<
   any,
   unknown,
-  StandardFunctionV1.Options<{ context: { db: Db } }>
+  { context: { db: Db } }
 > = summarize;
 
 // Output is covariant: a function returning a string returns `unknown`.
@@ -269,12 +269,12 @@ unsafe["~standard"].execute({}, { context: "not a context" });
 declare const optionalDb: StandardFunctionV1<
   Record<string, never>,
   string,
-  StandardFunctionV1.Options<{ context?: { db: Db } | undefined }>
+  { context?: { db: Db } | undefined }
 >;
 // @ts-expect-error a plain function type allows any context
 export const plainHost: StandardFunctionV1 = optionalDb;
 export const noContextHost: StandardFunctionV1<
   any,
   unknown,
-  StandardFunctionV1.Options<{ context?: undefined }>
+  { context?: undefined }
 > = optionalDb;

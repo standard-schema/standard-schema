@@ -99,7 +99,6 @@ export const createStandardFunction =
 If your library doesn't support Standard Function yet, use `createStandardFunction` to create functions directly. It uses `"standard-schema"` as its vendor, and the types of the function are inferred from its schemas.
 
 ```ts
-import type { StandardFunctionV1 } from "@standard-schema/spec";
 import { createStandardFunction } from "@standard-schema/utils";
 import { type } from "arktype";
 import { toStandardJsonSchema } from "@valibot/to-json-schema";
@@ -117,7 +116,7 @@ const getWeather = createStandardFunction({
     {
       signal,
       context,
-    }: StandardFunctionV1.Options<{ context: { apiKey: string } }>,
+    }: { signal?: AbortSignal; context: { apiKey: string } },
   ) {
     const response = await fetch(`https://example.com/weather/${city}`, {
       headers: { authorization: context.apiKey },
@@ -134,7 +133,6 @@ const getWeather = createStandardFunction({
 To report a failure its caller may act on, like a model correcting its input, a function created with `createStandardFunction` throws a `FunctionFailure`. It is returned as an issue with the source `"execution"`. Its message is shown to the caller, so it must not contain internal details. Any other error is thrown as-is.
 
 ```ts
-import type { StandardFunctionV1 } from "@standard-schema/spec";
 import { createStandardFunction, FunctionFailure } from "@standard-schema/utils";
 import { type } from "arktype";
 
@@ -142,10 +140,7 @@ const chargeCard = createStandardFunction({
   name: "charge_card",
   description: "Charge the current user's card",
   input: type({ amount: "number" }),
-  async execute(
-    { amount },
-    { context }: StandardFunctionV1.Options<{ context: { payments: Payments } }>,
-  ) {
+  async execute({ amount }, { context }: { context: { payments: Payments } }) {
     const charge = await context.payments.charge(amount);
     if (charge.declined) {
       throw new FunctionFailure("The payment was declined");

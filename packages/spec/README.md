@@ -204,7 +204,8 @@ export declare namespace StandardJSONSchemaV1 {
 export interface StandardFunctionV1<
   Input = any,
   Output = unknown,
-  in Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
+  in Options extends StandardFunctionV1.Options &
+    object = StandardFunctionV1.Options,
 > {
   /** The Standard Function properties. */
   readonly "~standard": StandardFunctionV1.Props<Input, Output, Options>;
@@ -215,7 +216,8 @@ export declare namespace StandardFunctionV1 {
   export interface Props<
     Input = any,
     Output = unknown,
-    in Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
+    in Options extends StandardFunctionV1.Options &
+      object = StandardFunctionV1.Options,
   > extends StandardJSONSchemaV1.Props<Input, Output> {
     /** The name of the function. Set to "" if it has none. */
     readonly name: string;
@@ -224,30 +226,21 @@ export declare namespace StandardFunctionV1 {
     /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
     readonly execute: (
       input: Input,
-      options: BaseOptions & Options,
+      options: StandardFunctionV1.Options & Options,
     ) => Result<Output> | Promise<Result<Output>>;
     /** Runs the function and yields its results as they become available, if supported. */
     readonly executeStream?:
       | ((
           input: Input,
-          options: BaseOptions & Options,
+          options: StandardFunctionV1.Options & Options,
         ) => AsyncIterable<Result<Output>>)
       | undefined;
     /** Inferred types associated with the function. */
     readonly types?: Types<Input, Output> | undefined;
   }
 
-  /** The options passed by callers as the second argument of `execute` and `executeStream`: the options every caller may pass, and the `Extra` options a function needs, like its `context` or an option of a specific caller. Extra options with the name of a standard one keep its type. */
-  export type Options<
-    Extra extends {
-      readonly [Key in keyof Extra]: Key extends keyof BaseOptions
-        ? BaseOptions[Key]
-        : unknown;
-    } = object,
-  > = BaseOptions & Extra;
-
-  /** The options every caller may pass. */
-  export interface BaseOptions {
+  /** The options every caller may pass, as the second argument of `execute` and `executeStream`. A function that needs more, like a context or an option of a specific caller, adds them in its own options type, where these keep their types. */
+  export interface Options {
     /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
     readonly signal?: AbortSignal | undefined;
     /** The id of this call, like the id a model assigned to a tool call. Omitted if the caller has none. */
@@ -298,7 +291,7 @@ export declare namespace StandardFunctionV1 {
   export type InferOptions<
     Function extends StandardFunctionV1<any, unknown, never>,
   > = [Function] extends [StandardFunctionV1<any, unknown, infer Options>]
-    ? BaseOptions & Options
+    ? StandardFunctionV1.Options & Options
     : never;
 }
 ```

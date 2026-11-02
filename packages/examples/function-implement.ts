@@ -29,13 +29,17 @@ export function defineFunction<
   InputOut,
   Return,
   Output = Return,
-  Options extends StandardFunctionV1.Options = StandardFunctionV1.Options,
+  Options extends StandardFunctionV1.Options &
+    object = StandardFunctionV1.Options,
 >(definition: {
   name: string;
   description?: string;
   input: FunctionSchema<InputIn, InputOut>;
   output?: FunctionSchema<Return, Output>;
-  run: (input: InputOut, options: Options) => Return | Promise<Return>;
+  run: (
+    input: InputOut,
+    options: StandardFunctionV1.Options & Options,
+  ) => Return | Promise<Return>;
 }): StandardFunctionV1<InputIn, Output, Options> {
   return {
     "~standard": {
@@ -131,19 +135,13 @@ interface WeatherContext {
 export const getWeather: StandardFunctionV1<
   { city: string },
   { city: string; temperature: number },
-  StandardFunctionV1.Options<{ context: WeatherContext }>
+  { context: WeatherContext }
 > = defineFunction({
   name: "get_weather",
   description: "Get the current temperature in a city, in degrees Celsius",
   input: citySchema,
   output: weatherSchema,
-  run: async (
-    { city },
-    {
-      signal,
-      context,
-    }: StandardFunctionV1.Options<{ context: WeatherContext }>,
-  ) => {
+  run: async ({ city }, { signal, context }) => {
     const response = await fetch(`https://example.com/weather/${city}`, {
       headers: { authorization: context.apiKey },
       signal: signal ?? null,

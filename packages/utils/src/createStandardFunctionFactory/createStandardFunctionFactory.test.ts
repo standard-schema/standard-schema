@@ -198,12 +198,8 @@ describe("createStandardFunctionFactory", () => {
   test("should infer options and pass them as-is", async () => {
     const fn = createStandardFunction({
       input: citySchema,
-      execute: (
-        { city },
-        {
-          context,
-        }: StandardFunctionV1.Options<{ context: { prefix: string } }>,
-      ) => `${context.prefix} ${city}`,
+      execute: ({ city }, { context }: { context: { prefix: string } }) =>
+        `${context.prefix} ${city}`,
     });
     expectTypeOf<
       StandardFunctionV1.InferOptions<typeof fn>["context"]

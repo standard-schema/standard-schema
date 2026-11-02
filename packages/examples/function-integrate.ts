@@ -59,7 +59,7 @@ export function describeTools(
 type RunnableFunction<Context> = StandardFunctionV1<
   any,
   unknown,
-  StandardFunctionV1.Options<{ callId: string; context: Context }>
+  { callId: string; context: Context }
 >;
 
 // Run the function the model called with the framework's context, and report
@@ -146,7 +146,7 @@ export function defineAgent<
 // Stream a function's results when it supports streaming, for example to
 // show progress, and fall back to `execute` otherwise.
 export async function* streamResults<
-  Options extends StandardFunctionV1.Options,
+  Options extends StandardFunctionV1.Options & object,
 >(
   fn: StandardFunctionV1<any, unknown, Options>,
   input: unknown,
