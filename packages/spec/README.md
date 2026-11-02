@@ -195,4 +195,103 @@ export declare namespace StandardJSONSchemaV1 {
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
 }
+
+// ###########################
+// ###   Standard Function  ###
+// ###########################
+
+/** The Standard Function interface. */
+export interface StandardFunctionV1<
+  Input = any,
+  Output = unknown,
+  in Options extends StandardFunctionV1.Options &
+    object = StandardFunctionV1.Options,
+> {
+  /** The Standard Function properties. */
+  readonly "~standard": StandardFunctionV1.Props<Input, Output, Options>;
+}
+
+export declare namespace StandardFunctionV1 {
+  /** The Standard Function properties interface. */
+  export interface Props<
+    Input = any,
+    Output = unknown,
+    in Options extends StandardFunctionV1.Options &
+      object = StandardFunctionV1.Options,
+  > extends StandardJSONSchemaV1.Props<Input, Output> {
+    /** The name of the function. Set to "" if it has none. */
+    readonly name: string;
+    /** A description of what the function does. Set to "" if it has none. */
+    readonly description: string;
+    /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
+    readonly execute: (
+      input: Input,
+      options: StandardFunctionV1.Options & Options,
+    ) => Result<Output> | Promise<Result<Output>>;
+    /** Runs the function and yields its results as they become available, if supported. */
+    readonly executeStream?:
+      | ((
+          input: Input,
+          options: StandardFunctionV1.Options & Options,
+        ) => AsyncIterable<Result<Output>>)
+      | undefined;
+    /** Inferred types associated with the function. */
+    readonly types?: Types<Input, Output> | undefined;
+  }
+
+  /** The options every caller may pass, as the second argument of `execute` and `executeStream`. A function that needs more, like a context or an option of a specific caller, adds them in its own options type, where these keep their types. */
+  export interface Options {
+    /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
+    readonly signal?: AbortSignal | undefined;
+    /** The id of this call, like the id a model assigned to a tool call. Omitted if the caller has none. */
+    readonly callId?: string | undefined;
+    /** What the function needs from its caller's code, like a database client or the current user. Passed as-is. */
+    readonly context?: unknown;
+  }
+
+  /** The result interface of the execute function. */
+  export type Result<Output> = SuccessResult<Output> | FailureResult;
+
+  /** The result interface if the function succeeds. */
+  export interface SuccessResult<Output> {
+    /** The output value. */
+    readonly value: Output;
+    /** A falsy value for `issues` indicates success. */
+    readonly issues?: undefined;
+  }
+
+  /** The result interface if the function fails in a way its caller may act on. */
+  export interface FailureResult extends StandardSchemaV1.FailureResult {
+    /**
+     * What the issues are about. Paths of `"input"` and `"output"` issues are relative to that value.
+     */
+    readonly source: "input" | "output" | "execution";
+  }
+
+  /** Your environment's built-in `AbortSignal` type, or `any` if it can't be detected. */
+  export type AbortSignal = typeof globalThis extends {
+    AbortSignal: { prototype: infer Signal };
+  }
+    ? Signal
+    : any;
+
+  /** The Standard Function types interface. */
+  export interface Types<Input = unknown, Output = unknown>
+    extends StandardTypedV1.Types<Input, Output> {}
+
+  /** Infers the input type of a Standard Function. */
+  export type InferInput<Function extends StandardTypedV1> =
+    StandardTypedV1.InferInput<Function>;
+
+  /** Infers the output type of a Standard Function. */
+  export type InferOutput<Function extends StandardTypedV1> =
+    StandardTypedV1.InferOutput<Function>;
+
+  /** Infers the options needed to run a Standard Function, including the standard ones. For a union of functions, infers the options needed to run all of them. */
+  export type InferOptions<
+    Function extends StandardFunctionV1<any, unknown, never>,
+  > = [Function] extends [StandardFunctionV1<any, unknown, infer Options>]
+    ? StandardFunctionV1.Options & Options
+    : never;
+}
 ```
