@@ -16,6 +16,9 @@
       "security": {
         "noDangerouslySetInnerHtml": "off"
       },
+      "suspicious": {
+        "noExplicitAny": "off"
+      },
       "style": {
         "noInferrableTypes": "error",
         "noNonNullAssertion": "off",

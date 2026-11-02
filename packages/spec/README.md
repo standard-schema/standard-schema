@@ -195,4 +195,96 @@ export declare namespace StandardJSONSchemaV1 {
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
 }
+
+// ###########################
+// ###   Standard Function  ###
+// ###########################
+
+/** The Standard Function interface. */
+export interface StandardFunctionV1<
+  Input = any,
+  Output = unknown,
+  in Context = unknown,
+> {
+  /** The Standard Function properties. */
+  readonly "~standard": StandardFunctionV1.Props<Input, Output, Context>;
+}
+
+export declare namespace StandardFunctionV1 {
+  /** The Standard Function properties interface. */
+  export interface Props<Input = any, Output = unknown, in Context = unknown>
+    extends StandardJSONSchemaV1.Props<Input, Output> {
+    /** The name of the function. Set to "" if it has none. */
+    readonly name: string;
+    /** A description of what the function does. Set to "" if it has none. */
+    readonly description: string;
+    /** Runs the function. Returns a failure the caller may act on, or throws if something unexpected happens. */
+    readonly execute: (
+      input: Input,
+      options: Options<Context>,
+    ) => Result<Output> | Promise<Result<Output>>;
+    /** Runs the function and yields its results as they become available, if supported. */
+    readonly executeStream?:
+      | ((
+          input: Input,
+          options: Options<Context>,
+        ) => AsyncIterable<Result<Output>>)
+      | undefined;
+    /** Inferred types associated with the function. */
+    readonly types?: Types<Input, Output> | undefined;
+  }
+
+  /** The options passed by callers as the second argument of `execute` and `executeStream`. */
+  export interface Options<Context = unknown> {
+    /** Aborted when the caller no longer needs the result, so the function can stop its work early. */
+    readonly signal?: AbortSignal | undefined;
+    /** What the function needs from its caller. Passed as-is. */
+    readonly context: Context;
+  }
+
+  /** The result interface of the execute function. */
+  export type Result<Output> = SuccessResult<Output> | FailureResult;
+
+  /** The result interface if the function succeeds. */
+  export interface SuccessResult<Output> {
+    /** The output value. */
+    readonly value: Output;
+    /** A falsy value for `issues` indicates success. */
+    readonly issues?: undefined;
+  }
+
+  /** The result interface if the function fails in a way its caller may act on. */
+  export interface FailureResult extends StandardSchemaV1.FailureResult {
+    /**
+     * What the issues are about. Paths of `"input"` and `"output"` issues are relative to that value. `"execution"` issues have no path.
+     */
+    readonly source: "input" | "output" | "execution";
+  }
+
+  /** Your environment's built-in `AbortSignal` type, or `any` if it can't be detected. */
+  export type AbortSignal = typeof globalThis extends {
+    AbortSignal: { prototype: infer Signal };
+  }
+    ? Signal
+    : any;
+
+  /** The Standard Function types interface. */
+  export interface Types<Input = unknown, Output = unknown>
+    extends StandardTypedV1.Types<Input, Output> {}
+
+  /** Infers the input type of a Standard Function. */
+  export type InferInput<Function extends StandardTypedV1> =
+    StandardTypedV1.InferInput<Function>;
+
+  /** Infers the output type of a Standard Function. */
+  export type InferOutput<Function extends StandardTypedV1> =
+    StandardTypedV1.InferOutput<Function>;
+
+  /** Infers the context needed to run a Standard Function. For a union of functions, infers the context needed to run all of them. */
+  export type InferContext<
+    Function extends StandardFunctionV1<any, unknown, never>,
+  > = [Function] extends [StandardFunctionV1<any, unknown, infer Context>]
+    ? Context
+    : never;
+}
 ```
