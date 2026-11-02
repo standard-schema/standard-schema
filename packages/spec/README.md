@@ -256,7 +256,7 @@ export declare namespace StandardFunctionV1 {
   /** The result interface if the function fails in a way its caller may act on. */
   export interface FailureResult extends StandardSchemaV1.FailureResult {
     /**
-     * What the issues are about. Paths of `"input"` and `"output"` issues are relative to that value. `"execution"` issues have no path.
+     * What the issues are about. Paths of `"input"` and `"output"` issues are relative to that value.
      */
     readonly source: "input" | "output" | "execution";
   }

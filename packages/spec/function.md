@@ -258,7 +258,7 @@ export declare namespace StandardFunctionV1 {
   /** The result interface if the function fails in a way its caller may act on. */
   export interface FailureResult extends StandardSchemaV1.FailureResult {
     /**
-     * What the issues are about. Paths of `"input"` and `"output"` issues are relative to that value. `"execution"` issues have no path.
+     * What the issues are about. Paths of `"input"` and `"output"` issues are relative to that value.
      */
     readonly source: "input" | "output" | "execution";
   }
@@ -353,7 +353,7 @@ What the issues are about:
 
 - `"input"`: The input the caller passed is the problem, like a missing property or a city that doesn't exist. Issue paths are relative to the input. The same input will fail again, so the caller has to change it.
 - `"output"`: The function couldn't produce a valid output. Issue paths are relative to the output. For a function with a deterministic body this is a bug, but for one that calls a model, running it again may succeed. The function did run, so it may have had side effects.
-- `"execution"`: The function ran and chose to fail for another reason, like a declined payment. These issues have no path.
+- `"execution"`: The function ran and chose to fail for another reason, like a declined payment.
 
 `source` always refers to the function's own input and output. A function that calls another function, like an agent calling a tool, shouldn't return the inner function's failure as its own, since its paths would point into the wrong value.
 
