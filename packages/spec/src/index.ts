@@ -192,7 +192,11 @@ export declare namespace StandardToolV1 {
     /** The schema of the tool's output, if any, whose input is the `Output` that `execute` returns. If it also implements Standard Schema, callers can validate with it. */
     readonly output?: StandardJSONSchemaV1<Output, unknown> | undefined;
     /**
-     * Runs the tool. Does not validate: callers must pass input matching `Input`, using a validator if the value isn't already known to match. Returns a failure the caller may act on, or rejects if something unexpected happens.
+     * Runs the tool. Does not validate: callers must pass input matching `Input`.
+     *
+     * If the `input` schema implements Standard Schema, running its `~standard.validate` always satisfies this. A JSON Schema check or a decoding guarantee only does when the schema has no transforms and converts without loss.
+     *
+     * Returns a failure the caller may act on, or rejects if something unexpected happens.
      */
     readonly execute: (
       input: Input,
