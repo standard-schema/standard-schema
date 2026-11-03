@@ -1,7 +1,7 @@
 /**
  * This example shows how to implement the Standard Tool interface.
- * It demonstrates exposing a tool built from a schema and a handler, where
- * the tool validates its own input before running the handler.
+ * It demonstrates exposing a tool built from schemas and a handler. The tool
+ * doesn't validate, so its caller validates with the schemas before running it.
  */
 
 import type {
@@ -31,16 +31,16 @@ interface RunOptions<Context> extends StandardToolV1.Options<Context> {
   readonly context: Context;
 }
 
-export function tool<InputIn, InputOut, Output, Context = unknown>(definition: {
+export function tool<Input, Output, Context = unknown>(definition: {
   name: string;
   description: string;
-  input: ToolSchema<InputIn, InputOut>;
-  output?: StandardJSONSchemaV1<Output>;
+  input: StandardJSONSchemaV1<unknown, Input>;
+  output?: StandardJSONSchemaV1<Output, unknown>;
   run: (
-    input: InputOut,
+    input: Input,
     options: RunOptions<Context>,
-  ) => Output | Promise<Output>;
-}): MyTool<InputIn, Output, Context> {
+  ) => Promise<StandardSchemaV1.Result<Output>>;
+}): MyTool<Input, Output, Context> {
   return {
     type: "tool",
     "~standard": {
@@ -48,29 +48,16 @@ export function tool<InputIn, InputOut, Output, Context = unknown>(definition: {
       vendor: "example-lib",
       name: definition.name,
       description: definition.description,
-      jsonSchema: {
-        // the model's arguments are described by the input schema's input
-        input: (options) =>
-          definition.input["~standard"].jsonSchema.input(options),
-        // without an output schema, the result can be any value
-        output: (options) =>
-          definition.output?.["~standard"].jsonSchema.output(options) ?? {},
-      },
+      input: definition.input,
+      ...(definition.output && { output: definition.output }),
       // annotated, since `execute`'s parameters can't be inferred while `Context` is generic
-      async execute(input, options?: StandardToolV1.Options<Context>) {
-        // callers pass the model's arguments as-is, so validate them first
-        const result = await definition.input["~standard"].validate(input);
-        if (result.issues) {
-          // prefer the library's own summary, since it is what the model reads
-          throw new Error(result.message ?? JSON.stringify(result.issues));
-        }
+      execute: (input, options?: StandardToolV1.Options<Context>) =>
         // forward the signal so the handler can stop its work early, and the
         // context it needs, which callers must pass unless it can be undefined
-        return definition.run(result.value, {
+        definition.run(input, {
           ...options,
           context: options?.context as Context,
-        });
-      },
+        }),
     },
   };
 }
@@ -119,8 +106,13 @@ const getWeather = tool({
     const response = await fetch(`https://example.com/weather/${city}`, {
       signal: options.signal ?? null,
     });
+    // a failure the model can act on is returned; anything unexpected, like a
+    // network error, rejects
+    if (response.status === 404) {
+      return { issues: [{ message: `No city named ${city}` }] };
+    }
     const { temperature }: { temperature: number } = await response.json();
-    return { city, temperature };
+    return { value: { city, temperature } };
   },
 });
 
@@ -128,7 +120,7 @@ await getWeather["~standard"].execute(
   { city: "Paris" },
   { signal: AbortSignal.timeout(10_000) },
 );
-// => { city: "Paris", temperature: 21 }
+// => { value: { city: "Paris", temperature: 21 } }
 
 // A tool that needs something from its caller declares it as its context.
 interface Db {
@@ -144,7 +136,7 @@ const greet = tool({
     { context }: RunOptions<{ db: Db; userId: string }>,
   ) => {
     const user = await context.db.getUser(context.userId);
-    return `Hello ${user.name}, welcome to ${city}`;
+    return { value: `Hello ${user.name}, welcome to ${city}` };
   },
 });
 

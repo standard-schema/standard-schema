@@ -17,7 +17,7 @@ The goal is to make it easier for frameworks to accept user-defined tools, witho
 
 ## The interface
 
-The specification consists of a single TypeScript interface `StandardToolV1` to be implemented by any library wishing to be spec-compliant. It extends `StandardJSONSchemaV1`, so a tool describes its own input and output as JSON Schema. The rest of the family is included below.
+The specification consists of a single TypeScript interface `StandardToolV1` to be implemented by any library wishing to be spec-compliant. A tool describes its input and output with `StandardJSONSchemaV1` schemas, and reports failures with the result of `StandardSchemaV1`. The rest of the family is included below.
 
 This interface can be found below in its entirety. Libraries wishing to implement the spec can copy/paste the code block below into their codebase. It's also available at `@standard-schema/spec` on [npm](https://www.npmjs.com/package/@standard-schema/spec) and [JSR](https://jsr.io/@standard-schema/spec).
 
@@ -222,18 +222,22 @@ export interface StandardToolV1<
 export declare namespace StandardToolV1 {
   /** The Standard Tool properties interface. */
   export interface Props<Input = any, Output = unknown, Context = unknown>
-    extends StandardJSONSchemaV1.Props<Input, Output> {
-    /** The name of the function. Set to "" for anonymous tools. */
+    extends StandardTypedV1.Props<Input, Output> {
+    /** The name of the tool. Set to "" for anonymous tools. */
     readonly name: string;
-    /** A description of the function's functionality. Set to "" for undescribed tools. */
+    /** A description of the tool's functionality. Set to "" for undescribed tools. */
     readonly description: string;
+    /** The schema of the tool's input, whose output is the `Input` that `execute` receives. If it also implements Standard Schema, callers can validate with it. */
+    readonly input: StandardJSONSchemaV1<unknown, Input>;
+    /** The schema of the tool's output, if any, whose input is the `Output` that `execute` returns. If it also implements Standard Schema, callers can validate with it. */
+    readonly output?: StandardJSONSchemaV1<Output, unknown> | undefined;
     /**
-     * Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`. Throws if the tool fails, including when its input is invalid.
+     * Runs the tool. Does not validate: callers must pass input matching `Input`, using a validator if the value isn't already known to match. Returns a failure the caller may act on, or rejects if something unexpected happens.
      */
     readonly execute: (
       input: Input,
       ...options: ExecuteOptions<Context>
-    ) => Output | Promise<Output>;
+    ) => Promise<StandardSchemaV1.Result<Output>>;
     /** Inferred types associated with the tool. */
     readonly types?: Types<Input, Output> | undefined;
   }
@@ -272,9 +276,14 @@ export declare namespace StandardToolV1 {
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
 
-  /** Infers the context type of a Standard Tool. */
-  export type InferContext<Tool extends StandardToolV1<any, any, never>> =
-    Tool extends StandardToolV1<any, any, infer Context> ? Context : never;
+  /** Infers the context type of a Standard Tool. For a union of tools, infers the context needed to run all of them. */
+  export type InferContext<Tool extends StandardToolV1<any, any, never>> = (
+    Tool extends StandardToolV1<any, any, infer Context>
+      ? (context: Context) => void
+      : never
+  ) extends (context: infer Context) => void
+    ? Context
+    : never;
 }
 ```
 
@@ -283,6 +292,8 @@ export declare namespace StandardToolV1 {
 The specification meets a few primary design objectives:
 
 - **Support tool calling.** Given a Standard Tool, you should be able to describe it to a model with its name, description and input JSON Schema, and run it with the arguments the model produces.
+- **Compose with validation.** `execute` doesn't validate. Validation already has a standard, so a framework that needs it accepts schemas that also implement Standard Schema and validates with them.
+- **Failures the caller can act on.** A tool returns failures it wants its caller to see, with the same result as Standard Schema, and rejects for anything unexpected.
 - **Support cancellation.** Callers can pass an `AbortSignal` to `execute`, so a tool can stop its work early once its result is no longer needed.
 - **Support caller context.** A tool can declare a `Context` it needs from its caller, like a database client or the current user, and callers pass it to `execute`. A tool needing a context its caller does not provide is a type error, not a crash at runtime.
 - **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" a tool's input and output types, so they can be extracted and used by frameworks.
@@ -310,7 +321,65 @@ These are the most frequently asked questions about Standard Tool. Questions tha
 
 ### Who validates a tool's input?
 
-The tool. Callers pass the model's arguments to `execute` as-is, and those arguments are expected to match `jsonSchema.input` but may not. A tool built from a schema library should validate its input with that schema before running, and throw if it is invalid. Callers can then report the error back to the model so it can correct its arguments.
+Its caller, where that's needed. `execute` doesn't validate, so callers must pass input matching `Input`, using a validator if the value isn't already known to match. Arguments from a model aren't known to match, so a framework that takes them accepts tools whose `input` also implements Standard Schema, documents that, and validates before running the tool:
+
+```ts
+import type { StandardSchemaV1, StandardToolV1 } from "@standard-schema/spec";
+
+type ValidatedTool<Input, Output> = StandardToolV1<Input, Output> & {
+  readonly "~standard": { readonly input: StandardSchemaV1<unknown, Input> };
+};
+
+async function runTool<Input, Output>(
+  tool: ValidatedTool<Input, Output>,
+  args: unknown,
+) {
+  const { input, execute } = tool["~standard"];
+  const result = await input["~standard"].validate(args);
+  // the tool didn't run, so report the issues and let the model try again
+  if (result.issues) return result;
+  return execute(result.value);
+}
+```
+
+Schemas that implement both specs, like the ones Zod and ArkType produce, need no extra work from the person defining the tool.
+
+### What about validating a tool's output?
+
+Output comes from the tool's own code, so most tools don't need a framework to check it. A tool can validate inside `execute`, or a framework can accept an `output` that also implements Standard Schema and validate the same way it validates `input`.
+
+### Why do `input` and `output` have their own schemas?
+
+So each can validate separately. A tool can't be a single validator for both its input and its output, since a validator only has one `validate` and one set of inferred types.
+
+`input` is required because a tool whose input can't be described can't be offered to a model, and it would have no use over a plain function. A tool with no arguments uses an empty object schema. `output` is optional because a model doesn't need it to call the tool.
+
+### What are the `Input` and `Output` of a tool?
+
+The types `execute` takes and returns, which is also what `InferInput` and `InferOutput` give. These can differ from what a framework sends and receives if a schema transforms its value. To describe the tool to a model or to infer those outer types, read the schemas:
+
+```
+model arguments -> input schema -> Input -> execute -> Output -> output schema -> caller
+```
+
+Describe a tool's arguments with `input["~standard"].jsonSchema.input(options)` and its result with `output["~standard"].jsonSchema.output(options)`.
+
+### When should a tool return a failure instead of throwing?
+
+A returned failure is part of the tool's contract: it is something the tool chose to tell its caller, like a declined payment, so it is safe to show to a model. A thrown error or rejection is unexpected, like a bug or a network outage, and may contain internal details. It's up to the framework whether to show those to a model, and it shouldn't by default.
+
+```ts
+async function execute(input: { amount: number }) {
+  try {
+    return { value: await charge(input) };
+  } catch (error) {
+    if (error instanceof CardDeclined) {
+      return { issues: [{ message: "The payment was declined" }] };
+    }
+    throw error;
+  }
+}
+```
 
 ### What if a tool's input isn't an object?
 
@@ -341,22 +410,27 @@ A framework that provides no context types its tools with `undefined`, as in `St
 
 Callers pass their context object as-is, so a tool receives the same object, with the same identity and prototype, that its caller holds. The spec's own options, `signal` and `callId`, sit beside `context` rather than inside it, so no key a tool chooses for its context can collide with them.
 
-### What if two tools need different values for the same context key?
+### How do I infer the context needed to run several tools?
 
-A framework with one context shared by every tool can't provide both, since `{ user: User }` and `{ user: string }` combine to an impossible type. A framework that keys contexts by tool name doesn't have this problem. Otherwise, wrap one of the tools so it reads the value from a different key.
-
-### How to only allow synchronous tools?
-
-The `~standard.execute()` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous tools, you can simply throw an error if it returns an instance of `Promise`.
+With `StandardToolV1.InferContext`. For a union of tools, it infers the intersection of the contexts they need, so an agent can require exactly what its tools need:
 
 ```ts
 import type { StandardToolV1 } from "@standard-schema/spec";
 
-function runTool(tool: StandardToolV1, input: unknown) {
-  const output = tool["~standard"].execute(input);
-  if (output instanceof Promise) {
-    throw new TypeError("Tool execution must be synchronous");
-  }
+function defineAgent<
+  const Tools extends ReadonlyArray<StandardToolV1<any, unknown, never>>,
+>(config: {
+  tools: Tools;
+  context: StandardToolV1.InferContext<Tools[number]>;
+}) {
   // ...
 }
 ```
+
+### What if two tools need different values for the same context key?
+
+A framework with one context shared by every tool can't provide both, since `{ user: User }` and `{ user: string }` combine to an impossible type. A framework that keys contexts by tool name doesn't have this problem. Otherwise, wrap one of the tools so it reads the value from a different key.
+
+### Why is `execute` always async?
+
+Tools nearly always do I/O and callers always await them, so a synchronous path would add a case to support with no caller that needs it. A synchronous function becomes a tool with `async (input) => ({ value: fn(input) })`.

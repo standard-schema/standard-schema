@@ -182,18 +182,22 @@ export interface StandardToolV1<
 export declare namespace StandardToolV1 {
   /** The Standard Tool properties interface. */
   export interface Props<Input = any, Output = unknown, Context = unknown>
-    extends StandardJSONSchemaV1.Props<Input, Output> {
-    /** The name of the function. Set to "" for anonymous tools. */
+    extends StandardTypedV1.Props<Input, Output> {
+    /** The name of the tool. Set to "" for anonymous tools. */
     readonly name: string;
-    /** A description of the function's functionality. Set to "" for undescribed tools. */
+    /** A description of the tool's functionality. Set to "" for undescribed tools. */
     readonly description: string;
+    /** The schema of the tool's input, whose output is the `Input` that `execute` receives. If it also implements Standard Schema, callers can validate with it. */
+    readonly input: StandardJSONSchemaV1<unknown, Input>;
+    /** The schema of the tool's output, if any, whose input is the `Output` that `execute` returns. If it also implements Standard Schema, callers can validate with it. */
+    readonly output?: StandardJSONSchemaV1<Output, unknown> | undefined;
     /**
-     * Runs the tool. `input` is expected to match `jsonSchema.input`, and the result to match `jsonSchema.output`. Throws if the tool fails, including when its input is invalid.
+     * Runs the tool. Does not validate: callers must pass input matching `Input`, using a validator if the value isn't already known to match. Returns a failure the caller may act on, or rejects if something unexpected happens.
      */
     readonly execute: (
       input: Input,
       ...options: ExecuteOptions<Context>
-    ) => Output | Promise<Output>;
+    ) => Promise<StandardSchemaV1.Result<Output>>;
     /** Inferred types associated with the tool. */
     readonly types?: Types<Input, Output> | undefined;
   }
@@ -232,7 +236,12 @@ export declare namespace StandardToolV1 {
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
 
-  /** Infers the context type of a Standard Tool. */
-  export type InferContext<Tool extends StandardToolV1<any, any, never>> =
-    Tool extends StandardToolV1<any, any, infer Context> ? Context : never;
+  /** Infers the context type of a Standard Tool. For a union of tools, infers the context needed to run all of them. */
+  export type InferContext<Tool extends StandardToolV1<any, any, never>> = (
+    Tool extends StandardToolV1<any, any, infer Context>
+      ? (context: Context) => void
+      : never
+  ) extends (context: infer Context) => void
+    ? Context
+    : never;
 }
