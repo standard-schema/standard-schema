@@ -109,6 +109,12 @@ export declare namespace StandardSchemaV1 {
     readonly message: string;
     /** The path of the issue, if any. */
     readonly path?: ReadonlyArray<PropertyKey | PathSegment> | undefined;
+    /**
+     * The issues of each alternative of a failed union, if any.
+     *
+     * Only set on an issue for a union that none of its alternatives matched. It holds one array per alternative tried, in the order they were tried, and the `path` of every issue in it starts at the root of the validated input, like the `path` of this issue. Libraries may leave it out, so consumers must not rely on it being present.
+     */
+    readonly unionIssues?: ReadonlyArray<ReadonlyArray<Issue>> | undefined;
   }
 
   /** The path segment interface of the issue. */

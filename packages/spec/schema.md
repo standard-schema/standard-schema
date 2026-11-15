@@ -76,6 +76,12 @@ export declare namespace StandardSchemaV1 {
     readonly message: string;
     /** The path of the issue, if any. */
     readonly path?: ReadonlyArray<PropertyKey | PathSegment> | undefined;
+    /**
+     * The issues of each alternative of a failed union, if any.
+     *
+     * Only set on an issue for a union that none of its alternatives matched. It holds one array per alternative tried, in the order they were tried, and the `path` of every issue in it starts at the root of the validated input, like the `path` of this issue. Libraries may leave it out, so consumers must not rely on it being present.
+     */
+    readonly unionIssues?: ReadonlyArray<ReadonlyArray<Issue>> | undefined;
   }
 
   /** The path segment interface of the issue. */
@@ -103,6 +109,10 @@ export declare namespace StandardSchemaV1 {
   >['output'];
 }
 ```
+
+### Union issues
+
+When a value matches none of the alternatives of a union, a library can report a single issue for the union and attach the issues of every alternative to its `unionIssues`: one array per alternative tried, in the order they were tried. The `path` of each of these issues starts at the root of the validated input, just like the `path` of the union's issue, so it can be used without knowing where the union sits. The property is optional and adding it didn't change the `version` of the spec, so libraries that report the issues of a union in another way, for example directly in `issues`, don't have to set it.
 
 ## Design goals
 
@@ -345,6 +355,23 @@ Unique symbols can also be declared in a "nominal" way that won't collapse. In t
 ![Screenshot showing the prioritization of external symbols in VS Code](https://github.com/standard-schema/standard-schema/assets/3084745/82c47820-90c3-4163-a838-858b987a6bea)
 
 Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike tilde-prefixed string keys.
+
+### How do I get the issues of a failed union?
+
+Some libraries report a failed union as a single issue and attach the issues of each of its alternatives to `unionIssues`. Read them when the union's message isn't enough, for example to show a message next to each form field. Since libraries may leave the property out, always fall back to the issue itself.
+
+```ts
+import type {StandardSchemaV1} from '@standard-schema/spec';
+
+const flattenIssues = (
+  issues: ReadonlyArray<StandardSchemaV1.Issue>
+): StandardSchemaV1.Issue[] =>
+  issues.flatMap((issue) =>
+    issue.unionIssues?.length
+      ? flattenIssues(issue.unionIssues.flat())
+      : [issue]
+  );
+```
 
 ### How to only allow synchronous validation?
 
