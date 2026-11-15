@@ -2,6 +2,10 @@
 
 All notable changes to the library will be documented in this file.
 
+## vX.X.X (Month DD, YYYY)
+
+- Add `getJsonPointer` function to create an [RFC 6901](https://www.rfc-editor.org/rfc/rfc6901) JSON Pointer from the path of an issue
+
 ## v0.3.0 (November 27, 2024)
 
 - Update utils to new Standard Schema spec
