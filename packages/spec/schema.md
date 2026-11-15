@@ -346,6 +346,19 @@ Unique symbols can also be declared in a "nominal" way that won't collapse. In t
 
 Thus, these symbol keys don't get sorted to the bottom of the autocomplete list, unlike tilde-prefixed string keys.
 
+### How do I report where an issue is?
+
+The `path` of an issue lists the keys that lead to the invalid value. The [`@standard-schema/utils`](https://www.npmjs.com/package/@standard-schema/utils) package turns it into a string. Use `getDotPath` to show people where an issue is, for example next to a form field. To pass the location on to other programs, for example as the `pointer` of an `errors` entry in [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457#section-3) problem details, use `getJsonPointer` instead. It returns a [JSON Pointer (RFC 6901)](https://www.rfc-editor.org/rfc/rfc6901), which, unlike a dot path, can tell `{ "note.title": … }` from `{ note: { title: … } }`.
+
+```ts
+import {getDotPath, getJsonPointer} from '@standard-schema/utils';
+
+getDotPath({message: 'Invalid title', path: ['note.title']}); // 'note.title'
+getDotPath({message: 'Invalid title', path: ['note', 'title']}); // 'note.title'
+getJsonPointer({message: 'Invalid title', path: ['note.title']}); // '/note.title'
+getJsonPointer({message: 'Invalid title', path: ['note', 'title']}); // '/note/title'
+```
+
 ### How to only allow synchronous validation?
 
 The `~standard.validate()` function might return a synchronous value _or_ a `Promise`. If you only accept synchronous validation, you can simply throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous validation whenever possible.
