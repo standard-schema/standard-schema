@@ -24,8 +24,9 @@ Many libraries sit on a serialization boundary that has to be crossed in both di
 - Cookies, `localStorage`, and other string-keyed stores
 - Database columns — dates, bigints, and JSON blobs
 - RPC, where the client encodes a request that the server decodes, then decodes a response that the server encoded
+- Messages between workers, processes, and other realms
 
-Standard Schema describes only the read direction. Tools that need the write direction have to hard-code an adapter per schema library, ask the user to define the inverse transform by hand, or reject transforming schemas outright. This spec provides a standardized way to run a transformation in reverse.
+Standard Schema describes only the read direction. Tools that need the write direction have to hard-code an adapter per schema library, ask the user to define the inverse transform by hand, or reject transforming schemas outright. This spec provides a standardized way to run a transformation in both directions.
 
 ## The interface
 
@@ -145,18 +146,23 @@ export interface StandardCodecV1<Input = unknown, Output = Input> {
 export declare namespace StandardCodecV1 {
   /** The Standard Codec properties interface. */
   export interface Props<Input = unknown, Output = Input>
-    extends StandardSchemaV1.Props<Input, Output> {
-    /** Encodes unknown values into the input type. This is the inverse of `validate`. */
+    extends StandardTypedV1.Props<Input, Output> {
+    /** Decodes unknown values into the output type. */
+    readonly decode: (
+      value: unknown,
+      options?: StandardCodecV1.Options | undefined
+    ) => Result<Output> | Promise<Result<Output>>;
+    /** Encodes unknown values into the input type. This is the inverse of `decode`. */
     readonly encode: (
       value: unknown,
       options?: StandardCodecV1.Options | undefined
     ) => Result<Input> | Promise<Result<Input>>;
   }
 
-  /** The result interface of the encode function. */
-  export type Result<Input> = StandardSchemaV1.Result<Input>;
+  /** The result interface of the decode and encode functions. */
+  export type Result<Value> = StandardSchemaV1.Result<Value>;
 
-  /** The options for the encode function. */
+  /** The options for the decode and encode functions. */
   export interface Options extends StandardSchemaV1.Options {}
 
   /** The Standard types interface. */
@@ -178,13 +184,13 @@ export declare namespace StandardCodecV1 {
 The specification meets a few primary design objectives:
 
 - **Support bidirectional transformation.** Given a Standard Codec compatible entity, you should be able to run its transformation in either direction, with errors presented in the same standardized format as Standard Schema.
-- **Build on Standard Schema.** Every Standard Codec is a valid Standard Schema, so it works unmodified with the tools that already accept `StandardSchemaV1`.
+- **Stand alone.** A codec doesn't have to be a schema. A schema library can implement this spec alongside Standard Schema, and a class or plain object can implement it with no schema library at all.
 - **Support static type inference.** For TypeScript libraries that do type inference, the specification provides a standard way for them to "advertise" their inferred type, so it can be extracted and used by external tools.
 - **Minimal.** It should be easy for libraries to implement this spec in a few lines of code that call their existing functions/methods.
 - **Avoid API conflicts.** The entire spec is tucked inside a single object property called `~standard`, which avoids potential naming conflicts with the API surface of existing libraries.
 - **Do no harm to DX.** The `~standard` property is tilde-prefixed to [de-prioritize it in autocompletion](https://x.com/colinhacks/status/1816860780459073933). By contrast, an underscore-prefixed property would show up before properties/methods with alphanumeric names.
 
-## What schema libraries implement the spec?
+## What libraries implement the spec?
 
 These are the libraries that have already implemented the Standard Codec interface. (If you maintain a library that implements the spec, [create a PR](https://github.com/standard-schema/standard-schema/compare) to add yourself!)
 
@@ -210,32 +216,78 @@ These are the most frequently asked questions about Standard Codec. If your ques
 
 ### What's the relationship between this and _Standard Schema_?
 
-Standard Codec _extends_ Standard Schema. Its properties interface inherits `validate`, so anything that implements `StandardCodecV1` also satisfies `StandardSchemaV1` and can be passed to the tools that already accept it.
+Standard Codec is _orthogonal_ to Standard Schema, the same way Standard JSON Schema is. All three share the `StandardTypedV1` base, and any given object can implement one or more of them.
 
-This differs from _Standard JSON Schema_, which is orthogonal to Standard Schema and shares only the `StandardTypedV1` base. JSON Schema conversion has nothing to do with validation, but encoding is defined as the inverse of validation, so the two cannot be separated.
+A schema library that implements both Standard Schema and Standard Codec can point `decode` at the function it already uses for `validate`.
 
-### Which method is the decode direction?
+```ts
+const schema = {
+  '~standard': {
+    version: 1,
+    vendor: 'example-lib',
+    validate: parse,
+    decode: parse, // decoding is validation, for a schema
+    encode: serialize,
+  },
+};
+```
 
-Validation is. A Standard Codec _is_ a Standard Schema, so `~standard.validate()` already accepts the encoded representation and returns the decoded one. There is no separate `decode` method; a second method with the same job would create two sources of truth.
+A consumer that needs both validation and encoding accepts the intersection, `StandardSchemaV1 & StandardCodecV1`.
 
-| Direction | Method     | Signature                   |
-| --------- | ---------- | --------------------------- |
-| Decode    | `validate` | `unknown -> Result<Output>` |
-| Encode    | `encode`   | `unknown -> Result<Input>`  |
+### What do the two methods accept and return?
 
-Both methods accept `unknown`, both return the same `Result` union, and both may return a `Promise`. A codec that receives a value it can't handle returns `issues` rather than throwing, in either direction.
+Both accept `unknown` and return the same `Result` union as Standard Schema's `validate`.
+
+| Direction | Method   | Signature                   |
+| --------- | -------- | --------------------------- |
+| Decode    | `decode` | `unknown -> Result<Output>` |
+| Encode    | `encode` | `unknown -> Result<Input>`  |
+
+Either may return a `Promise`. A codec that receives a value it can't handle returns `issues` rather than throwing, in either direction.
 
 ```ts
 codec['~standard'].encode('not a date');
 // => { issues: [{ message: "Expected a valid Date", path: [] }] }
 ```
 
+### Can a class be its own codec?
+
+Yes. Put the codec on the class as a static `~standard` property. The class then describes both ends of its own serialization, with no schema library involved.
+
+```ts
+class Point {
+  constructor(readonly x: number, readonly y: number) {}
+
+  static readonly '~standard': StandardCodecV1.Props<[number, number], Point> = {
+    version: 1,
+    vendor: 'example-lib',
+    decode(value) {
+      if (!Array.isArray(value) || value.length !== 2 || !value.every((n) => typeof n === 'number')) {
+        return { issues: [{ message: 'Expected a [number, number] tuple', path: [] }] };
+      }
+      return { value: new Point(value[0], value[1]) };
+    },
+    encode(value) {
+      if (!(value instanceof Point)) {
+        return { issues: [{ message: 'Expected a Point', path: [] }] };
+      }
+      return { value: [value.x, value.y] };
+    },
+  };
+}
+
+Point['~standard'].encode(new Point(1, 2)); // => { value: [1, 2] }
+Point['~standard'].decode([1, 2]); // => { value: Point { x: 1, y: 2 } }
+```
+
+A transport that receives an instance, such as a worker or IPC channel, reaches its codec through `instance.constructor['~standard']`.
+
 ### Should a codec round-trip?
 
 Yes, wherever it can. For any value that decodes successfully, encoding the result should reproduce the original input, and vice versa.
 
 ```ts
-const decoded = codec['~standard'].validate(input); // { value: output }
+const decoded = codec['~standard'].decode(input); // { value: output }
 const encoded = codec['~standard'].encode(output); // { value: input }
 ```
 
@@ -243,31 +295,32 @@ This is a semantic expectation, not something the type system enforces. Codecs t
 
 ### Why is this a separate spec instead of adding to `StandardSchemaV1`?
 
-Adding a required method to `StandardSchemaV1` would be a breaking change for every library that implements it today, and encoding isn't universally implementable — a schema built around a one-way transform has no inverse to expose. A separate interface keeps `StandardSchemaV1` stable and lets consumers opt into requiring the reverse direction.
+Adding required methods to `StandardSchemaV1` would be a breaking change for every library that implements it today, and encoding isn't universally implementable — a schema built around a one-way transform has no inverse to expose. A separate interface keeps `StandardSchemaV1` stable, lets consumers opt into requiring both directions, and lets codecs that aren't schemas implement it.
 
 ### Only some of my schemas are encodable. What should I do?
 
-Implement `~standard.encode` on the ones that are. Consumers that need the reverse direction can narrow at runtime:
+Implement `~standard.decode` and `~standard.encode` on the ones that are. Consumers that need both directions can narrow at runtime:
 
 ```ts
-function isCodec(schema: StandardSchemaV1): schema is StandardCodecV1 {
-  return typeof (schema['~standard'] as StandardCodecV1.Props).encode === 'function';
+function isCodec<T extends StandardSchemaV1>(schema: T): schema is T & StandardCodecV1 {
+  const props = schema['~standard'] as Partial<StandardCodecV1.Props>;
+  return typeof props.decode === 'function' && typeof props.encode === 'function';
 }
 ```
 
 ### My schema doesn't transform anything. Is it still a codec?
 
-Yes, and it's the easy case. When the input and output types are identical, encoding and decoding are the same operation, so `~standard.encode` can delegate straight to `~standard.validate`.
+Yes, and it's the easy case. When the input and output types are identical, encoding and decoding are the same operation, so `~standard.decode` and `~standard.encode` can both delegate straight to `~standard.validate`.
 
-### How do issue paths work when encoding?
+### How do issue paths work in a codec?
 
-The same way they work when validating. Each `path` is relative to the value passed to the method that produced the issue — the encoded value for `validate`, the decoded value for `encode`.
+The same way they work in Standard Schema. Each `path` is relative to the value passed to the method that produced the issue — the encoded value for `decode`, the decoded value for `encode`.
 
-### How do I only allow synchronous encoding?
+### How do I only allow synchronous codecs?
 
-The `~standard.encode()` function might return a synchronous value _or_ a `Promise`, exactly like `~standard.validate()`. If you only accept synchronous encoding, throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous encoding whenever possible.
+Both `~standard.decode()` and `~standard.encode()` might return a synchronous value _or_ a `Promise`, exactly like Standard Schema's `~standard.validate()`. If you only accept synchronous codecs, throw an error if the returned value is an instance of `Promise`. Libraries are encouraged to preferentially use synchronous codecs whenever possible.
 
-### I'm a schema library author. How do I implement this spec?
+### I'm a library author. How do I implement this spec?
 
 Refer to the [implementation example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/codec-implement.ts) for a worked example.
 

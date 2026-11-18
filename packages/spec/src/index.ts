@@ -171,18 +171,23 @@ export interface StandardCodecV1<Input = unknown, Output = Input> {
 export declare namespace StandardCodecV1 {
   /** The Standard Codec properties interface. */
   export interface Props<Input = unknown, Output = Input>
-    extends StandardSchemaV1.Props<Input, Output> {
-    /** Encodes unknown values into the input type. This is the inverse of `validate`. */
+    extends StandardTypedV1.Props<Input, Output> {
+    /** Decodes unknown values into the output type. */
+    readonly decode: (
+      value: unknown,
+      options?: StandardCodecV1.Options | undefined,
+    ) => Result<Output> | Promise<Result<Output>>;
+    /** Encodes unknown values into the input type. This is the inverse of `decode`. */
     readonly encode: (
       value: unknown,
       options?: StandardCodecV1.Options | undefined,
     ) => Result<Input> | Promise<Result<Input>>;
   }
 
-  /** The result interface of the encode function. */
-  export type Result<Input> = StandardSchemaV1.Result<Input>;
+  /** The result interface of the decode and encode functions. */
+  export type Result<Value> = StandardSchemaV1.Result<Value>;
 
-  /** The options for the encode function. */
+  /** The options for the decode and encode functions. */
   export interface Options extends StandardSchemaV1.Options {}
 
   /** The Standard types interface. */

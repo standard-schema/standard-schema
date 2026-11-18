@@ -9,7 +9,7 @@ export async function standardDecode<T extends StandardCodecV1>(
   codec: T,
   value: unknown,
 ): Promise<StandardCodecV1.InferOutput<T>> {
-  let result = codec["~standard"].validate(value);
+  let result = codec["~standard"].decode(value);
   if (result instanceof Promise) result = await result;
 
   // if the `issues` field exists, decoding failed
