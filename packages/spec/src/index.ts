@@ -161,3 +161,75 @@ export declare namespace StandardJSONSchemaV1 {
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
 }
+
+/** The Standard Tool interface. */
+export interface StandardToolV1<
+  Input = unknown,
+  Output = unknown,
+  Context = unknown,
+> {
+  /** The Standard Tool properties. */
+  readonly "~standard": StandardToolV1.Props<Input, Output, Context>;
+}
+
+export declare namespace StandardToolV1 {
+  /** The Standard Tool properties interface. */
+  export interface Props<Input = unknown, Output = unknown, Context = unknown>
+    extends StandardTypedV1.Props<Input, Output> {
+    /** The name of the tool, if any. */
+    readonly name?: string | undefined;
+    /** The description of the tool, if any. */
+    readonly description?: string | undefined;
+    /** The schema of the input, if any. Its output is the input of `execute`. */
+    readonly input?: Schema<unknown, Input> | undefined;
+    /** The schema of the output, if any. Its input is the output of `execute`. */
+    readonly output?: Schema<Output, unknown> | undefined;
+    /** Executes the tool with a valid input and returns its output. */
+    readonly execute: (
+      input: Input,
+      options?: StandardToolV1.Options<Context> | undefined,
+    ) => Output | Promise<Output>;
+  }
+
+  /** The schema interface of the input and output. */
+  export type Schema<Input = unknown, Output = Input> = StandardSchemaV1<
+    Input,
+    Output
+  > &
+    StandardJSONSchemaV1<Input, Output>;
+
+  /** The options interface of the execute function. */
+  export interface Options<Context = unknown> {
+    /** The signal to abort the execution, if any. */
+    readonly signal?: AbortSignal | undefined;
+    /** The identifier of the call, if any. */
+    readonly callId?: string | undefined;
+    /** The context of the application, if any. */
+    readonly context?: Context | undefined;
+  }
+
+  /** The built-in `AbortSignal` type, or `unknown` if it is not available. */
+  export type AbortSignal = typeof globalThis extends {
+    AbortSignal: { prototype: infer Signal };
+  }
+    ? Signal
+    : unknown;
+
+  /** The Standard Tool types interface. */
+  export interface Types<Input = unknown, Output = unknown>
+    extends StandardTypedV1.Types<Input, Output> {}
+
+  /** Infers the input type of the execute function of a Standard Tool. */
+  export type InferInput<Tool extends StandardTypedV1> =
+    StandardTypedV1.InferInput<Tool>;
+
+  /** Infers the output type of the execute function of a Standard Tool. */
+  export type InferOutput<Tool extends StandardTypedV1> =
+    StandardTypedV1.InferOutput<Tool>;
+
+  /** Infers the context type of a Standard Tool. */
+  export type InferContext<Tool extends StandardTypedV1> =
+    Tool extends StandardToolV1<infer _Input, infer _Output, infer Context>
+      ? Context
+      : unknown;
+}
