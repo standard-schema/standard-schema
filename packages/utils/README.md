@@ -1,6 +1,6 @@
 # Standard Schema Utils
 
-There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information. To simplify both tasks, Standard Schema also ships a utils package that provides a `getDotPath` function and a `SchemaError` class.
+There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information. To simplify both tasks, Standard Schema also ships a utils package that provides a `getDotPath` function and a `SchemaError` class. It also provides a `createStandardToolFactory` and a `createStandardTool` function to create [Standard Tools](https://standardschema.dev/tool).
 
 ```sh
 npm install @standard-schema/utils   # npm
@@ -57,5 +57,76 @@ async function validateInput<TSchema extends StandardSchemaV1>(
     throw new SchemaError(result.issues);
   }
   return result.value;
+}
+```
+
+## Create Standard Tool Factory
+
+AI libraries can use `createStandardToolFactory` to add [Standard Tool](https://standardschema.dev/tool) to the tools returned by their existing tool function. Their API stays the same, their users don't need to install this package, and the tools can be executed by any library that supports the spec.
+
+```ts
+import { createStandardToolFactory } from "@standard-schema/utils";
+
+const createStandardTool = createStandardToolFactory("my-ai-lib");
+
+export function tool(config) {
+  const standardTool = createStandardTool({
+    description: config.description,
+    input: config.inputSchema,
+    // map the options of the spec to the options of your API
+    execute: (input, options) =>
+      config.execute(input, {
+        toolCallId: options.callId ?? "",
+        abortSignal: options.signal,
+        context: options.context,
+      }),
+  });
+  return { ...config, ...standardTool };
+}
+```
+
+The created `~standard` property validates the input before running the tool and its output afterwards. Both schemas must implement Standard Schema and Standard JSON Schema. Invalid input or output is returned as issues with the source `"input"` or `"output"`.
+
+If your library doesn't have its own tool function yet, you can also export the created function directly:
+
+```ts
+export const createStandardTool = createStandardToolFactory("my-ai-lib");
+```
+
+## Create Standard Tool
+
+If your AI library doesn't support Standard Tool yet, use `createStandardTool` to create tools directly. It uses `"standard-schema"` as its vendor, and the types of the tool are inferred from its schemas.
+
+```ts
+import { createStandardTool } from "@standard-schema/utils";
+import { type } from "arktype";
+import { toStandardJsonSchema } from "@valibot/to-json-schema";
+import * as v from "valibot";
+
+const getWeather = createStandardTool({
+  name: "get_weather",
+  description: "Get the current temperature in a city, in degrees Celsius",
+  input: type({ city: "string" }),
+  output: toStandardJsonSchema(
+    v.object({ city: v.string(), temperature: v.number() }),
+  ),
+  async execute({ city }, { signal }) {
+    const response = await fetch(`https://example.com/weather/${city}`, {
+      signal,
+    });
+    const { temperature } = await response.json();
+    return { city, temperature };
+  },
+});
+```
+
+Any library that supports the spec can then execute the tool:
+
+```ts
+const result = await getWeather["~standard"].execute({ city: "Berlin" });
+if (result.issues) {
+  // `result.source` is `"input"` if the tool did not run, or `"output"`
+} else {
+  // the validated output is in `result.value`
 }
 ```

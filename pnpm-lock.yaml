@@ -23,6 +23,9 @@ importers:
       '@standard-schema/spec':
         specifier: workspace:*
         version: link:../spec
+      '@standard-schema/utils':
+        specifier: workspace:*
+        version: link:../utils
       arktype:
         specifier: ^2.0.0
         version: 2.0.0
