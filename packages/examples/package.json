@@ -6,6 +6,7 @@
     "lint": "pnpm biome lint .",
     "format": "pnpm biome format --write .",
     "check": "pnpm biome check .",
+    "typecheck": "tsc -p .",
     "build": "tsup"
   },
   "devDependencies": {
