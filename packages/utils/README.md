@@ -1,6 +1,6 @@
 # Standard Schema Utils
 
-There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information. To simplify both tasks, Standard Schema also ships a utils package that provides a `getDotPath` function and a `SchemaError` class.
+There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information. To simplify both tasks, Standard Schema also ships a utils package that provides a `getDotPath` function and a `SchemaError` class. It also provides a `createStandardFunctionFactory` and a `createStandardFunction` function and a `FunctionFailure` class to create [Standard Functions](https://standardschema.dev/function).
 
 ```sh
 npm install @standard-schema/utils   # npm
@@ -58,4 +58,94 @@ async function validateInput<TSchema extends StandardSchemaV1>(
   }
   return result.value;
 }
+```
+
+## Create Standard Function Factory
+
+Libraries can use `createStandardFunctionFactory` to add [Standard Function](https://standardschema.dev/function) to the functions or tools returned by their existing API. Their API stays the same, their users don't need to install this package, and the functions can be run by any library that supports the spec.
+
+```ts
+import { createStandardFunctionFactory } from "@standard-schema/utils";
+
+const createStandardFunction = createStandardFunctionFactory("my-ai-lib");
+
+export function tool(config) {
+  const standardFunction = createStandardFunction({
+    description: config.description,
+    input: config.inputSchema,
+    // map the options of the spec to the options of your API
+    execute: (input, { signal, callId, context }) =>
+      config.execute(input, {
+        abortSignal: signal,
+        toolCallId: callId,
+        context,
+      }),
+  });
+  return { ...config, ...standardFunction };
+}
+```
+
+The created `~standard` property validates the input before running the function and its output afterwards. Both schemas must implement Standard Schema and Standard JSON Schema. Invalid input or output is returned as issues with the source `"input"` or `"output"`. Without a schema, the input or output can be any value, and its JSON Schema is `{}`.
+
+If your library doesn't have its own function yet, you can also export the created function directly:
+
+```ts
+export const createStandardFunction =
+  createStandardFunctionFactory("my-ai-lib");
+```
+
+## Create Standard Function
+
+If your library doesn't support Standard Function yet, use `createStandardFunction` to create functions directly. It uses `"standard-schema"` as its vendor, and the types of the function are inferred from its schemas.
+
+```ts
+import { createStandardFunction } from "@standard-schema/utils";
+import { type } from "arktype";
+import { toStandardJsonSchema } from "@valibot/to-json-schema";
+import * as v from "valibot";
+
+const getWeather = createStandardFunction({
+  name: "get_weather",
+  description: "Get the current temperature in a city, in degrees Celsius",
+  input: type({ city: "string" }),
+  output: toStandardJsonSchema(
+    v.object({ city: v.string(), temperature: v.number() }),
+  ),
+  async execute(
+    { city },
+    {
+      signal,
+      context,
+    }: { signal?: AbortSignal; context: { apiKey: string } },
+  ) {
+    const response = await fetch(`https://example.com/weather/${city}`, {
+      headers: { authorization: context.apiKey },
+      signal,
+    });
+    const { temperature } = await response.json();
+    return { city, temperature };
+  },
+});
+```
+
+## Function Failure
+
+To report a failure its caller may act on, like a model correcting its input, a function created with `createStandardFunction` throws a `FunctionFailure`. It is returned as an issue with the source `"execution"`. Its message is shown to the caller, so it must not contain internal details. Any other error is thrown as-is.
+
+```ts
+import { createStandardFunction, FunctionFailure } from "@standard-schema/utils";
+import { type } from "arktype";
+
+const chargeCard = createStandardFunction({
+  name: "charge_card",
+  description: "Charge the current user's card",
+  input: type({ amount: "number" }),
+  async execute({ amount }, { context }: { context: { payments: Payments } }) {
+    const charge = await context.payments.charge(amount);
+    if (charge.declined) {
+      throw new FunctionFailure("The payment was declined");
+    }
+    return { id: charge.id };
+  },
+});
 ```
