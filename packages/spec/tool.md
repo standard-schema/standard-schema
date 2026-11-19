@@ -113,6 +113,8 @@ export declare namespace StandardSchemaV1 {
   export interface FailureResult {
     /** The issues of failed validation. */
     readonly issues: ReadonlyArray<Issue>;
+    /** A human-readable summary of the failure, if the library provides one. When present, prefer it over a message built from `issues`. */
+    readonly message?: string | undefined;
   }
 
   /** The issue interface of the failure output. */
@@ -459,7 +461,7 @@ So a library that adopts the spec can't drop them by accident, and frameworks al
 
 ### Why does `execute` return a result instead of its output?
 
-So a framework can tell a failure the tool means its caller to see, like a declined payment, from an unexpected error that may contain internal details, without knowing anything about the tool. If tools only threw, a framework couldn't recognize another library's error classes, so it would have to show a model every error or none. If a failure were part of `Output`, a framework couldn't tell it from success. The result is Standard Schema's, so a framework reports a tool's failures the same way it reports invalid input.
+So a framework can tell a failure the tool means its caller to see, like a declined payment, from an unexpected error that may contain internal details, without knowing anything about the tool. If tools only threw, a framework couldn't recognize another library's error classes, so it would have to show a model every error or none. If a failure were part of `Output`, a framework couldn't tell it from success. The result is Standard Schema's, so a framework reports a tool's failures the same way it reports invalid input, preferring its `message` summary when present.
 
 The cost is that code calling a tool directly checks `issues` and reads `value`, as it does after `validate`. Resolving to the output itself, with a failure marked by a reserved key, would save that step, but the output would have to be an object that never uses the key, and TypeScript adds the key to an output returned beside a failure, so every library would need a type to remove it.
 

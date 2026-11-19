@@ -60,16 +60,20 @@ export function describeTools(
   });
 }
 
-// What the model reads for a failure: each issue's message, after its path.
+// What the model reads for a failure: the library's own summary if it has
+// one, otherwise each issue's message after its path.
 function failureContent(failure: StandardSchemaV1.FailureResult): string {
-  return failure.issues
-    .map(({ message, path }) => {
-      const keys = path?.map((segment) =>
-        String(typeof segment === "object" ? segment.key : segment),
-      );
-      return keys?.length ? `${keys.join(".")}: ${message}` : message;
-    })
-    .join("\n");
+  return (
+    failure.message ??
+    failure.issues
+      .map(({ message, path }) => {
+        const keys = path?.map((segment) =>
+          String(typeof segment === "object" ? segment.key : segment),
+        );
+        return keys?.length ? `${keys.join(".")}: ${message}` : message;
+      })
+      .join("\n")
+  );
 }
 
 // Run the tool the model called, and report the outcome back to it. A

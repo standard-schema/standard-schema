@@ -68,6 +68,8 @@ export declare namespace StandardSchemaV1 {
   export interface FailureResult {
     /** The issues of failed validation. */
     readonly issues: ReadonlyArray<Issue>;
+    /** A human-readable summary of the failure, if the library provides one. When present, prefer it over a message built from `issues`. */
+    readonly message?: string | undefined;
   }
 
   /** The issue interface of the failure output. */
@@ -361,3 +363,7 @@ function validateInput(schema: StandardSchemaV1, data: unknown) {
   // ...
 }
 ```
+
+### How do I get a single error message from a failed validation?
+
+Use the failure's `message` when it's present, since a library's own summary usually reads better than one assembled from `issues`. Otherwise, join the issues' messages, prefixing each with its path from `getDotPath` in [`@standard-schema/utils`](https://github.com/standard-schema/standard-schema/tree/main/packages/utils) when it has one.

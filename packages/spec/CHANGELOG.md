@@ -5,6 +5,7 @@ All notable changes to the library will be documented in this file.
 ## Unreleased
 
 - Add Standard Tool (`StandardToolV1`), for tools that describe themselves with Standard JSON Schema and can be called by AI models
+- Add optional `message` to `StandardSchemaV1.FailureResult`, a human-readable summary of the failure
 
 ## v1.1.0 (December 15, 2025)
 

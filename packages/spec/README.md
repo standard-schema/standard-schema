@@ -101,6 +101,8 @@ export declare namespace StandardSchemaV1 {
   export interface FailureResult {
     /** The issues of failed validation. */
     readonly issues: ReadonlyArray<Issue>;
+    /** A human-readable summary of the failure, if the library provides one. When present, prefer it over a message built from `issues`. */
+    readonly message?: string | undefined;
   }
 
   /** The issue interface of the failure output. */
