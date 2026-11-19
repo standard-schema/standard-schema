@@ -77,7 +77,7 @@ export declare namespace StandardSchemaV1 {
     /** Validates unknown input values. */
     readonly validate: (
       value: unknown,
-      options?: StandardSchemaV1.Options | undefined
+      options?: StandardSchemaV1.Options | undefined,
     ) => Result<Output> | Promise<Result<Output>>;
   }
 
@@ -152,11 +152,11 @@ export declare namespace StandardJSONSchemaV1 {
   export interface Converter {
     /** Converts the input type to JSON Schema. May throw if conversion is not supported. */
     readonly input: (
-      options: StandardJSONSchemaV1.Options
+      options: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
     /** Converts the output type to JSON Schema. May throw if conversion is not supported. */
     readonly output: (
-      options: StandardJSONSchemaV1.Options
+      options: StandardJSONSchemaV1.Options,
     ) => Record<string, unknown>;
   }
 
@@ -171,7 +171,7 @@ export declare namespace StandardJSONSchemaV1 {
     | "draft-2020-12"
     | "draft-07"
     | "openapi-3.0"
-    // Accepts any string for future targets while preserving autocomplete
+    // Accepts any string: allows future targets while preserving autocomplete
     | ({} & string);
 
   /** The options for the input/output methods. */
