@@ -1,6 +1,6 @@
 # Standard Schema Utils
 
-There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information. To simplify both tasks, Standard Schema also ships a utils package that provides a `getDotPath` function and a `SchemaError` class.
+There are two common tasks that third-party libraries perform after validation fails. The first is to flatten the issues by creating a dot path to more easily associate the issues with the input data. This is commonly used in form libraries. The second is to throw an error that contains all the issue information. To simplify both tasks, Standard Schema also ships a utils package that provides `getDotPath` and `getJsonPointer` functions and a `SchemaError` class.
 
 ```sh
 npm install @standard-schema/utils   # npm
@@ -38,6 +38,31 @@ async function getFormErrors(schema: StandardSchemaV1, data: unknown) {
   }
   return { formErrors, fieldErrors };
 }
+```
+
+## Get JSON Pointer
+
+A dot path can't tell a key containing a `.` from nested keys: `getDotPath` returns `note.title` for both `["note.title"]` and `["note", "title"]`. When the path has to leave your process, for example in an API error response, pass the issue to the `getJsonPointer` function instead. It returns a [JSON Pointer (RFC 6901)](https://www.rfc-editor.org/rfc/rfc6901), with `~` escaped as `~0` and `/` as `~1`, or `""`, the whole value, if the issue does not contain a path. If the path contains a key that is not of type `string` or `number`, the function returns `null`.
+
+| `path`              | `getDotPath` | `getJsonPointer` |
+| ------------------- | ------------ | ---------------- |
+| `["note.title"]`    | `note.title` | `/note.title`    |
+| `["note", "title"]` | `note.title` | `/note/title`    |
+| `["note/title"]`    | `note/title` | `/note~1title`   |
+| `["tags", 0]`       | `tags.0`     | `/tags/0`        |
+| `[]`                | `null`       | `""`             |
+
+```ts
+import type { StandardSchemaV1 } from "@standard-schema/spec";
+import { getJsonPointer } from "@standard-schema/utils";
+
+const getProblemErrors = async (schema: StandardSchemaV1, data: unknown) => {
+  const result = await schema["~standard"].validate(data);
+  return (result.issues ?? []).map((issue) => ({
+    detail: issue.message,
+    pointer: getJsonPointer(issue),
+  }));
+};
 ```
 
 ## Schema Error
