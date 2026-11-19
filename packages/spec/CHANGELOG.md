@@ -5,6 +5,7 @@ All notable changes to the library will be documented in this file.
 ## Unreleased
 
 - Add Standard Tool (`StandardToolV1`), for tools that describe themselves with Standard JSON Schema and can be called by AI models
+- Add optional `meta` to `StandardTypedV1`, for metadata the vendor associates with an entity
 
 ## v1.1.0 (December 15, 2025)
 

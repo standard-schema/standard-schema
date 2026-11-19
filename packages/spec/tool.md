@@ -49,6 +49,8 @@ export declare namespace StandardTypedV1 {
     readonly version: 1;
     /** The name of the library that implements this interface. */
     readonly vendor: string;
+    /** Arbitrary metadata the vendor associates with this entity, such as a title or examples. Not interpreted by the spec. */
+    readonly meta?: Record<string, unknown> | undefined;
     /** Inferred types associated with this entity. */
     readonly types?: Types<Input, Output> | undefined;
   }
@@ -456,6 +458,10 @@ A tool's input can be any type, like a string or an array, but model providers a
 ### Why are `name` and `description` required?
 
 So a library that adopts the spec can't drop them by accident, and frameworks always read a string, never `undefined`. A tool without one sets it to `""`. Many libraries name tools by the key they're registered under, so a framework whose model provider requires a name can fall back to that key with `name || key`, as the [integration example](https://github.com/standard-schema/standard-schema/blob/main/packages/examples/tool-integrate.ts) does.
+
+### Where do a tool's title or annotations go?
+
+In `meta`, which every spec inherits from Standard Typed, so a tool's `input` and `output` schemas have it too. The spec doesn't define its keys, so a framework that reads a title or MCP annotations from `meta` documents the keys it reads.
 
 ### Why does `execute` return a result instead of its output?
 

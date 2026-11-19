@@ -11,6 +11,8 @@ export declare namespace StandardTypedV1 {
     readonly version: 1;
     /** The name of the library that implements this interface. */
     readonly vendor: string;
+    /** Arbitrary metadata the vendor associates with this entity, such as a title or examples. Not interpreted by the spec. */
+    readonly meta?: Record<string, unknown> | undefined;
     /** Inferred types associated with this entity. */
     readonly types?: Types<Input, Output> | undefined;
   }
