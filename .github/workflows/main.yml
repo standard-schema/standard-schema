@@ -58,3 +58,27 @@ jobs:
       - name: Run Vitest
         run: pnpm test
         working-directory: packages/utils
+
+  examples_tsc:
+    name: Run tsc in /examples
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          registry-url: 'https://registry.npmjs.org'
+          cache: pnpm
+      - name: Install dependencies
+        shell: bash
+        run: pnpm install
+      - name: Run tsc
+        run: pnpm typecheck
+        working-directory: packages/examples
