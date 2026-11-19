@@ -9,17 +9,17 @@ export declare namespace StandardTypedV1 {
   export interface Props<Input = unknown, Output = Input> {
     /** The version number of the standard. */
     readonly version: 1;
-    /** The vendor name of the schema library. */
+    /** The name of the library that implements this interface. */
     readonly vendor: string;
-    /** Inferred types associated with the schema. */
+    /** Inferred types associated with this entity. */
     readonly types?: Types<Input, Output> | undefined;
   }
 
   /** The Standard Typed types interface. */
   export interface Types<Input = unknown, Output = Input> {
-    /** The input type of the schema. */
+    /** The input type of this entity. */
     readonly input: Input;
-    /** The output type of the schema. */
+    /** The output type of this entity. */
     readonly output: Output;
   }
 
@@ -160,4 +160,99 @@ export declare namespace StandardJSONSchemaV1 {
   /** Infers the output type of a Standard. */
   export type InferOutput<Schema extends StandardTypedV1> =
     StandardTypedV1.InferOutput<Schema>;
+}
+
+/** The Standard Tool interface. */
+export interface StandardToolV1<
+  Input = any,
+  Output = unknown,
+  Context = unknown,
+> {
+  /** The Standard Tool properties. */
+  readonly "~standard": StandardToolV1.Props<Input, Output, Context>;
+}
+
+export declare namespace StandardToolV1 {
+  /** The Standard Tool properties interface. */
+  export interface Props<Input = any, Output = unknown, Context = unknown>
+    extends StandardTypedV1.Props<Input, Output> {
+    /** The name of the tool. Set to "" if it has none. */
+    readonly name: string;
+    /** A description of what the tool does. Set to "" if it has none. */
+    readonly description: string;
+    /** The schema of the tool's input, whose output type is the `Input` that `execute` takes. If it also implements Standard Schema, callers can validate with it. */
+    readonly input: StandardJSONSchemaV1<unknown, Input>;
+    /** The schema of the tool's output, if any, whose input type is the `Output` that `execute` resolves to. If it also implements Standard Schema, callers can validate with it. */
+    readonly output?: StandardJSONSchemaV1<Output, unknown> | undefined;
+    /**
+     * Runs the tool. Does not validate: the caller must pass an input matching `Input`, like the `value` returned by the `input` schema's `validate`.
+     *
+     * Resolves to the output, or to a failure the tool chose to report, which is safe to show a model. Rejects if something unexpected happens, and the error may contain internal details.
+     */
+    readonly execute: (
+      input: Input,
+      ...options: ExecuteOptions<Context>
+    ) => Promise<StandardSchemaV1.Result<Output>>;
+  }
+
+  /** The type of a tool's `execute` function. */
+  export type ExecuteFunction<
+    Input = any,
+    Output = unknown,
+    Context = unknown,
+  > = Props<Input, Output, Context>["execute"];
+
+  /** A Standard Tool whose `input` also implements Standard Schema, so a caller can validate input with it before calling `execute`. */
+  export type Validatable<
+    Input = any,
+    Output = unknown,
+    Context = unknown,
+  > = StandardToolV1<Input, Output, Context> & {
+    readonly "~standard": {
+      readonly input: StandardSchemaV1<unknown, Input>;
+    };
+  };
+
+  /** The options callers pass as the second argument of `execute`. */
+  export interface Options<Context = unknown> {
+    /** Aborted when the caller no longer needs the result, so the tool can stop its work early. */
+    readonly signal?: AbortSignal | undefined;
+    /** The identifier of the call, such as the id a model assigned to it. Omitted if the caller has none. */
+    readonly callId?: string | undefined;
+    /** What the tool needs from its caller to run, like a database client or the current user. Callers pass their own object as-is. */
+    readonly context?: Context | undefined;
+  }
+
+  /** The parameters of `execute` after `input`: an options object, required along with its `context` unless `Context` includes `undefined`. */
+  export type ExecuteOptions<Context = unknown> = undefined extends Context
+    ? [options?: Options<Context> | undefined]
+    : [options: Options<Context> & { readonly context: Context }];
+
+  /** The environment's built-in `AbortSignal` type, or `any` if it can't be detected. */
+  export type AbortSignal = typeof globalThis extends {
+    AbortSignal: { prototype: infer Signal };
+  }
+    ? Signal
+    : any;
+
+  /** The Standard Tool types interface. */
+  export interface Types<Input = unknown, Output = unknown>
+    extends StandardTypedV1.Types<Input, Output> {}
+
+  /** Infers the input type of a Standard Tool: what `execute` takes, which is the output type of its `input` schema. */
+  export type InferInput<Tool extends StandardToolV1<any, unknown, never>> =
+    Tool extends StandardToolV1<infer Input, unknown, never> ? Input : never;
+
+  /** Infers the output type of a Standard Tool: what `execute` resolves to, which is the input type of its `output` schema. */
+  export type InferOutput<Tool extends StandardToolV1<any, unknown, never>> =
+    Tool extends StandardToolV1<any, infer Output, never> ? Output : never;
+
+  /** Infers the context type of a Standard Tool. For a union of tools, infers the context needed to run all of them. */
+  export type InferContext<Tool extends StandardToolV1<any, unknown, never>> = (
+    Tool extends StandardToolV1<any, unknown, infer Context>
+      ? (context: Context) => void
+      : never
+  ) extends (context: infer Context) => void
+    ? Context
+    : never;
 }

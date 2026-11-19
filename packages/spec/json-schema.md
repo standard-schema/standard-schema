@@ -48,17 +48,17 @@ export declare namespace StandardTypedV1 {
   export interface Props<Input = unknown, Output = Input> {
     /** The version number of the standard. */
     readonly version: 1;
-    /** The vendor name of the schema library. */
+    /** The name of the library that implements this interface. */
     readonly vendor: string;
-    /** Inferred types associated with the schema. */
+    /** Inferred types associated with this entity. */
     readonly types?: Types<Input, Output> | undefined;
   }
 
   /** The Standard Typed types interface. */
   export interface Types<Input = unknown, Output = Input> {
-    /** The input type of the schema. */
+    /** The input type of this entity. */
     readonly input: Input;
-    /** The output type of the schema. */
+    /** The output type of this entity. */
     readonly output: Output;
   }
 
