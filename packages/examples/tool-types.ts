@@ -128,6 +128,9 @@ type _description = Assert<Equal<StandardToolV1.Props["description"], string>>;
 type _defaults = Assert<
   Equal<StandardToolV1, StandardToolV1<any, unknown, unknown>>
 >;
+type _meta = Assert<
+  Equal<StandardToolV1.Props["meta"], Record<string, unknown> | undefined>
+>;
 
 // The context needed to run a union of tools is the intersection of theirs.
 type _union = Assert<
