@@ -10,7 +10,10 @@ describe("SchemaError", () => {
     const error = new SchemaError(issues);
     expect(error).toBeInstanceOf(SchemaError);
     expect(error.name).toBe("SchemaError");
-    expect(error.message).toBe(issues[0].message);
+    expect(error.message).toMatchInlineSnapshot(`
+      "× Error message 1
+      × Error message 2"
+    `);
     expect(error.issues).toStrictEqual(issues);
   });
 });
