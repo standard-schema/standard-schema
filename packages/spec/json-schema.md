@@ -165,6 +165,7 @@ The answer to this question is a little more nuanced than with regular _Standard
 | [stnl](https://github.com/re-utils/stnl) | v2.1+ | [Commit](https://github.com/re-utils/stnl/commit/3faa7126b15c69e668e242e3bf93ea7fa9c25772) | via `toStandardJSONSchema.v1()` | [#](#stnl) |
 | [VineJS](https://github.com/vinejs/vine) | v4.3.0+ | [PR](https://github.com/vinejs/vine/pull/139) | via `validator['~standard'].jsonSchema.input()`
 | [Sury](https://github.com/DZakh/sury) | v11.0.0-alpha.10+ | [PR](https://github.com/DZakh/sury/pull/267) | via `S.enableStandardJSONSchema()` | [#](#sury) |
+| [Juniper](https://github.com/JacobLey/leyman/tree/main/apps/juniper) | v2.0+ | [Commit](https://github.com/JacobLey/leyman/commit/c9ae8575155be1a9415b6d3b60e46fcebd195c61) | `draft-07` target since v2.5 | [#](#juniper) |
 
 ## Usage
 
@@ -233,6 +234,14 @@ import * as S from 'sury';
 S.enableStandardJSONSchema();
 
 S.string satisfies StandardJSONSchemaV1; // ✅
+```
+
+### Juniper
+
+```ts
+import { stringSchema } from 'juniper';
+
+stringSchema() satisfies StandardJSONSchemaV1; // ✅
 ```
 
 ## What tools / frameworks accept spec-compliant schemas?
